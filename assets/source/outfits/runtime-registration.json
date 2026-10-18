@@ -1,0 +1,3203 @@
+{
+  "schemaVersion": 1,
+  "atlas": "assets/runtime/wardrobe.webp",
+  "atlasSha256": "ef711e132ccbf1216749a8b6c4ae23acc0f9f14ad81272cc8acf05f90b3d4ff1",
+  "atlasSize": [
+    1536,
+    3120
+  ],
+  "cellSize": [
+    192,
+    208
+  ],
+  "columns": 8,
+  "rows": 15,
+  "validCells": 90,
+  "transparentUnusedCells": 30,
+  "alphaValues": [
+    0,
+    255
+  ],
+  "exactLosslessRoundtrip": true,
+  "sourceOperations": [
+    "existing generated pixels only",
+    "binary alpha",
+    "limited-palette nearest-color mapping",
+    "nearest-neighbor uniform scale with integer dimension rounding",
+    "integer translation",
+    "lossless WebP encoding"
+  ],
+  "neutralLandmarks": {
+    "headTopCenter": [
+      96,
+      90
+    ],
+    "rightEyeCenter": [
+      125,
+      107
+    ],
+    "rightArmGrip": [
+      164,
+      124
+    ],
+    "ground": 184
+  },
+  "runtimeRules": [
+    "No idle body y displacement is baked into these cells. Apply actual core head offset once in the renderer.",
+    "Transforms marked follow=head may follow body head offset; ground/trajectory pieces must retain their registered world baseline/trajectory.",
+    "Skateboard rows 1 and 8 hold wheel bottom at y184; bodyOffsetY=-42 puts neutral feet on deck.",
+    "Chef signature row 12 combines hat above y95 and table starting y119; if body moves, crop the headpiece and groundpiece separately so the table stays planted.",
+    "Wizard/hardhat base rows intentionally have no held tool. Signature row9 has light replacement in frames2 and3.",
+    "Only the neutral contact is verified here. Actual moving-body wardrobe attachment, walking, interruption and recovery remain runtime checks."
+  ],
+  "parts": {
+    "headphones": {
+      "source": "assets/source/outfits/extracted/headphones.png",
+      "sourceSha256": "487189f14da617f0ede3598dea40eadf5b0f8c997422088c13997e12254b356d",
+      "sourceSize": [
+        239,
+        133
+      ],
+      "sourceAnchor": [
+        119.5,
+        53
+      ],
+      "requestedScale": 0.55,
+      "actualSize": [
+        131,
+        73
+      ],
+      "actualScale": [
+        0.5481171548117155,
+        0.5488721804511278
+      ],
+      "actualAnchor": [
+        65.5,
+        29.090225563909776
+      ],
+      "palette": [
+        "#0a527d",
+        "#f6f5e9"
+      ]
+    },
+    "skateboard": {
+      "source": "assets/source/outfits/extracted/skateboard.png",
+      "sourceSha256": "14793b53e3ea98f366b2456c5410f60d9004f64a5f6f653bf1bd38489b4fc75b",
+      "sourceSize": [
+        254,
+        85
+      ],
+      "sourceAnchor": [
+        127,
+        16
+      ],
+      "requestedScale": 0.6062992125984252,
+      "actualSize": [
+        154,
+        52
+      ],
+      "actualScale": [
+        0.6062992125984252,
+        0.611764705882353
+      ],
+      "actualAnchor": [
+        77.0,
+        9.788235294117648
+      ],
+      "palette": [
+        "#482139",
+        "#f0c56a",
+        "#30241b"
+      ]
+    },
+    "wizard-hat": {
+      "source": "assets/source/outfits/extracted/wizard-hat.png",
+      "sourceSha256": "f64e447fd460cf36d213f207384100739527dd8ee74733e77e64f6ad9dec6da8",
+      "sourceSize": [
+        243,
+        170
+      ],
+      "sourceAnchor": [
+        121.5,
+        157
+      ],
+      "requestedScale": 0.52,
+      "actualSize": [
+        126,
+        88
+      ],
+      "actualScale": [
+        0.5185185185185185,
+        0.5176470588235295
+      ],
+      "actualAnchor": [
+        63.0,
+        81.27058823529413
+      ],
+      "palette": [
+        "#5345a4",
+        "#242788",
+        "#f7f4de"
+      ]
+    },
+    "wizard-wand": {
+      "source": "assets/source/outfits/extracted/wizard-wand.png",
+      "sourceSha256": "877d6f9e9bf89596a5484996fd5f16ec3ecd4416b02250c6f77e02747b77e975",
+      "sourceSize": [
+        48,
+        125
+      ],
+      "sourceAnchor": [
+        24,
+        114
+      ],
+      "requestedScale": 0.55,
+      "actualSize": [
+        26,
+        69
+      ],
+      "actualScale": [
+        0.5416666666666666,
+        0.552
+      ],
+      "actualAnchor": [
+        13.0,
+        62.928000000000004
+      ],
+      "palette": [
+        "#141413",
+        "#f4d25b",
+        "#faf8e5"
+      ]
+    },
+    "safety-helmet": {
+      "source": "assets/source/outfits/extracted/safety-helmet.png",
+      "sourceSha256": "fe53ecc0c057f84f9299d1fa76105e311ac6b1025a21a4f955f974462f88c7dc",
+      "sourceSize": [
+        193,
+        101
+      ],
+      "sourceAnchor": [
+        96.5,
+        96
+      ],
+      "requestedScale": 0.6,
+      "actualSize": [
+        116,
+        61
+      ],
+      "actualScale": [
+        0.6010362694300518,
+        0.6039603960396039
+      ],
+      "actualAnchor": [
+        58.0,
+        57.980198019801975
+      ],
+      "palette": [
+        "#f4c65c",
+        "#bd903c"
+      ]
+    },
+    "spanner": {
+      "source": "assets/source/outfits/extracted/spanner.png",
+      "sourceSha256": "df3fab03cddcf79d8194b7d19974c748c857c11aebce842de0099077e87d9dd6",
+      "sourceSize": [
+        53,
+        101
+      ],
+      "sourceAnchor": [
+        26.5,
+        87
+      ],
+      "requestedScale": 0.6,
+      "actualSize": [
+        32,
+        61
+      ],
+      "actualScale": [
+        0.6037735849056604,
+        0.6039603960396039
+      ],
+      "actualAnchor": [
+        16.0,
+        52.54455445544554
+      ],
+      "palette": [
+        "#696965",
+        "#3a3a38"
+      ]
+    },
+    "detective-hat": {
+      "source": "assets/source/outfits/extracted/detective-hat.png",
+      "sourceSha256": "211cebaa15c3a87f5a4400e218b20b95931395644995e88f8effb35c493a4ea1",
+      "sourceSize": [
+        191,
+        97
+      ],
+      "sourceAnchor": [
+        95.5,
+        91
+      ],
+      "requestedScale": 0.6,
+      "actualSize": [
+        115,
+        58
+      ],
+      "actualScale": [
+        0.6020942408376964,
+        0.5979381443298969
+      ],
+      "actualAnchor": [
+        57.5,
+        54.41237113402062
+      ],
+      "palette": [
+        "#191813",
+        "#704a19"
+      ]
+    },
+    "monocle": {
+      "source": "assets/source/outfits/extracted/monocle.png",
+      "sourceSha256": "5ad2eb31dfc1179cab0bdc1ff1d8979e74be216ff9681c5b08b72cdbce7671cb",
+      "sourceSize": [
+        74,
+        114
+      ],
+      "sourceAnchor": [
+        27,
+        34
+      ],
+      "requestedScale": 0.48,
+      "actualSize": [
+        36,
+        55
+      ],
+      "actualScale": [
+        0.4864864864864865,
+        0.4824561403508772
+      ],
+      "actualAnchor": [
+        13.135135135135135,
+        16.403508771929825
+      ],
+      "palette": [
+        "#20208e"
+      ]
+    },
+    "chef-hat": {
+      "source": "assets/source/outfits/extracted/chef-hat.png",
+      "sourceSha256": "5df4de61a497ed5523ef8d000f86bfc3d78ea02804d47d6397ef3a52a293f9b7",
+      "sourceSize": [
+        186,
+        128
+      ],
+      "sourceAnchor": [
+        93,
+        123
+      ],
+      "requestedScale": 0.6,
+      "actualSize": [
+        112,
+        77
+      ],
+      "actualScale": [
+        0.6021505376344086,
+        0.6015625
+      ],
+      "actualAnchor": [
+        56.0,
+        73.9921875
+      ],
+      "palette": [
+        "#f9f8eb",
+        "#e4e4da",
+        "#f0f0e5"
+      ]
+    },
+    "cowboy-hat": {
+      "source": "assets/source/outfits/extracted/cowboy-hat.png",
+      "sourceSha256": "e23a514c27b1788434ecf5e887078d7c32d376af71254d301467e94a4b34cd9c",
+      "sourceSize": [
+        267,
+        114
+      ],
+      "sourceAnchor": [
+        133.5,
+        106
+      ],
+      "requestedScale": 0.53,
+      "actualSize": [
+        142,
+        60
+      ],
+      "actualScale": [
+        0.5318352059925093,
+        0.5263157894736842
+      ],
+      "actualAnchor": [
+        71.0,
+        55.78947368421052
+      ],
+      "palette": [
+        "#75470c",
+        "#482c08"
+      ]
+    },
+    "workbench": {
+      "source": "assets/source/outfits/extra-extracted/workbench.png",
+      "sourceSha256": "5b97bdc3d49733ac0f293902ebb41bdcdacb113efb8344bd8859d1a448941245",
+      "sourceSize": [
+        390,
+        218
+      ],
+      "sourceAnchor": [
+        195,
+        218
+      ],
+      "requestedScale": 0.3,
+      "actualSize": [
+        117,
+        65
+      ],
+      "actualScale": [
+        0.3,
+        0.2981651376146789
+      ],
+      "actualAnchor": [
+        58.5,
+        65.0
+      ],
+      "palette": [
+        "#b6b6b0",
+        "#545450",
+        "#f7f5e7"
+      ]
+    },
+    "football": {
+      "source": "assets/source/outfits/extra-extracted/football.png",
+      "sourceSha256": "8065cc76043aee639fbeb26894026d44337c623970ce9d7a44cec385d4079d2c",
+      "sourceSize": [
+        230,
+        230
+      ],
+      "sourceAnchor": [
+        115,
+        115
+      ],
+      "requestedScale": 0.11304347826086956,
+      "actualSize": [
+        26,
+        26
+      ],
+      "actualScale": [
+        0.11304347826086956,
+        0.11304347826086956
+      ],
+      "actualAnchor": [
+        13.0,
+        13.0
+      ],
+      "palette": [
+        "#141413",
+        "#faf9ee"
+      ]
+    },
+    "wand-tip-light": {
+      "source": "assets/source/outfits/extra-extracted/wand-tip-light.png",
+      "sourceSha256": "49bd045dfc9579c953c1ed73b262d078f7075e47aa639eb527668f241436a6ac",
+      "sourceSize": [
+        133,
+        243
+      ],
+      "sourceAnchor": [
+        66.5,
+        224
+      ],
+      "requestedScale": 0.285,
+      "actualSize": [
+        38,
+        69
+      ],
+      "actualScale": [
+        0.2857142857142857,
+        0.2839506172839506
+      ],
+      "actualAnchor": [
+        19.0,
+        63.60493827160494
+      ],
+      "palette": [
+        "#141413",
+        "#f6d877",
+        "#faf5d6"
+      ]
+    }
+  },
+  "rowsDefinition": [
+    {
+      "row": 0,
+      "id": "headphones",
+      "kind": "base",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                30,
+                61
+              ],
+              "bounds": [
+                30,
+                61,
+                161,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                96,
+                89
+              ],
+              "position": [
+                30,
+                60
+              ],
+              "bounds": [
+                30,
+                60,
+                161,
+                133
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                97,
+                90
+              ],
+              "position": [
+                32,
+                61
+              ],
+              "bounds": [
+                32,
+                61,
+                163,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                96,
+                91
+              ],
+              "position": [
+                30,
+                62
+              ],
+              "bounds": [
+                30,
+                62,
+                161,
+                135
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                95,
+                90
+              ],
+              "position": [
+                30,
+                61
+              ],
+              "bounds": [
+                30,
+                61,
+                161,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                30,
+                61
+              ],
+              "bounds": [
+                30,
+                61,
+                161,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 1,
+      "id": "skateboard",
+      "kind": "base",
+      "count": 6,
+      "bodyOffsetY": -42,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "id": "wizard",
+      "kind": "base",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 3,
+      "id": "hardhat",
+      "kind": "base",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 4,
+      "id": "detective",
+      "kind": "base",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                107
+              ],
+              "position": [
+                112,
+                91
+              ],
+              "bounds": [
+                112,
+                91,
+                148,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                107
+              ],
+              "position": [
+                112,
+                91
+              ],
+              "bounds": [
+                112,
+                91,
+                148,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                107
+              ],
+              "position": [
+                112,
+                91
+              ],
+              "bounds": [
+                112,
+                91,
+                148,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                107
+              ],
+              "position": [
+                112,
+                91
+              ],
+              "bounds": [
+                112,
+                91,
+                148,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                107
+              ],
+              "position": [
+                112,
+                91
+              ],
+              "bounds": [
+                112,
+                91,
+                148,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                107
+              ],
+              "position": [
+                112,
+                91
+              ],
+              "bounds": [
+                112,
+                91,
+                148,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 5,
+      "id": "chef",
+      "kind": "base",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 6,
+      "id": "cowboy",
+      "kind": "base",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 7,
+      "id": "headphones",
+      "kind": "signature",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                30,
+                61
+              ],
+              "bounds": [
+                30,
+                61,
+                161,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                94,
+                88
+              ],
+              "position": [
+                28,
+                59
+              ],
+              "bounds": [
+                28,
+                59,
+                159,
+                132
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                93,
+                90
+              ],
+              "position": [
+                28,
+                61
+              ],
+              "bounds": [
+                28,
+                61,
+                159,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                98,
+                92
+              ],
+              "position": [
+                32,
+                63
+              ],
+              "bounds": [
+                32,
+                63,
+                163,
+                136
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                99,
+                90
+              ],
+              "position": [
+                34,
+                61
+              ],
+              "bounds": [
+                34,
+                61,
+                165,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "headphones",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                30,
+                61
+              ],
+              "bounds": [
+                30,
+                61,
+                161,
+                134
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 8,
+      "id": "skateboard",
+      "kind": "signature",
+      "count": 6,
+      "bodyOffsetY": -42,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                94,
+                141.78823529411764
+              ],
+              "position": [
+                17,
+                132
+              ],
+              "bounds": [
+                17,
+                132,
+                171,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                93,
+                141.78823529411764
+              ],
+              "position": [
+                16,
+                132
+              ],
+              "bounds": [
+                16,
+                132,
+                170,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                98,
+                141.78823529411764
+              ],
+              "position": [
+                21,
+                132
+              ],
+              "bounds": [
+                21,
+                132,
+                175,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                99,
+                141.78823529411764
+              ],
+              "position": [
+                22,
+                132
+              ],
+              "bounds": [
+                22,
+                132,
+                176,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "skateboard",
+              "target": [
+                96,
+                141.78823529411764
+              ],
+              "position": [
+                19,
+                132
+              ],
+              "bounds": [
+                19,
+                132,
+                173,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 9,
+      "id": "wizard",
+      "kind": "signature",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "wizard-wand",
+              "target": [
+                164,
+                127
+              ],
+              "position": [
+                151,
+                64
+              ],
+              "bounds": [
+                151,
+                64,
+                177,
+                133
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                95,
+                89
+              ],
+              "position": [
+                32,
+                8
+              ],
+              "bounds": [
+                32,
+                8,
+                158,
+                96
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "wizard-wand",
+              "target": [
+                163,
+                124
+              ],
+              "position": [
+                150,
+                61
+              ],
+              "bounds": [
+                150,
+                61,
+                176,
+                130
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                94,
+                90
+              ],
+              "position": [
+                31,
+                9
+              ],
+              "bounds": [
+                31,
+                9,
+                157,
+                97
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "wand-tip-light",
+              "target": [
+                164,
+                121
+              ],
+              "position": [
+                145,
+                57
+              ],
+              "bounds": [
+                145,
+                57,
+                183,
+                126
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                97,
+                91
+              ],
+              "position": [
+                34,
+                10
+              ],
+              "bounds": [
+                34,
+                10,
+                160,
+                98
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "wand-tip-light",
+              "target": [
+                164,
+                121
+              ],
+              "position": [
+                145,
+                57
+              ],
+              "bounds": [
+                145,
+                57,
+                183,
+                126
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                97,
+                90
+              ],
+              "position": [
+                34,
+                9
+              ],
+              "bounds": [
+                34,
+                9,
+                160,
+                97
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "wizard-wand",
+              "target": [
+                165,
+                124
+              ],
+              "position": [
+                152,
+                61
+              ],
+              "bounds": [
+                152,
+                61,
+                178,
+                130
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "wizard-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                33,
+                9
+              ],
+              "bounds": [
+                33,
+                9,
+                159,
+                97
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "wizard-wand",
+              "target": [
+                164,
+                127
+              ],
+              "position": [
+                151,
+                64
+              ],
+              "bounds": [
+                151,
+                64,
+                177,
+                133
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 10,
+      "id": "hardhat",
+      "kind": "signature",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "spanner",
+              "target": [
+                164,
+                124
+              ],
+              "position": [
+                148,
+                71
+              ],
+              "bounds": [
+                148,
+                71,
+                180,
+                132
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                95,
+                89
+              ],
+              "position": [
+                37,
+                31
+              ],
+              "bounds": [
+                37,
+                31,
+                153,
+                92
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "spanner",
+              "target": [
+                164,
+                121
+              ],
+              "position": [
+                148,
+                68
+              ],
+              "bounds": [
+                148,
+                68,
+                180,
+                129
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                94,
+                90
+              ],
+              "position": [
+                36,
+                32
+              ],
+              "bounds": [
+                36,
+                32,
+                152,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "spanner",
+              "target": [
+                162,
+                124
+              ],
+              "position": [
+                146,
+                71
+              ],
+              "bounds": [
+                146,
+                71,
+                178,
+                132
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                97,
+                91
+              ],
+              "position": [
+                39,
+                33
+              ],
+              "bounds": [
+                39,
+                33,
+                155,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "spanner",
+              "target": [
+                164,
+                127
+              ],
+              "position": [
+                148,
+                74
+              ],
+              "bounds": [
+                148,
+                74,
+                180,
+                135
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                97,
+                90
+              ],
+              "position": [
+                39,
+                32
+              ],
+              "bounds": [
+                39,
+                32,
+                155,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "spanner",
+              "target": [
+                166,
+                124
+              ],
+              "position": [
+                150,
+                71
+              ],
+              "bounds": [
+                150,
+                71,
+                182,
+                132
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "safety-helmet",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                32
+              ],
+              "bounds": [
+                38,
+                32,
+                154,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "spanner",
+              "target": [
+                164,
+                124
+              ],
+              "position": [
+                148,
+                71
+              ],
+              "bounds": [
+                148,
+                71,
+                180,
+                132
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 11,
+      "id": "detective",
+      "kind": "signature",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                124,
+                107
+              ],
+              "position": [
+                111,
+                91
+              ],
+              "bounds": [
+                111,
+                91,
+                147,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                95,
+                89
+              ],
+              "position": [
+                38,
+                35
+              ],
+              "bounds": [
+                38,
+                35,
+                153,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                106
+              ],
+              "position": [
+                112,
+                90
+              ],
+              "bounds": [
+                112,
+                90,
+                148,
+                145
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                94,
+                90
+              ],
+              "position": [
+                36,
+                36
+              ],
+              "bounds": [
+                36,
+                36,
+                151,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                126,
+                106
+              ],
+              "position": [
+                113,
+                90
+              ],
+              "bounds": [
+                113,
+                90,
+                149,
+                145
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                97,
+                91
+              ],
+              "position": [
+                40,
+                37
+              ],
+              "bounds": [
+                40,
+                37,
+                155,
+                95
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                126,
+                107
+              ],
+              "position": [
+                113,
+                91
+              ],
+              "bounds": [
+                113,
+                91,
+                149,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                97,
+                90
+              ],
+              "position": [
+                40,
+                36
+              ],
+              "bounds": [
+                40,
+                36,
+                155,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                125,
+                108
+              ],
+              "position": [
+                112,
+                92
+              ],
+              "bounds": [
+                112,
+                92,
+                148,
+                147
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "detective-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                38,
+                36
+              ],
+              "bounds": [
+                38,
+                36,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "monocle",
+              "target": [
+                124,
+                107
+              ],
+              "position": [
+                111,
+                91
+              ],
+              "bounds": [
+                111,
+                91,
+                147,
+                146
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 12,
+      "id": "chef",
+      "kind": "signature",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "workbench",
+              "target": [
+                96,
+                184
+              ],
+              "position": [
+                38,
+                119
+              ],
+              "bounds": [
+                38,
+                119,
+                155,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                95,
+                89
+              ],
+              "position": [
+                39,
+                15
+              ],
+              "bounds": [
+                39,
+                15,
+                151,
+                92
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "workbench",
+              "target": [
+                96,
+                184
+              ],
+              "position": [
+                38,
+                119
+              ],
+              "bounds": [
+                38,
+                119,
+                155,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                94,
+                90
+              ],
+              "position": [
+                38,
+                16
+              ],
+              "bounds": [
+                38,
+                16,
+                150,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "workbench",
+              "target": [
+                96,
+                184
+              ],
+              "position": [
+                38,
+                119
+              ],
+              "bounds": [
+                38,
+                119,
+                155,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                97,
+                91
+              ],
+              "position": [
+                41,
+                17
+              ],
+              "bounds": [
+                41,
+                17,
+                153,
+                94
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "workbench",
+              "target": [
+                96,
+                184
+              ],
+              "position": [
+                38,
+                119
+              ],
+              "bounds": [
+                38,
+                119,
+                155,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                97,
+                90
+              ],
+              "position": [
+                41,
+                16
+              ],
+              "bounds": [
+                41,
+                16,
+                153,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "workbench",
+              "target": [
+                96,
+                184
+              ],
+              "position": [
+                38,
+                119
+              ],
+              "bounds": [
+                38,
+                119,
+                155,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "chef-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                40,
+                16
+              ],
+              "bounds": [
+                40,
+                16,
+                152,
+                93
+              ],
+              "follow": "head"
+            },
+            {
+              "part": "workbench",
+              "target": [
+                96,
+                184
+              ],
+              "position": [
+                38,
+                119
+              ],
+              "bounds": [
+                38,
+                119,
+                155,
+                184
+              ],
+              "follow": "ground"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 13,
+      "id": "cowboy",
+      "kind": "signature",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                97,
+                92
+              ],
+              "position": [
+                26,
+                36
+              ],
+              "bounds": [
+                26,
+                36,
+                168,
+                96
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                98,
+                94
+              ],
+              "position": [
+                27,
+                38
+              ],
+              "bounds": [
+                27,
+                38,
+                169,
+                98
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                97,
+                93
+              ],
+              "position": [
+                26,
+                37
+              ],
+              "bounds": [
+                26,
+                37,
+                168,
+                97
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                91
+              ],
+              "position": [
+                25,
+                35
+              ],
+              "bounds": [
+                25,
+                35,
+                167,
+                95
+              ],
+              "follow": "head"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "cowboy-hat",
+              "target": [
+                96,
+                90
+              ],
+              "position": [
+                25,
+                34
+              ],
+              "bounds": [
+                25,
+                34,
+                167,
+                94
+              ],
+              "follow": "head"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "row": 14,
+      "id": "football",
+      "kind": "trajectory",
+      "count": 6,
+      "bodyOffsetY": 0,
+      "frames": [
+        {
+          "index": 0,
+          "transforms": [
+            {
+              "part": "football",
+              "target": [
+                170,
+                142
+              ],
+              "position": [
+                157,
+                129
+              ],
+              "bounds": [
+                157,
+                129,
+                183,
+                155
+              ],
+              "follow": "trajectory"
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "transforms": [
+            {
+              "part": "football",
+              "target": [
+                163,
+                120
+              ],
+              "position": [
+                150,
+                107
+              ],
+              "bounds": [
+                150,
+                107,
+                176,
+                133
+              ],
+              "follow": "trajectory"
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "transforms": [
+            {
+              "part": "football",
+              "target": [
+                150,
+                101
+              ],
+              "position": [
+                137,
+                88
+              ],
+              "bounds": [
+                137,
+                88,
+                163,
+                114
+              ],
+              "follow": "trajectory"
+            }
+          ]
+        },
+        {
+          "index": 3,
+          "transforms": [
+            {
+              "part": "football",
+              "target": [
+                138,
+                120
+              ],
+              "position": [
+                125,
+                107
+              ],
+              "bounds": [
+                125,
+                107,
+                151,
+                133
+              ],
+              "follow": "trajectory"
+            }
+          ]
+        },
+        {
+          "index": 4,
+          "transforms": [
+            {
+              "part": "football",
+              "target": [
+                160,
+                146
+              ],
+              "position": [
+                147,
+                133
+              ],
+              "bounds": [
+                147,
+                133,
+                173,
+                159
+              ],
+              "follow": "trajectory"
+            }
+          ]
+        },
+        {
+          "index": 5,
+          "transforms": [
+            {
+              "part": "football",
+              "target": [
+                170,
+                142
+              ],
+              "position": [
+                157,
+                129
+              ],
+              "bounds": [
+                157,
+                129,
+                183,
+                155
+              ],
+              "follow": "trajectory"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "contact": "qa/pet/wardrobe-contact.png",
+  "neutralEyeOcclusion": [],
+  "structuralValidation": "pass",
+  "visualReview": {
+    "status": "pass for neutral overlay contact",
+    "encodedAtlasSha256": "ef711e132ccbf1216749a8b6c4ae23acc0f9f14ad81272cc8acf05f90b3d4ff1",
+    "inspected": [
+      "Complete 15-row contact sheet rendered from exact encoded WebP bytes.",
+      "Native-size crops of all seven base outfits, wizard/hardhat tools, detective, chef workbench and cowboy hat dip.",
+      "Both eyes remain fully unobscured in every neutral comparison, confirmed by zero opaque overlap with approved neutral eye pixels.",
+      "All four underlying legs retain their original topology. The chef workbench intentionally occludes the lower body in its signature scene.",
+      "Wizard hat tip, skateboard wheels and football remain unclipped. Wheel and workbench last pixels are y183 with ground anchor184.",
+      "Headphones, skateboard and hats were flattened to a small stable palette to eliminate generated texture; chef keeps three ivory/gray shades and visible crown folds."
+    ],
+    "limitations": [
+      "This approval covers neutral-body composition only; actual moving-body attachment and interruption/recovery remain runtime checks.",
+      "Runtime must apply body-head following once, skip it for ground/trajectory pieces and split chef headpiece from its fixed workbench."
+    ]
+  }
+}

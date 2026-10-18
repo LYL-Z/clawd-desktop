@@ -1,0 +1,7 @@
+{
+  "id": "clawd",
+  "displayName": "Clawd",
+  "description": "A terracotta pixel companion inspired by the supplied Claude references.",
+  "spriteVersionNumber": 2,
+  "spritesheetPath": "spritesheet.webp"
+}

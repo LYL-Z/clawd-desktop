@@ -1,0 +1,24 @@
+{
+  "generation_mode": "built-in image_gen",
+  "generation_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a14002-206d-7dc2-a2fa-518d598f7ba9\\exec-7b24f4d9-079b-4544-b036-c22aeed73e58.png",
+  "prompt": "prompts/accessory-strip-01.md",
+  "reference_images": ["../pet-run/references/canonical-base.png", "../../../brief/references/03-welcome-clawd.png", "../../../brief/references/01-claude-variants.jpg", "../../../brief/references/02-absolutely-right.jpg", "seven-slot-guide.png"],
+  "expected_groups": 7,
+  "observed_groups": 7,
+  "extracted_pieces": 10,
+  "source_size": [2172, 724],
+  "source_has_true_transparency": true,
+  "source_semantics_pass": true,
+  "source_accepted": true,
+  "final_runtime_accepted": false,
+  "observations": [
+    "Seven clear groups in requested order; headphone, skateboard, wizard, construction, detective, chef and cowboy designs all locate in supplied references.",
+    "No Clawd body, face, text, scenery or guide marks are present, so the approved shared pet identity remains untouched.",
+    "All ten extracted pieces were inspected individually at their native pixel dimensions; all are whole and unclipped.",
+    "Wand has a pale-yellow squared tip with no particles. The spanner is independent from helmet. Monocle includes its generated chain pieces.",
+    "Generated source contained nonbinary alpha and faint boundary residue. Preliminary extraction thresholds alpha at 128 and clears all transparent RGB, preserving the original RGB of visible pixels. Palette quantization is intentionally deferred to the shared final pipeline.",
+    "Each part is a static source overlay; it is not evidence that a complete wardrobe animation set or signature action has been implemented."
+  ],
+  "remaining": ["Final palette normalization", "Final scale and per-part attachment registration", "Overlay contact sheet at normal pet size", "Animation attachment/collision and wardrobe recovery checks"],
+  "source_element_class": "B: user supplied images 01/02; source outfit design only, no independent official status claimed"
+}

@@ -1,0 +1,75 @@
+{
+  "asset": "theatre/chorus-raw.png",
+  "generation_tool": "built-in image_gen",
+  "references": [
+    "assets/source/pet-run/references/canonical-base.png",
+    "brief/references/03-welcome-clawd.png",
+    "brief/references/02-absolutely-right.jpg"
+  ],
+  "dimensions": [
+    2172,
+    724
+  ],
+  "visual_verdict": "approved_source_pending_shared_palette_alpha_cleanup",
+  "review": {
+    "count": "Four whole Clawd companions in one horizontal row, all four short legs and both black square eyes visible in each.",
+    "order": [
+      "camera: black/red body with lens and flash attached to raised right arm",
+      "bulb: gold lightbulb with black filament and pale base attached to raised right arm",
+      "heart: terracotta-red stepped heart attached to raised arm",
+      "bubble: blue bubble with exactly three black square dots attached by tail to arm"
+    ],
+    "style": "Cohesive terracotta flat pixel silhouettes with black poster outlines; no extra scenery or text.",
+    "spacing": "All four groups separated, safe margins, feet on common source baseline y=603; no clipping."
+  },
+  "deterministic_observation": {
+    "large_connected_groups": 4,
+    "group_bboxes": [
+      [
+        70,
+        299,
+        493,
+        603
+      ],
+      [
+        610,
+        213,
+        1023,
+        603
+      ],
+      [
+        1147,
+        270,
+        1569,
+        603
+      ],
+      [
+        1690,
+        236,
+        2135,
+        603
+      ]
+    ],
+    "tiny_non_group_fragment": {
+      "area": 1,
+      "bbox": [
+        371,
+        393,
+        372,
+        394
+      ]
+    },
+    "transparent_background": true,
+    "alpha_extrema": [
+      0,
+      255
+    ],
+    "unique_alpha_values": 256
+  },
+  "required_final_processing": [
+    "Alpha is antialiased and must be thresholded to 0/255 before runtime pixel sprites.",
+    "One 1px disconnected source fragment should be discarded deterministically while extracting the four large groups.",
+    "Quantize slight source texture to the project's approved palette and inspect final normal-size results."
+  ],
+  "final_runtime_verified": false
+}

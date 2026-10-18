@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "canvas": [
+    3840,
+    2160
+  ],
+  "iconSafeZone": [
+    0,
+    0,
+    960,
+    2160
+  ],
+  "font": {
+    "path": "C:/Windows/Fonts/seguibl.ttf",
+    "size": 300,
+    "licenseNote": "Locally installed Windows Segoe UI Black; no font file is copied or redistributed.",
+    "expectedSha256": "bdf29c9b7484c631f19d6ef436a63d15f8a1a82bc856f1a0f6906c41a097d2b1"
+  },
+  "title": {
+    "text": "CLAWD",
+    "xy": [
+      1220,
+      270
+    ]
+  },
+  "palettes": {
+    "light": {
+      "background": "#FAF9F5",
+      "text": "#141413",
+      "dots": "#D4D3CE"
+    },
+    "dark": {
+      "background": "#141413",
+      "text": "#FAF9F5",
+      "dots": "#363635"
+    }
+  },
+  "sources": {
+    "default": {
+      "path": "assets/runtime/core-standard.webp",
+      "row": 0,
+      "column": 3,
+      "expectedSha256": "d2e37687257afed4cf083fbaf9816045e10d509d2ff266bc054f8e0f9042eb78"
+    },
+    "wizardOverlay": {
+      "path": "assets/runtime/wardrobe.webp",
+      "row": 9,
+      "column": 2,
+      "expectedSha256": "ef711e132ccbf1216749a8b6c4ae23acc0f9f14ad81272cc8acf05f90b3d4ff1"
+    },
+    "mark": {
+      "path": "assets/runtime/mark.png",
+      "expectedSha256": "f20be19be758cd814dc751127acc3563053239fe91a5bc0f9e4610ef117311dc"
+    },
+    "chorus": {
+      "path": "assets/runtime/chorus.webp",
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "expectedSha256": "dd446371971df72328fa30c752a0a88a3b5a55a8d22e96f30b4c3b8b2eeaa607"
+    }
+  },
+  "placements": [
+    {
+      "id": "reference-mark",
+      "asset": "mark",
+      "scale": 4,
+      "xy": [
+        1520,
+        580
+      ],
+      "allowOcclusion": true,
+      "maxOccludedFraction": 0.38,
+      "backgroundBlendOpacity": 0.55
+    },
+    {
+      "id": "default-hero",
+      "asset": "default",
+      "scale": 8,
+      "anchor": [
+        2690,
+        1610
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "wizard",
+      "asset": "wizard",
+      "scale": 3,
+      "anchor": [
+        3370,
+        1020
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "camera",
+      "asset": "chorus-0",
+      "scale": 2,
+      "anchor": [
+        1850,
+        1920
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "bulb",
+      "asset": "chorus-1",
+      "scale": 2,
+      "anchor": [
+        2300,
+        1980
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "heart",
+      "asset": "chorus-2",
+      "scale": 2,
+      "anchor": [
+        2770,
+        1940
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "speech",
+      "asset": "chorus-3",
+      "scale": 2,
+      "anchor": [
+        3220,
+        1880
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    }
+  ],
+  "dotField": {
+    "origin": [
+      1450,
+      2010
+    ],
+    "columns": 79,
+    "rows": 3,
+    "spacing": 24,
+    "size": 3
+  },
+  "designNote": "The approved default idle frame 3 is the foreground protagonist at 8× integer scale. The irregular reference mark opens behind it, remaining mostly visible while the protagonist provides a deliberate occlusion. A smaller wizard stays elevated at the right. The four held-prop crabs make a gentle staggered formation rather than an index grid. Project-name typography is subordinate to the protagonist. Both themes share exact geometry and unchanged sprite colours; no new illustrated scene, prop or IP element. The mark alone uses 55% original RGB and 45% theme-paper RGB for separation at the deliberate overlap. Its original alpha and irregular silhouette are unchanged. This is a deterministic compositing derivative, not a new source drawing. All character and prop colours stay exact."
+}

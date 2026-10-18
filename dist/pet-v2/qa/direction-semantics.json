@@ -1,0 +1,709 @@
+{
+  "atlas": "D:\\claude-pet\\dist\\pet-v2\\spritesheet.webp",
+  "atlasSha256": "096fdd396bb9796b4a04c8d024fd939aa68d81d594dbaefcf26e1f56a153cada",
+  "reviewedAt": "2026-10-16T09:18:30.841389+00:00",
+  "reviewer": "root",
+  "reviewInputs": [
+    "qa/direction-labeled.png",
+    "qa/final-contact.png",
+    "look-row-10-resume-01/boundaries-native.png",
+    "exports/previews/codex-v2/look-loop.gif"
+  ],
+  "mechanic": "Two complete black square eyes use natural cartoon face projection, consistent with the approved running-right core; the silhouette stays frontal.",
+  "continuityReview": {
+    "body": "Stable frontal body, arms, four feet and baseline; no head or body clipping.",
+    "alphaHoleWarnings": "Reported rows 159..181 are the three open gaps between four feet, below the solid torso; not interior torso holes.",
+    "localDiffWarnings": "Actual normal-size ordered poses remain in the intended quadrants. Discrete eye steps and weak intermediate angles are retained as warnings, not claimed as uniform angular interpolation.",
+    "boundaries": "157.5->180 and 337.5->000 re-center eyes without body-scale, baseline or identity changes; the sweep remains clockwise."
+  },
+  "directions": [
+    {
+      "label": "000",
+      "expected": "up",
+      "observed": "Centered face looking up; both complete square eyes sit near the top head edge.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(22, 90, 169, 183); left eye center=[71.0, 99.0], right eye center=[125.0, 99.0]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          22,
+          90,
+          169,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              65,
+              93,
+              78,
+              106
+            ],
+            "center": [
+              71.0,
+              99.0
+            ],
+            "pixels": 169
+          },
+          {
+            "bbox": [
+              119,
+              93,
+              132,
+              106
+            ],
+            "center": [
+              125.0,
+              99.0
+            ],
+            "pixels": 169
+          }
+        ]
+      }
+    },
+    {
+      "label": "022.5",
+      "expected": "up-right",
+      "observed": "Eyes rise and shift toward screen-right within the same complete body.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(23, 90, 170, 182); left eye center=[80.0, 101.0], right eye center=[129.04, 100.96]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          23,
+          90,
+          170,
+          182
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              74,
+              95,
+              87,
+              108
+            ],
+            "center": [
+              80.0,
+              101.0
+            ],
+            "pixels": 169
+          },
+          {
+            "bbox": [
+              123,
+              95,
+              137,
+              108
+            ],
+            "center": [
+              129.04,
+              100.96
+            ],
+            "pixels": 170
+          }
+        ]
+      }
+    },
+    {
+      "label": "045",
+      "expected": "up-right",
+      "observed": "Both eyes occupy the upper-right part of the face; orange border remains outside them.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(23, 90, 169, 182); left eye center=[87.5, 101.5], right eye center=[133.0, 101.5]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          23,
+          90,
+          169,
+          182
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              82,
+              95,
+              94,
+              109
+            ],
+            "center": [
+              87.5,
+              101.5
+            ],
+            "pixels": 168
+          },
+          {
+            "bbox": [
+              127,
+              95,
+              140,
+              109
+            ],
+            "center": [
+              133.0,
+              101.5
+            ],
+            "pixels": 182
+          }
+        ]
+      }
+    },
+    {
+      "label": "067.5",
+      "expected": "up-right",
+      "observed": "Upper-right gaze remains visible, with weak distinction from the right cardinal.",
+      "verdict": "warning",
+      "reason": "Native cell bounds=(24, 90, 170, 183); left eye center=[87.3, 105.98], right eye center=[134.0, 106.0]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          24,
+          90,
+          170,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              81,
+              100,
+              95,
+              113
+            ],
+            "center": [
+              87.3,
+              105.98
+            ],
+            "pixels": 163
+          },
+          {
+            "bbox": [
+              128,
+              100,
+              141,
+              113
+            ],
+            "center": [
+              134.0,
+              106.0
+            ],
+            "pixels": 169
+          }
+        ]
+      }
+    },
+    {
+      "label": "090",
+      "expected": "right",
+      "observed": "Both eyes clearly shift screen-right; the outer eye remains fully inside orange; no body turntable.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(23, 90, 169, 183); left eye center=[101.0, 109.0], right eye center=[135.0, 109.5]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          23,
+          90,
+          169,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              95,
+              103,
+              108,
+              116
+            ],
+            "center": [
+              101.0,
+              109.0
+            ],
+            "pixels": 169
+          },
+          {
+            "bbox": [
+              129,
+              103,
+              142,
+              117
+            ],
+            "center": [
+              135.0,
+              109.5
+            ],
+            "pixels": 182
+          }
+        ]
+      }
+    },
+    {
+      "label": "112.5",
+      "expected": "down-right",
+      "observed": "Right gaze lowers slightly; the downward component is subtle at native size.",
+      "verdict": "warning",
+      "reason": "Native cell bounds=(24, 90, 169, 183); left eye center=[90.5, 115.57], right eye center=[134.43, 115.5]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          24,
+          90,
+          169,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              84,
+              109,
+              98,
+              123
+            ],
+            "center": [
+              90.5,
+              115.57
+            ],
+            "pixels": 194
+          },
+          {
+            "bbox": [
+              128,
+              109,
+              142,
+              123
+            ],
+            "center": [
+              134.43,
+              115.5
+            ],
+            "pixels": 194
+          }
+        ]
+      }
+    },
+    {
+      "label": "135",
+      "expected": "down-right",
+      "observed": "The right-shifted eyes are lower on the face, giving a readable down-right gaze.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(24, 90, 170, 182); left eye center=[87.67, 118.53], right eye center=[134.0, 118.5]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          24,
+          90,
+          170,
+          182
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              81,
+              112,
+              95,
+              126
+            ],
+            "center": [
+              87.67,
+              118.53
+            ],
+            "pixels": 191
+          },
+          {
+            "bbox": [
+              128,
+              112,
+              141,
+              126
+            ],
+            "center": [
+              134.0,
+              118.5
+            ],
+            "pixels": 182
+          }
+        ]
+      }
+    },
+    {
+      "label": "157.5",
+      "expected": "down-right",
+      "observed": "Down-right gaze holds near the preceding pose; recentering at the next down frame is a larger eye step.",
+      "verdict": "warning",
+      "reason": "Native cell bounds=(24, 90, 170, 183); left eye center=[89.0, 122.0], right eye center=[132.0, 122.0]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          24,
+          90,
+          170,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              83,
+              116,
+              96,
+              129
+            ],
+            "center": [
+              89.0,
+              122.0
+            ],
+            "pixels": 169
+          },
+          {
+            "bbox": [
+              126,
+              116,
+              139,
+              129
+            ],
+            "center": [
+              132.0,
+              122.0
+            ],
+            "pixels": 169
+          }
+        ]
+      }
+    },
+    {
+      "label": "180",
+      "expected": "down",
+      "observed": "Eyes recenter horizontally and sit lower than neutral, clearly separating down from the high up pose.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(22, 91, 170, 183); left eye center=[76.54, 119.47], right eye center=[114.5, 119.5]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          22,
+          91,
+          170,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              71,
+              114,
+              83,
+              126
+            ],
+            "center": [
+              76.54,
+              119.47
+            ],
+            "pixels": 143
+          },
+          {
+            "bbox": [
+              109,
+              114,
+              121,
+              126
+            ],
+            "center": [
+              114.5,
+              119.5
+            ],
+            "pixels": 144
+          }
+        ]
+      }
+    },
+    {
+      "label": "202.5",
+      "expected": "down-left",
+      "observed": "The lowered pair begins moving screen-left; two separate eyes and all four legs remain visible.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(23, 91, 171, 183); left eye center=[73.32, 117.95], right eye center=[95.5, 119.5]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          23,
+          91,
+          171,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              68,
+              112,
+              80,
+              125
+            ],
+            "center": [
+              73.32,
+              117.95
+            ],
+            "pixels": 151
+          },
+          {
+            "bbox": [
+              90,
+              114,
+              102,
+              126
+            ],
+            "center": [
+              95.5,
+              119.5
+            ],
+            "pixels": 144
+          }
+        ]
+      }
+    },
+    {
+      "label": "225",
+      "expected": "down-left",
+      "observed": "The pair is both left-shifted and lower than the up-left group, reading down-left.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(23, 91, 169, 183); left eye center=[66.04, 116.31], right eye center=[88.49, 119.41]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          23,
+          91,
+          169,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              61,
+              110,
+              72,
+              123
+            ],
+            "center": [
+              66.04,
+              116.31
+            ],
+            "pixels": 136
+          },
+          {
+            "bbox": [
+              83,
+              113,
+              95,
+              126
+            ],
+            "center": [
+              88.49,
+              119.41
+            ],
+            "pixels": 146
+          }
+        ]
+      }
+    },
+    {
+      "label": "247.5",
+      "expected": "down-left",
+      "observed": "Left gaze retains a small downward component; its angle is close to the following left cardinal.",
+      "verdict": "warning",
+      "reason": "Native cell bounds=(23, 91, 169, 183); left eye center=[62.39, 111.03], right eye center=[84.54, 114.96]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          23,
+          91,
+          169,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              57,
+              105,
+              69,
+              118
+            ],
+            "center": [
+              62.39,
+              111.03
+            ],
+            "pixels": 153
+          },
+          {
+            "bbox": [
+              79,
+              109,
+              91,
+              122
+            ],
+            "center": [
+              84.54,
+              114.96
+            ],
+            "pixels": 155
+          }
+        ]
+      }
+    },
+    {
+      "label": "270",
+      "expected": "left",
+      "observed": "Both square eyes clearly cluster screen-left with complete orange margin; the body stays frontal.",
+      "verdict": "pass",
+      "reason": "Native cell bounds=(24, 91, 170, 183); left eye center=[63.0, 111.0], right eye center=[85.5, 114.0]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          24,
+          91,
+          170,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              58,
+              105,
+              69,
+              118
+            ],
+            "center": [
+              63.0,
+              111.0
+            ],
+            "pixels": 143
+          },
+          {
+            "bbox": [
+              80,
+              108,
+              92,
+              121
+            ],
+            "center": [
+              85.5,
+              114.0
+            ],
+            "pixels": 156
+          }
+        ]
+      }
+    },
+    {
+      "label": "292.5",
+      "expected": "up-left",
+      "observed": "The left-shifted pair rises; angular distinction from the subsequent up-left cells is weak.",
+      "verdict": "warning",
+      "reason": "Native cell bounds=(24, 91, 169, 183); left eye center=[66.46, 106.04], right eye center=[93.0, 105.5]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          24,
+          91,
+          169,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              61,
+              100,
+              73,
+              113
+            ],
+            "center": [
+              66.46,
+              106.04
+            ],
+            "pixels": 155
+          },
+          {
+            "bbox": [
+              88,
+              100,
+              99,
+              112
+            ],
+            "center": [
+              93.0,
+              105.5
+            ],
+            "pixels": 132
+          }
+        ]
+      }
+    },
+    {
+      "label": "315",
+      "expected": "up-left",
+      "observed": "Both eyes stay high and left; the final two upper-left poses form a near-plateau.",
+      "verdict": "warning",
+      "reason": "Native cell bounds=(24, 91, 170, 183); left eye center=[66.0, 106.0], right eye center=[94.46, 102.96]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          24,
+          91,
+          170,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              61,
+              100,
+              72,
+              113
+            ],
+            "center": [
+              66.0,
+              106.0
+            ],
+            "pixels": 143
+          },
+          {
+            "bbox": [
+              89,
+              97,
+              101,
+              110
+            ],
+            "center": [
+              94.46,
+              102.96
+            ],
+            "pixels": 155
+          }
+        ]
+      }
+    },
+    {
+      "label": "337.5",
+      "expected": "up-left",
+      "observed": "High-left gaze is preserved; about one native pixel of horizontal variation is not a perceptible reversed sweep. Recentring to up is a larger discrete step.",
+      "verdict": "warning",
+      "reason": "Native cell bounds=(22, 91, 169, 183); left eye center=[64.5, 104.5], right eye center=[92.07, 102.99]; separate complete ink components; four leg gaps remain below the solid torso.",
+      "measuredLandmarks": {
+        "alphaBounds": [
+          22,
+          91,
+          169,
+          183
+        ],
+        "eyes": [
+          {
+            "bbox": [
+              59,
+              99,
+              71,
+              111
+            ],
+            "center": [
+              64.5,
+              104.5
+            ],
+            "pixels": 144
+          },
+          {
+            "bbox": [
+              87,
+              97,
+              99,
+              110
+            ],
+            "center": [
+              92.07,
+              102.99
+            ],
+            "pixels": 143
+          }
+        ]
+      }
+    }
+  ]
+}

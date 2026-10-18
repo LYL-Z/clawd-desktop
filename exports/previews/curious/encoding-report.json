@@ -1,0 +1,16 @@
+{
+  "captureEvidence": {
+    "runId": "motion-sway-2026-10-16T08-51-10-214Z",
+    "inputManifest": "qa/runtime/history/motion-sway-2026-10-16T08-51-10-214Z/inputs.json"
+  },
+  "sourceReport": "qa/runtime/motion-sway.json",
+  "outputs": [
+    {
+      "id": "sway",
+      "frames": 17,
+      "fps": 12,
+      "mp4": "exports/previews/curious/sway.mp4",
+      "decoded": true
+    }
+  ]
+}

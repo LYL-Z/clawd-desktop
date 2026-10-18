@@ -1,0 +1,26 @@
+{
+  "generation_mode": "built-in image_gen",
+  "generation_source": "C:\\Users\\Lenovo\\.codex\\generated_images\\01a14002-206d-7dc2-a2fa-518d598f7ba9\\exec-044d4822-4084-4a14-b480-451988c7d1d1.png",
+  "source": "extra-props-strip.png",
+  "prompt": "prompts/extra-props-strip-01.md",
+  "reference_images": ["../pet-run/references/canonical-base.png", "../../../brief/references/03-welcome-clawd.png", "../../../brief/references/01-claude-variants.jpg", "../../../brief/references/02-absolutely-right.jpg", "three-slot-guide.png"],
+  "source_size": [2170, 725],
+  "expected_groups": 3,
+  "actual_groups": 3,
+  "source_has_true_transparency": true,
+  "source_semantics_pass": true,
+  "source_accepted": true,
+  "runtime_registration_accepted": false,
+  "pieces": [
+    {"id":"workbench","source_element_class":"B, reference 01 row 1 column 3 and chef working scene","observed":"Slim light-gray tabletop with a dark keyboard and short dark-gray supports. Four pale key blocks. Front-facing compact workbench; no monitor, stove, boiler, pot or pet body.","size":[390,218],"candidate_landmarks":{"top_contact_center":[195,45],"feet_baseline_center":[195,217]}},
+    {"id":"football","source_element_class":"B, reference 01 bottom-left football","observed":"One black-and-ivory football, square stepped circular perimeter, square black-and-white pattern. Tight bounds are square and complete.","size":[230,230],"candidate_landmarks":{"center":[115,115],"bottom_contact":[115,229]}},
+    {"id":"wand-tip-light","source_element_class":"C, compact bright state directly derived from reference 02 pale-yellow wand tip","observed":"Small pale-yellow squared cross cap with brighter ivory center directly attached to a short black shaft; no detached sparks, glow cloud or array. It includes the shaft to preserve physical attachment and should replace/overlay the resting wand in the intended action.","size":[133,243],"candidate_landmarks":{"light_center":[66.5,62],"shaft_grip":[66.5,224]}}
+  ],
+  "observations": [
+    "All three individually extracted images were inspected at native size and are complete without clipping, overlap, labels, guide lines, character bodies or unrelated scenery.",
+    "Extraction uses only connected original generated pixels, alpha>=128 and hidden-RGB clearing; it draws nothing and makes no palette or scaling changes.",
+    "Source had partial alpha and subtle fill variation, so shared final pixel quantization remains necessary.",
+    "These are static source assets only; this review does not assert runtime action, attachment, animation, hit-testing or recovery acceptance."
+  ],
+  "remaining": ["Unified palette quantization", "Nearest-neighbor scaling against approved body", "Final attachment registration", "Native-size animation checks"]
+}

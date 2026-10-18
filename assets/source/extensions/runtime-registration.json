@@ -1,0 +1,221 @@
+{
+  "anchor": {
+    "x": 96,
+    "y": 184
+  },
+  "source": "built-in image_gen; actual generated components only",
+  "items": {
+    "rest-strip.png": {
+      "row": 0,
+      "scale": 0.45806451612903226,
+      "sourceBounds": [
+        [
+          46,
+          281,
+          355,
+          457
+        ],
+        [
+          400,
+          288,
+          708,
+          458
+        ],
+        [
+          754,
+          288,
+          1063,
+          458
+        ],
+        [
+          1108,
+          274,
+          1417,
+          458
+        ],
+        [
+          1462,
+          266,
+          1772,
+          458
+        ],
+        [
+          1816,
+          260,
+          2126,
+          457
+        ]
+      ],
+      "framePaths": [
+        "assets\\source\\pet-run\\qa\\extensions-frames\\rest\\00.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\rest\\01.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\rest\\02.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\rest\\03.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\rest\\04.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\rest\\05.png"
+      ],
+      "bounds": [
+        [
+          25,
+          103,
+          167,
+          184
+        ],
+        [
+          26,
+          106,
+          167,
+          184
+        ],
+        [
+          25,
+          106,
+          167,
+          184
+        ],
+        [
+          25,
+          100,
+          167,
+          184
+        ],
+        [
+          25,
+          96,
+          167,
+          184
+        ],
+        [
+          25,
+          93,
+          167,
+          183
+        ]
+      ]
+    },
+    "interaction-strip.png": {
+      "row": 1,
+      "scale": 0.5035460992907801,
+      "sourceBounds": [
+        [
+          87,
+          258,
+          323,
+          458
+        ],
+        [
+          430,
+          258,
+          669,
+          471
+        ],
+        [
+          763,
+          263,
+          1048,
+          466
+        ],
+        [
+          1120,
+          284,
+          1401,
+          479
+        ],
+        [
+          1472,
+          336,
+          1754,
+          480
+        ],
+        [
+          1824,
+          284,
+          2106,
+          480
+        ]
+      ],
+      "framePaths": [
+        "assets\\source\\pet-run\\qa\\extensions-frames\\interaction\\00.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\interaction\\01.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\interaction\\02.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\interaction\\03.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\interaction\\04.png",
+        "assets\\source\\pet-run\\qa\\extensions-frames\\interaction\\05.png"
+      ],
+      "bounds": [
+        [
+          36,
+          73,
+          155,
+          173
+        ],
+        [
+          37,
+          73,
+          156,
+          179
+        ],
+        [
+          24,
+          75,
+          168,
+          176
+        ],
+        [
+          27,
+          85,
+          167,
+          183
+        ],
+        [
+          26,
+          112,
+          167,
+          184
+        ],
+        [
+          26,
+          86,
+          167,
+          183
+        ]
+      ]
+    },
+    "chorus": {
+      "count": 4,
+      "sourceBounds": [
+        [
+          70,
+          299,
+          493,
+          603
+        ],
+        [
+          610,
+          213,
+          1023,
+          603
+        ],
+        [
+          1147,
+          270,
+          1569,
+          603
+        ],
+        [
+          1690,
+          236,
+          2135,
+          603
+        ]
+      ],
+      "scale": 0.31910112359550563,
+      "order": [
+        "camera",
+        "bulb",
+        "heart",
+        "bubble"
+      ]
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "name": "clawd-desktop",
+  "version": "1.0.1",
+  "private": true,
+  "description": "CLAWD — 从欢迎屏走出的传奇，本地 Claude 粉丝桌宠",
+  "author": "Clawd fan project",
+  "license": "UNLICENSED",
+  "main": "app/main.cjs",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "start": "npm run build && electron .",
+    "studio": "npm run build && electron . --studio",
+    "pack": "npm run build && python scripts/make-icon.py && electron-builder --win dir --x64 --publish never",
+    "release": "npm run build && python scripts/make-icon.py && electron-builder --win portable --x64 --publish never"
+  },
+  "build": {
+    "appId": "local.clawd.fan.desktop",
+    "productName": "Clawd",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "app/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ],
+      "icon": "app/icon.ico",
+      "signExecutable": false
+    },
+    "portable": {
+      "artifactName": "Clawd-${version}-windows-x64.exe"
+    },
+    "asar": true,
+    "asarUnpack": [
+      "app/window-probe.exe"
+    ],
+    "extraFiles": [
+      {
+        "from": "docs/Windows使用说明.txt",
+        "to": "使用说明.txt"
+      },
+      {
+        "from": "LICENSE.md",
+        "to": "CLAWD-来源与使用.md"
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "electron": "44.7.2",
+    "electron-builder": "26.15.3",
+    "esbuild": "0.28.2",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2"
+  }
+}

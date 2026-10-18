@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "source": "D:\\claude-pet\\assets\\source\\outfits\\extra-props-strip.png",
+  "source_size": [
+    2170,
+    725
+  ],
+  "operation": "Connected generated pixels only; alpha>=128, hidden RGB zero, no rescale or redrawing",
+  "pieces": [
+    {
+      "id": "workbench",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extra-extracted\\workbench.png",
+      "source_bbox": [
+        445,
+        315,
+        835,
+        533
+      ],
+      "size": [
+        390,
+        218
+      ],
+      "opaque_pixels": 56037
+    },
+    {
+      "id": "football",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extra-extracted\\football.png",
+      "source_bbox": [
+        1070,
+        304,
+        1300,
+        534
+      ],
+      "size": [
+        230,
+        230
+      ],
+      "opaque_pixels": 40376
+    },
+    {
+      "id": "wand-tip-light",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extra-extracted\\wand-tip-light.png",
+      "source_bbox": [
+        1554,
+        290,
+        1687,
+        533
+      ],
+      "size": [
+        133,
+        243
+      ],
+      "opaque_pixels": 16457
+    }
+  ]
+}

@@ -1,0 +1,296 @@
+{
+  "captureEvidence": {
+    "runId": "motion-2026-10-16T13-58-36-040Z",
+    "inputManifest": "qa/runtime/history/motion-2026-10-16T13-58-36-040Z/inputs.json"
+  },
+  "sourceReport": "qa/runtime/motion.json",
+  "outputs": [
+    {
+      "id": "idle",
+      "frames": 14,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/idle.mp4",
+      "decoded": true
+    },
+    {
+      "id": "running-right",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/running-right.mp4",
+      "decoded": true
+    },
+    {
+      "id": "running-left",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/running-left.mp4",
+      "decoded": true
+    },
+    {
+      "id": "waving",
+      "frames": 9,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/waving.mp4",
+      "decoded": true
+    },
+    {
+      "id": "jumping",
+      "frames": 11,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/jumping.mp4",
+      "decoded": true
+    },
+    {
+      "id": "failed",
+      "frames": 15,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/failed.mp4",
+      "decoded": true
+    },
+    {
+      "id": "waiting",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/waiting.mp4",
+      "decoded": true
+    },
+    {
+      "id": "running",
+      "frames": 10,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/running.mp4",
+      "decoded": true
+    },
+    {
+      "id": "review",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/review.mp4",
+      "decoded": true
+    },
+    {
+      "id": "sleep",
+      "frames": 23,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/sleep.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wake",
+      "frames": 8,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wake.mp4",
+      "decoded": true
+    },
+    {
+      "id": "held",
+      "frames": 7,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/held.mp4",
+      "decoded": true
+    },
+    {
+      "id": "thrown",
+      "frames": 5,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/thrown.mp4",
+      "decoded": true
+    },
+    {
+      "id": "landing",
+      "frames": 5,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/landing.mp4",
+      "decoded": true
+    },
+    {
+      "id": "peek-left",
+      "frames": 12,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/peek-left.mp4",
+      "decoded": true
+    },
+    {
+      "id": "peek-right",
+      "frames": 12,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/peek-right.mp4",
+      "decoded": true
+    },
+    {
+      "id": "turn",
+      "frames": 8,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/turn.mp4",
+      "decoded": true
+    },
+    {
+      "id": "sway",
+      "frames": 17,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/sway.mp4",
+      "decoded": true
+    },
+    {
+      "id": "headphone-groove",
+      "frames": 11,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/headphone-groove.mp4",
+      "decoded": true
+    },
+    {
+      "id": "skate",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/skate.mp4",
+      "decoded": true
+    },
+    {
+      "id": "skate-jump",
+      "frames": 11,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/skate-jump.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wizard-charge",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wizard-charge.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wizard-cast",
+      "frames": 9,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wizard-cast.mp4",
+      "decoded": true
+    },
+    {
+      "id": "hardhat-work",
+      "frames": 10,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/hardhat-work.mp4",
+      "decoded": true
+    },
+    {
+      "id": "detective-inspect",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/detective-inspect.mp4",
+      "decoded": true
+    },
+    {
+      "id": "chef-prepare",
+      "frames": 10,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/chef-prepare.mp4",
+      "decoded": true
+    },
+    {
+      "id": "cowboy-tip",
+      "frames": 9,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/cowboy-tip.mp4",
+      "decoded": true
+    },
+    {
+      "id": "football",
+      "frames": 11,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/football.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-none",
+      "frames": 14,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-none.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-headphones",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-headphones.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-skateboard",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-skateboard.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-wizard",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-wizard.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-hardhat",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-hardhat.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-detective",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-detective.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-chef",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-chef.mp4",
+      "decoded": true
+    },
+    {
+      "id": "wardrobe-cowboy",
+      "frames": 13,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/wardrobe-cowboy.mp4",
+      "decoded": true
+    },
+    {
+      "id": "welcome",
+      "frames": 39,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/welcome.mp4",
+      "decoded": true
+    },
+    {
+      "id": "agreement",
+      "frames": 58,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/agreement.mp4",
+      "decoded": true
+    },
+    {
+      "id": "sigil",
+      "frames": 48,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/sigil.mp4",
+      "decoded": true
+    },
+    {
+      "id": "ensemble",
+      "frames": 66,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/ensemble.mp4",
+      "decoded": true
+    },
+    {
+      "id": "look-directions",
+      "frames": 32,
+      "fps": 12,
+      "mp4": "exports/previews/desktop/look-directions.mp4",
+      "decoded": true
+    }
+  ]
+}

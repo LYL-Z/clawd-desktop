@@ -1,0 +1,49 @@
+{
+  "sources": [
+    {
+      "id": "default",
+      "path": "assets/runtime/core-standard.webp",
+      "row": 0,
+      "column": 3,
+      "expectedSha256": "d2e37687257afed4cf083fbaf9816045e10d509d2ff266bc054f8e0f9042eb78",
+      "sha256": "d2e37687257afed4cf083fbaf9816045e10d509d2ff266bc054f8e0f9042eb78",
+      "operation": "exact 192×208 cell crop"
+    },
+    {
+      "id": "wizardOverlay",
+      "path": "assets/runtime/wardrobe.webp",
+      "row": 9,
+      "column": 2,
+      "expectedSha256": "ef711e132ccbf1216749a8b6c4ae23acc0f9f14ad81272cc8acf05f90b3d4ff1",
+      "sha256": "ef711e132ccbf1216749a8b6c4ae23acc0f9f14ad81272cc8acf05f90b3d4ff1",
+      "operation": "exact 192×208 cell crop"
+    },
+    {
+      "id": "mark",
+      "path": "assets/runtime/mark.png",
+      "expectedSha256": "f20be19be758cd814dc751127acc3563053239fe91a5bc0f9e4610ef117311dc",
+      "sha256": "f20be19be758cd814dc751127acc3563053239fe91a5bc0f9e4610ef117311dc",
+      "operation": "unchanged image"
+    },
+    {
+      "id": "chorus",
+      "path": "assets/runtime/chorus.webp",
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "expectedSha256": "dd446371971df72328fa30c752a0a88a3b5a55a8d22e96f30b4c3b8b2eeaa607",
+      "sha256": "dd446371971df72328fa30c752a0a88a3b5a55a8d22e96f30b4c3b8b2eeaa607",
+      "operation": "four exact 192×208 cell crops"
+    }
+  ],
+  "font": {
+    "localPath": "C:\\Windows\\Fonts\\seguibl.ttf",
+    "sha256": "bdf29c9b7484c631f19d6ef436a63d15f8a1a82bc856f1a0f6906c41a097d2b1",
+    "redistributed": false,
+    "note": "Locally installed Windows Segoe UI Black; no font file is copied or redistributed."
+  },
+  "meaning": "Exact source association. These are generated project assets based on the user-provided Claude references; independent source reproduction permission remains unknown."
+}

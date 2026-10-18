@@ -1,0 +1,24 @@
+{
+  "status": "source accessories only; final registration pending",
+  "coordinate_system": "local extracted PNG pixels, x right and y down; candidate attachment landmarks manually inspected, not final runtime positions",
+  "constraints": [
+    "No source image contains a Clawd body; all source pieces are generated, then extracted from their original pixels.",
+    "Preserve aspect ratios and resize with nearest-neighbor only.",
+    "Register against the parent's approved 192x208 core, not against independently fitted per-row previews.",
+    "Wizard hat is tall: choose a uniform local overlay scale that leaves top padding; do not clip its tip or shrink the pet body.",
+    "Ordinary movement should hide held tools. Wand, spanner and monocle can use independent attachment transforms.",
+    "Final runtime palette quantization and visual overlay/playback checks remain required."
+  ],
+  "parts": [
+    {"id":"headphones","attach_to":"head top center","landmark":[119.5,53],"reason":"Arch spans the wide top; earcups descend on both sides. Approximate head-top y follows reference 01 where earcups begin beside the forehead.","preferred_semantic_scale":"earcups flank the torso's top region without covering both eyes"},
+    {"id":"skateboard","attach_to":"feet contact center","landmark":[127,16],"reason":"Center of top deck surface between raised ends; wheels remain below feet.","preferred_semantic_scale":"deck slightly wider than standing body and all four feet remain visible"},
+    {"id":"wizard-hat","attach_to":"head top center","landmark":[121.5,157],"reason":"Center of central underside of stepped brim, excluding the lower side corners.","preferred_semantic_scale":"hat brim overhangs top body, tip remains within local stage"},
+    {"id":"wizard-wand","attach_to":"raised side arm tip","landmark":[24,114],"reason":"Lower black handle grip point; square pale-yellow tip stays above hand.","preferred_semantic_scale":"tip readable but no detached sparks included"},
+    {"id":"safety-helmet","attach_to":"head top center","landmark":[96.5,96],"reason":"Underside of broad helmet brim.","preferred_semantic_scale":"helmet brim overhangs top head by a small amount"},
+    {"id":"spanner","attach_to":"working side arm tip","landmark":[26.5,87],"reason":"Lower handle grip; fork remains upright for work cycle.","preferred_semantic_scale":"short local hand tool, hidden on ordinary walking"},
+    {"id":"detective-hat","attach_to":"head top center","landmark":[95.5,91],"reason":"Underside of flat hat brim.","preferred_semantic_scale":"preserve stepped fedora crown, do not cover eyes"},
+    {"id":"monocle","attach_to":"one square eye center","landmark":[27,34],"reason":"Center of square lens opening; chain descends at its outer side. Source's small transparent breaks remain unfilled.","preferred_semantic_scale":"blue frame surrounds one black eye while the other remains uncovered"},
+    {"id":"chef-hat","attach_to":"head top center","landmark":[93,123],"reason":"Underside of white chef band.","preferred_semantic_scale":"broad band follows top head, puffy crown stays safely inside local stage"},
+    {"id":"cowboy-hat","attach_to":"head top center","landmark":[133.5,106],"reason":"Central underside of low dark-brim silhouette.","preferred_semantic_scale":"wide brim, one hat only, no rope or additional scenery"}
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "canvas": [
+    3840,
+    2160
+  ],
+  "iconSafeZone": [
+    0,
+    0,
+    960,
+    2160
+  ],
+  "font": {
+    "path": "C:/Windows/Fonts/seguibl.ttf",
+    "size": 430,
+    "licenseNote": "Locally installed Windows Segoe UI Black; no font file is copied or redistributed."
+  },
+  "title": {
+    "text": "CLAWD",
+    "xy": [
+      1200,
+      270
+    ]
+  },
+  "palettes": {
+    "light": {
+      "background": "#FAF9F5",
+      "text": "#141413",
+      "dots": "#D4D3CE"
+    },
+    "dark": {
+      "background": "#141413",
+      "text": "#FAF9F5",
+      "dots": "#363635"
+    }
+  },
+  "sources": {
+    "default": {
+      "path": "assets/runtime/core-standard.webp",
+      "row": 0,
+      "column": 3
+    },
+    "wizardOverlay": {
+      "path": "assets/runtime/wardrobe.webp",
+      "row": 9,
+      "column": 2
+    },
+    "mark": {
+      "path": "assets/runtime/mark.png"
+    },
+    "chorus": {
+      "path": "assets/runtime/chorus.webp",
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "placements": [
+    {
+      "id": "reference-mark",
+      "asset": "mark",
+      "scale": 4,
+      "xy": [
+        1140,
+        920
+      ]
+    },
+    {
+      "id": "default-hero",
+      "asset": "default",
+      "scale": 7,
+      "anchor": [
+        2680,
+        1500
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "wizard",
+      "asset": "wizard",
+      "scale": 3,
+      "anchor": [
+        3350,
+        920
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "camera",
+      "asset": "chorus-0",
+      "scale": 2,
+      "anchor": [
+        1980,
+        1970
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "bulb",
+      "asset": "chorus-1",
+      "scale": 2,
+      "anchor": [
+        2380,
+        1970
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "heart",
+      "asset": "chorus-2",
+      "scale": 2,
+      "anchor": [
+        2780,
+        1970
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "speech",
+      "asset": "chorus-3",
+      "scale": 2,
+      "anchor": [
+        3180,
+        1970
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    }
+  ],
+  "dotField": {
+    "origin": [
+      1450,
+      2010
+    ],
+    "columns": 79,
+    "rows": 3,
+    "spacing": 24,
+    "size": 3
+  },
+  "designNote": "Same approved idle frame 3 is used for the default hero and the wizard body, selected from the approved row for its clean open eyes and standing contour. Oversized project-name typography provides scale; the irregular reference mark, elevated wizard and four held-prop crabs remain legible and individually separated. Identical geometry in both themes; character palettes are unchanged. No new illustration or IP elements."
+}

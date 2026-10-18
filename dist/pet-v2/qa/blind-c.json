@@ -1,0 +1,18 @@
+{
+  "pairs": [
+    {"pair":"horizontal-1","A":"screen-right","B":"screen-left","reason":"A的两块黑色眼睛整体偏在橙色头部右半侧，右眼靠近右边沿；B的双眼整体偏左，左眼靠近左边沿。"},
+    {"pair":"horizontal-2","A":"screen-left","B":"screen-right","reason":"A双眼聚在头部左侧，眼睛右侧保留较宽橙色区域；B双眼移到头部右侧，右眼接近右轮廓。"},
+    {"pair":"horizontal-3","A":"screen-right","B":"screen-left","reason":"A眼睛组合的中心位于头部中心右侧，最右眼紧靠右缘；B两眼组合位于头部中心左侧，右侧留白较宽。"},
+    {"pair":"horizontal-4","A":"screen-right","B":"screen-left","reason":"A两眼明显靠向右端，右眼旁橙色余量很窄；B两眼明显聚在左端，左眼旁橙色余量很窄。"},
+    {"pair":"horizontal-5","A":"screen-left","B":"screen-right","reason":"A的两个黑色眼块在头部左半部；B的两个黑色眼块在头部右半部且右眼贴近右侧轮廓。"},
+    {"pair":"horizontal-6","A":"screen-right","B":"screen-left","reason":"A双眼偏右，右眼邻近右边沿；B双眼偏左，左眼邻近左边沿，脸右侧橙色面积更大。"},
+    {"pair":"horizontal-7","A":"screen-left","B":"screen-right","reason":"A双眼聚在头部左侧并略向右下排列；B双眼整体偏在头部右侧，右眼靠近右轮廓。"},
+    {"pair":"vertical-1","A":"up","B":"down","reason":"A双眼紧贴头部上边缘附近，眼下橙色面积明显较大；B双眼位于较低的中部水平，眼上有宽橙色带。"},
+    {"pair":"vertical-2","A":"up","B":"down","reason":"A眼睛沿着头顶下方的窄带排列；B眼睛下降到接近横向手臂高度，头顶至眼睛之间的橙色区域更厚。"},
+    {"pair":"vertical-3","A":"up","B":"down","reason":"A两眼靠近头顶边沿；B两眼位于头部中下位置，明显低于头顶且接近手臂上缘。"},
+    {"pair":"vertical-4","A":"down","B":"up","reason":"A眼线下移到头部中部、贴近横向手臂高度；B眼线更靠上，眼睛与头顶之间只有较窄橙色带。"},
+    {"pair":"vertical-5","A":"up","B":"down","reason":"A双眼靠近头部上沿，右眼还略高；B双眼整体更低，眼上橙色带更宽，接近手臂水平。"},
+    {"pair":"vertical-6","A":"up","B":"down","reason":"A双眼位于头顶附近的高处；B双眼下降到脸中部，右眼略低，顶部留有较宽橙色区域。"},
+    {"pair":"vertical-7","A":"down","B":"up","reason":"A双眼在头部较低处并向右下倾斜，接近手臂高度；B双眼位于更高处，靠近头顶上沿。"}
+  ]
+}

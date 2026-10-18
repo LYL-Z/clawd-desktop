@@ -1,0 +1,88 @@
+{
+  "asset": "extensions/rest-strip.png",
+  "generation_tool": "built-in image_gen",
+  "references": [
+    "assets/source/pet-run/references/canonical-base.png",
+    "brief/references/03-welcome-clawd.png"
+  ],
+  "dimensions": [
+    2172,
+    724
+  ],
+  "visual_verdict": "approved_source_pending_shared_registration_palette_alpha_cleanup",
+  "review": {
+    "count": "Exactly six whole separated poses in one row.",
+    "identity": "Same terracotta outline-free flat body, four clearly separated short legs and two simple internal black eyes; sleeping eye-lines replace squares without new eyebrows, mouth or props.",
+    "pose_order": [
+      "half-closed eyes and lowered body",
+      "both closed thin eye-lines, body lowered",
+      "sleeping closed eye-lines, lowered body held",
+      "only screen-left square eye opens while right remains a closed line",
+      "both eyes open, body rises",
+      "neutral square eyes, fully awake body"
+    ],
+    "semantics": "Frames 0-2 form falling asleep; frames 3-5 form awakening. Feet stay planted with 1 source-pixel antialias baseline variation.",
+    "spacing": "Six connected groups with clean gaps and safe margins, no clipping, no Z letters, detached particles, props, shadow, ground or guide marks."
+  },
+  "deterministic_observation": {
+    "key_rgb": [
+      255,
+      0,
+      255
+    ],
+    "key_threshold": 96,
+    "connected_groups": 6,
+    "group_bboxes": [
+      [
+        46,
+        281,
+        355,
+        457
+      ],
+      [
+        400,
+        288,
+        708,
+        458
+      ],
+      [
+        754,
+        288,
+        1063,
+        458
+      ],
+      [
+        1108,
+        274,
+        1417,
+        458
+      ],
+      [
+        1462,
+        266,
+        1772,
+        458
+      ],
+      [
+        1816,
+        260,
+        2126,
+        457
+      ]
+    ],
+    "group_areas": [
+      36219,
+      35506,
+      35300,
+      38731,
+      40179,
+      41599
+    ]
+  },
+  "required_final_processing": [
+    "Use one shared scale and baseline for all six groups; preserve intentional sleep compression and wake rise.",
+    "Source still shows slight grain; quantize to approved body/eye palette without redrawing silhouette.",
+    "Remove magenta by chroma and apply final binary alpha cleanup; inspect runtime normal-size sleep/wake transitions."
+  ],
+  "final_runtime_verified": false
+}

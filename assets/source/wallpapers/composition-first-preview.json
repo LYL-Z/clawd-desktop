@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 1,
+  "canvas": [
+    3840,
+    2160
+  ],
+  "iconSafeZone": [
+    0,
+    0,
+    960,
+    2160
+  ],
+  "font": {
+    "path": "C:/Windows/Fonts/seguibl.ttf",
+    "size": 148,
+    "licenseNote": "Locally installed Windows Segoe UI Black; no font file is copied or redistributed."
+  },
+  "title": {
+    "text": "Welcome, Claw’d",
+    "xy": [
+      1220,
+      330
+    ]
+  },
+  "palettes": {
+    "light": {
+      "background": "#FAF9F5",
+      "text": "#141413",
+      "dots": "#D4D3CE"
+    },
+    "dark": {
+      "background": "#141413",
+      "text": "#FAF9F5",
+      "dots": "#363635"
+    }
+  },
+  "sources": {
+    "default": {
+      "path": "assets/runtime/core-standard.webp",
+      "row": 0,
+      "column": 0
+    },
+    "wizardOverlay": {
+      "path": "assets/runtime/wardrobe.webp",
+      "row": 9,
+      "column": 2
+    },
+    "mark": {
+      "path": "assets/runtime/mark.png"
+    },
+    "chorus": {
+      "path": "assets/runtime/chorus.webp",
+      "columns": [
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "placements": [
+    {
+      "id": "reference-mark",
+      "asset": "mark",
+      "scale": 3,
+      "xy": [
+        1220,
+        700
+      ]
+    },
+    {
+      "id": "default-hero",
+      "asset": "default",
+      "scale": 7,
+      "anchor": [
+        2520,
+        1430
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "wizard",
+      "asset": "wizard",
+      "scale": 3,
+      "anchor": [
+        3330,
+        890
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "camera",
+      "asset": "chorus-0",
+      "scale": 2,
+      "anchor": [
+        1700,
+        1870
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "bulb",
+      "asset": "chorus-1",
+      "scale": 2,
+      "anchor": [
+        2150,
+        1870
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "heart",
+      "asset": "chorus-2",
+      "scale": 2,
+      "anchor": [
+        2600,
+        1870
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    },
+    {
+      "id": "speech",
+      "asset": "chorus-3",
+      "scale": 2,
+      "anchor": [
+        3050,
+        1870
+      ],
+      "sourceAnchor": [
+        96,
+        184
+      ]
+    }
+  ],
+  "dotField": {
+    "origin": [
+      1300,
+      1924
+    ],
+    "columns": 83,
+    "rows": 5,
+    "spacing": 24,
+    "size": 3
+  },
+  "designNote": "One open-paper stage, a large default Clawd, a smaller raised wizard, the supplied irregular mark, and four held-prop crabs. Identical geometry in both themes. No new character, background illustration, celestial object, building, or generic magic circle."
+}

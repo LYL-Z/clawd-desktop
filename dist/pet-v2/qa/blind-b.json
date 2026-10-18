@@ -1,0 +1,18 @@
+{
+  "pairs": [
+    {"pair":"horizontal-1","A":"screen-right","B":"screen-left","reason":"A 的双眼整体靠近身体右侧，右眼距右边缘很近；B 的双眼聚在身体左半部，右侧留下更宽的橙色区域。"},
+    {"pair":"horizontal-2","A":"screen-left","B":"screen-right","reason":"A 的双眼位于身体左半部，左眼靠近左缘；B 的双眼移到右半部，右眼靠近右缘。"},
+    {"pair":"horizontal-3","A":"screen-right","B":"screen-left","reason":"A 的右眼紧靠身体右缘，双眼中心位于身体中线右侧；B 的双眼偏左，左眼靠近左缘。"},
+    {"pair":"horizontal-4","A":"screen-right","B":"screen-left","reason":"A 的双眼集中在右半部，右眼贴近右侧轮廓；B 的两眼集中在左半部，身体右侧空白明显较多。"},
+    {"pair":"horizontal-5","A":"screen-left","B":"screen-right","reason":"A 的双眼靠左，左眼到左边缘的距离很短；B 的双眼靠右，右眼距右侧轮廓较近。"},
+    {"pair":"horizontal-6","A":"screen-right","B":"screen-left","reason":"A 的双眼中心偏右，右眼靠近右侧边缘；B 的双眼位于左半部，右边保留大片橙色身体。"},
+    {"pair":"horizontal-7","A":"screen-left","B":"screen-right","reason":"A 的双眼聚在身体中线左侧，右侧空白较宽；B 的双眼聚在中线右侧，右眼更接近右边缘。"},
+    {"pair":"vertical-1","A":"up","B":"down","reason":"A 的眼睛紧邻身体顶边，眼睛上方仅有很窄的橙色条；B 的眼睛明显下移，处于横臂高度附近，上方橙色区域更厚。"},
+    {"pair":"vertical-2","A":"up","B":"down","reason":"A 的双眼靠近身体上沿；B 的双眼处在更低的位置，与横臂的上半区域相近，头顶到眼睛的距离较大。"},
+    {"pair":"vertical-3","A":"up","B":"down","reason":"A 的双眼几乎贴着身体顶部；B 的双眼降至横臂一带，眼睛上方有明显更宽的橙色区域。"},
+    {"pair":"vertical-4","A":"down","B":"up","reason":"A 的眼睛位于身体内较低处，接近横臂高度；B 的眼睛更接近身体顶边，上方橙色留白较窄。"},
+    {"pair":"vertical-5","A":"up","B":"down","reason":"A 的双眼靠身体顶边，眼上方橙色区域很薄；B 的双眼向下落到横臂上缘附近，头顶留白明显变厚。"},
+    {"pair":"vertical-6","A":"up","B":"down","reason":"A 的双眼贴近身体上部边缘；B 的双眼位于更低的横臂附近，上方橙色面积比 A 大。"},
+    {"pair":"vertical-7","A":"down","B":"up","reason":"A 的双眼较低，与横臂的高度接近；B 的双眼靠近顶边，眼睛上方仅留较窄的橙色条。"}
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "atlas": "D:\\claude-pet\\dist\\pet-v2\\spritesheet.webp",
+  "atlasSha256": "096fdd396bb9796b4a04c8d024fd939aa68d81d594dbaefcf26e1f56a153cada",
+  "source": "Grid crops of final encoded atlas; no artwork substituted",
+  "standardStateGifs": 9,
+  "allStateMp4FullyDecoded": true,
+  "lookMp4FullyDecoded": true,
+  "transitionSize": [
+    192,
+    208
+  ],
+  "stills": [
+    {
+      "state": "idle",
+      "frame": 0,
+      "ms": 0
+    },
+    {
+      "state": "waving",
+      "frame": 2,
+      "ms": 280
+    },
+    {
+      "state": "jumping",
+      "frame": 3,
+      "ms": 420
+    },
+    {
+      "state": "failed",
+      "frame": 6,
+      "ms": 840
+    }
+  ]
+}

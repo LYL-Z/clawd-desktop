@@ -1,0 +1,89 @@
+{
+  "asset": "extensions/interaction-strip.png",
+  "generation_tool": "built-in image_gen",
+  "references": [
+    "assets/source/pet-run/references/canonical-base.png",
+    "brief/references/03-welcome-clawd.png"
+  ],
+  "dimensions": [
+    2172,
+    724
+  ],
+  "visual_verdict": "approved_source_pending_shared_registration_palette_alpha_cleanup",
+  "review": {
+    "count": "Exactly six complete Clawd interaction poses, generated independently of jumping core row.",
+    "identity": "Terracotta no-outline body, four individually separated short legs in every pose, no mouth, two black square eyes wholly within body.",
+    "pose_order": [
+      "picked up, arms tucked inward, upward attentive eyes, four hanging legs",
+      "held, arms remain tucked, four hanging legs lengthen gently",
+      "tossed right, eyes as a pair move toward screen-right inside forehead, arms open, four legs hang",
+      "airborne rightward continuation with downward body settling and rightward eyes",
+      "compressed landing with four planted feet, square eyes forward",
+      "normal restored stance"
+    ],
+    "spacing": "Six separated connected groups, no clipped limbs or detached effects; no human hand, string, props, symbols or shadows.",
+    "motion_notes": "First two poses intentionally reduce arm span while keeping torso width comparable to resting. Landing pose intentionally squashes body. Runtime should provide actual carried/tossed position and velocity; source is pose set, not a complete physics demonstration."
+  },
+  "deterministic_observation": {
+    "key_rgb": [
+      255,
+      0,
+      255
+    ],
+    "key_threshold": 96,
+    "connected_groups": 6,
+    "group_bboxes": [
+      [
+        87,
+        258,
+        323,
+        458
+      ],
+      [
+        430,
+        258,
+        669,
+        471
+      ],
+      [
+        763,
+        263,
+        1048,
+        466
+      ],
+      [
+        1120,
+        284,
+        1401,
+        479
+      ],
+      [
+        1472,
+        336,
+        1754,
+        480
+      ],
+      [
+        1824,
+        284,
+        2106,
+        480
+      ]
+    ],
+    "group_areas": [
+      34334,
+      36926,
+      37049,
+      35258,
+      27726,
+      36938
+    ]
+  },
+  "required_final_processing": [
+    "Extract by actual component bounds with one common body scale; do not individually enlarge narrower picked-up silhouettes to fill cell width.",
+    "Register held and airborne poses by common torso/interaction anchor; retain hanging-leg and landing squash geometry.",
+    "Quantize slight source grain and remove magenta fringe with binary alpha cleanup.",
+    "Inspect native-size transitions and actual desktop carried/tossed/landing runtime behavior before accepting."
+  ],
+  "final_runtime_verified": false
+}

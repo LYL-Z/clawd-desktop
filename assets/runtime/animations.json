@@ -1,0 +1,620 @@
+{
+  "version": 2,
+  "cellWidth": 192,
+  "cellHeight": 208,
+  "anchor": {
+    "x": 96,
+    "y": 184
+  },
+  "atlas": "core.webp",
+  "animations": {
+    "idle": {
+      "row": 0,
+      "count": 6,
+      "durations": [
+        280,
+        110,
+        110,
+        140,
+        140,
+        320
+      ]
+    },
+    "running-right": {
+      "row": 1,
+      "count": 8,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ]
+    },
+    "running-left": {
+      "row": 2,
+      "count": 8,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ]
+    },
+    "waving": {
+      "row": 3,
+      "count": 4,
+      "durations": [
+        140,
+        140,
+        140,
+        280
+      ]
+    },
+    "jumping": {
+      "row": 4,
+      "count": 5,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        280
+      ]
+    },
+    "failed": {
+      "row": 5,
+      "count": 8,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        140,
+        140,
+        240
+      ]
+    },
+    "waiting": {
+      "row": 6,
+      "count": 6,
+      "durations": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        260
+      ]
+    },
+    "running": {
+      "row": 7,
+      "count": 6,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ]
+    },
+    "review": {
+      "row": 8,
+      "count": 6,
+      "durations": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        280
+      ]
+    },
+    "sleep": {
+      "atlas": "extensions.webp",
+      "row": 0,
+      "startFrame": 0,
+      "count": 3,
+      "durations": [
+        260,
+        400,
+        1200
+      ]
+    },
+    "wake": {
+      "atlas": "extensions.webp",
+      "row": 0,
+      "startFrame": 3,
+      "count": 3,
+      "durations": [
+        220,
+        180,
+        260
+      ]
+    },
+    "held": {
+      "atlas": "extensions.webp",
+      "row": 1,
+      "startFrame": 0,
+      "count": 2,
+      "durations": [
+        240,
+        280
+      ]
+    },
+    "thrown": {
+      "atlas": "extensions.webp",
+      "row": 1,
+      "startFrame": 2,
+      "count": 2,
+      "durations": [
+        180,
+        180
+      ]
+    },
+    "landing": {
+      "atlas": "extensions.webp",
+      "row": 1,
+      "startFrame": 4,
+      "count": 2,
+      "durations": [
+        120,
+        240
+      ]
+    },
+    "peek-left": {
+      "atlas": "core.webp",
+      "row": 0,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ]
+    },
+    "peek-right": {
+      "atlas": "core.webp",
+      "row": 0,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ]
+    },
+    "turn": {
+      "atlas": "turn.webp",
+      "row": 0,
+      "count": 4,
+      "durations": [
+        160,
+        100,
+        160,
+        220
+      ],
+      "loop": false
+    },
+    "sway": {
+      "atlas": "curious.webp",
+      "row": 0,
+      "count": 8,
+      "durations": [
+        180,
+        140,
+        200,
+        120,
+        200,
+        160,
+        140,
+        220
+      ],
+      "loop": false,
+      "label": "歪头打量与回稳"
+    },
+    "headphone-groove": {
+      "atlas": "core.webp",
+      "row": 0,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        140
+      ]
+    },
+    "skate": {
+      "atlas": "core.webp",
+      "row": 1,
+      "count": 8,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ]
+    },
+    "skate-jump": {
+      "atlas": "core.webp",
+      "row": 4,
+      "count": 5,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        280
+      ]
+    },
+    "wizard-charge": {
+      "atlas": "core.webp",
+      "row": 6,
+      "count": 6,
+      "durations": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        260
+      ]
+    },
+    "wizard-cast": {
+      "atlas": "core.webp",
+      "row": 3,
+      "count": 4,
+      "durations": [
+        140,
+        140,
+        140,
+        280
+      ]
+    },
+    "hardhat-work": {
+      "atlas": "core.webp",
+      "row": 7,
+      "count": 6,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ]
+    },
+    "detective-inspect": {
+      "atlas": "core.webp",
+      "row": 8,
+      "count": 6,
+      "durations": [
+        150,
+        150,
+        150,
+        150,
+        150,
+        280
+      ]
+    },
+    "chef-prepare": {
+      "atlas": "core.webp",
+      "row": 7,
+      "count": 6,
+      "durations": [
+        120,
+        120,
+        120,
+        120,
+        120,
+        220
+      ]
+    },
+    "cowboy-tip": {
+      "atlas": "core.webp",
+      "row": 3,
+      "count": 4,
+      "durations": [
+        140,
+        140,
+        140,
+        280
+      ]
+    },
+    "football": {
+      "atlas": "core.webp",
+      "row": 0,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        140
+      ]
+    }
+  },
+  "productionStatus": "Final V2 atlas accepted locally; intermediate-angle warnings documented; actual Codex loading not tested",
+  "outfits": {
+    "headphones": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 0,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "animations": {
+        "headphone-groove": {
+          "row": 7,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        }
+      },
+      "followHead": true
+    },
+    "skateboard": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 1,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "animations": {
+        "skate": {
+          "row": 8,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        },
+        "skate-jump": {
+          "row": 8,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        }
+      },
+      "bodyOffsetY": -42,
+      "followHead": false
+    },
+    "wizard": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 2,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "animations": {
+        "wizard-charge": {
+          "row": 9,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        },
+        "wizard-cast": {
+          "row": 9,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        }
+      },
+      "followHead": true
+    },
+    "hardhat": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 3,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "animations": {
+        "hardhat-work": {
+          "row": 10,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        }
+      },
+      "followHead": true
+    },
+    "detective": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 4,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "animations": {
+        "detective-inspect": {
+          "row": 11,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        }
+      },
+      "followHead": true
+    },
+    "chef": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 5,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "animations": {
+        "chef-prepare": {
+          "row": 12,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        }
+      },
+      "followHead": true,
+      "groundRegionY": 119
+    },
+    "cowboy": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 6,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "animations": {
+        "cowboy-tip": {
+          "row": 13,
+          "count": 6,
+          "durations": [
+            140,
+            140,
+            180,
+            180,
+            140,
+            240
+          ]
+        }
+      },
+      "followHead": true
+    },
+    "football": {
+      "atlas": "wardrobe.webp",
+      "overlay": true,
+      "row": 14,
+      "count": 6,
+      "durations": [
+        140,
+        140,
+        140,
+        140,
+        140,
+        280
+      ],
+      "hidden": true,
+      "followHead": false
+    }
+  },
+  "chorus": {
+    "atlas": "chorus.webp",
+    "cellWidth": 192,
+    "cellHeight": 208,
+    "count": 4,
+    "anchor": {
+      "x": 96,
+      "y": 184
+    }
+  },
+  "headReferenceY": 90,
+  "look": {
+    "startRow": 9,
+    "count": 16
+  }
+}

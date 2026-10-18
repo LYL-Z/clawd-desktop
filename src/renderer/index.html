@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'">
+  <title>Clawd · 动作剧场</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="studio">
+  <aside><p class="eyebrow">CLAUDE FAN PROJECT</p><h1>Clawd<span>动作剧场</span></h1><p class="intro">从欢迎屏走出来，<br>在桌边留下一个小小的世界。</p>
+    <label>造型<select id="outfit"></select></label>
+    <label>动作<select id="action"></select></label>
+    <label>演出<select id="performance"><option value="">选择一场演出</option></select></label>
+    <div class="buttons"><button id="play">播放 / 暂停</button><button id="restart">重播</button></div>
+    <label>逐帧检查<input type="range" id="timeline" min="0" max="5500" value="0" step="40"></label>
+    <label class="check"><input type="checkbox" id="reduced">减弱动态</label>
+    <label class="check"><input type="checkbox" id="directions">十六向注视</label>
+    <label>注视方向<input type="range" id="direction" min="0" max="15" value="0" step="1"></label>
+    <p id="status" role="status">正在载入角色素材…</p>
+    <p class="note">非官方粉丝作品<br>本地运行 · 默认无声</p>
+  </aside>
+  <main><header><span id="scene-name">欢迎蟹</span><span id="clock">0.00 s</span></header><div id="stage-wrap"><canvas id="stage" aria-label="Clawd 动画预览"></canvas></div><footer><span id="asset-count">素材待校验</span><span>右键打开桌宠菜单</span></footer></main>
+</div>
+<p id="error" hidden></p><script src="ui.js"></script>
+</body></html>

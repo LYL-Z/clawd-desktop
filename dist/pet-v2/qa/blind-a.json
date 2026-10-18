@@ -1,0 +1,18 @@
+{
+  "pairs": [
+    {"pair":"horizontal-1","A":"screen-right","B":"screen-left","reason":"A两眼整体位于橙色躯干中心的右侧，右眼接近躯干右边缘；B两眼集中在躯干左半部，右侧留白明显更宽。"},
+    {"pair":"horizontal-2","A":"screen-left","B":"screen-right","reason":"A两眼在躯干左上区域，左眼离左边缘较近；B两眼向右偏移，最右眼紧靠右边缘。"},
+    {"pair":"horizontal-3","A":"screen-right","B":"screen-left","reason":"A右眼贴近躯干右边缘，眼睛整体偏右；B双眼处于躯干左半部，躯干右侧保留大块橙色。"},
+    {"pair":"horizontal-4","A":"screen-right","B":"screen-left","reason":"A双眼明显聚集于右上方，最右眼接近边界；B双眼位于左上方，右眼右侧仍有较宽橙色区域。"},
+    {"pair":"horizontal-5","A":"screen-left","B":"screen-right","reason":"A左眼靠近躯干左缘，双眼中心偏左；B右眼靠近躯干右缘，双眼整体偏右。"},
+    {"pair":"horizontal-6","A":"screen-right","B":"screen-left","reason":"A双眼中心在身体中线右侧，右眼邻近右边缘；B双眼均集中在身体左侧，右侧留白较多。"},
+    {"pair":"horizontal-7","A":"screen-left","B":"screen-right","reason":"A双眼比身体水平中线偏左，最左眼与左边缘距离较短；B双眼明显偏右，右眼接近躯干右缘。"},
+    {"pair":"vertical-1","A":"up","B":"down","reason":"A双眼贴近躯干上边缘，眼睛上方只有很窄的橙色带；B双眼下降至躯干较低的位置，上方橙色带明显更高。"},
+    {"pair":"vertical-2","A":"up","B":"down","reason":"A双眼紧靠身体顶部；B双眼位于顶部以下更深处，眼睛上方留出的橙色面积更大。"},
+    {"pair":"vertical-3","A":"up","B":"down","reason":"A眼睛上沿靠近躯干上沿；B双眼下移至躯干中部附近，上方橙色留白明显增多。"},
+    {"pair":"vertical-4","A":"down","B":"up","reason":"A眼睛位于躯干内部较低处，顶部到眼睛的橙色带较宽；B眼睛更接近躯干顶部，顶部留白更窄。"},
+    {"pair":"vertical-5","A":"up","B":"down","reason":"A双眼紧邻躯干上边缘；B双眼比顶部明显下移，上方橙色区域较高。"},
+    {"pair":"vertical-6","A":"up","B":"down","reason":"A两眼位于躯干上缘附近，顶部橙色带较薄；B两眼在躯干内更低，上方橙色留白更宽。"},
+    {"pair":"vertical-7","A":"down","B":"up","reason":"A双眼位置较低，顶部与眼睛之间存在明显橙色间隔；B双眼上移接近躯干顶部，顶部间隔较短。"}
+  ]
+}

@@ -1,0 +1,240 @@
+{
+  "ok": true,
+  "source": "D:\\claude-pet\\assets\\source\\outfits\\accessory-strip-01.png",
+  "source_size": [
+    2172,
+    724
+  ],
+  "operation": "alpha>=128; connected generated pixels only; monocle retains its three native blue chain segments; no rescale, palette changes, drawing or final registration",
+  "components": [
+    {
+      "id": "headphones",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\headphones.png",
+      "source_bbox": [
+        38,
+        291,
+        277,
+        424
+      ],
+      "size": [
+        239,
+        133
+      ],
+      "area": 9040,
+      "candidate_anchor": [
+        119.5,
+        132
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "skateboard",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\skateboard.png",
+      "source_bbox": [
+        322,
+        345,
+        576,
+        430
+      ],
+      "size": [
+        254,
+        85
+      ],
+      "area": 10025,
+      "candidate_anchor": [
+        127.0,
+        84
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "wizard-hat",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\wizard-hat.png",
+      "source_bbox": [
+        608,
+        261,
+        851,
+        431
+      ],
+      "size": [
+        243,
+        170
+      ],
+      "area": 24866,
+      "candidate_anchor": [
+        121.5,
+        169
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "wizard-wand",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\wizard-wand.png",
+      "source_bbox": [
+        850,
+        300,
+        898,
+        425
+      ],
+      "size": [
+        48,
+        125
+      ],
+      "area": 2801,
+      "candidate_anchor": [
+        24.0,
+        124
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "safety-helmet",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\safety-helmet.png",
+      "source_bbox": [
+        947,
+        316,
+        1140,
+        417
+      ],
+      "size": [
+        193,
+        101
+      ],
+      "area": 14699,
+      "candidate_anchor": [
+        96.5,
+        100
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "spanner",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\spanner.png",
+      "source_bbox": [
+        1156,
+        330,
+        1209,
+        431
+      ],
+      "size": [
+        53,
+        101
+      ],
+      "area": 2930,
+      "candidate_anchor": [
+        26.5,
+        100
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "detective-hat",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\detective-hat.png",
+      "source_bbox": [
+        1267,
+        319,
+        1458,
+        416
+      ],
+      "size": [
+        191,
+        97
+      ],
+      "area": 13862,
+      "candidate_anchor": [
+        95.5,
+        96
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "monocle",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\monocle.png",
+      "source_bbox": [
+        1470,
+        334,
+        1544,
+        448
+      ],
+      "size": [
+        74,
+        114
+      ],
+      "area": 2590,
+      "candidate_anchor": [
+        37.0,
+        113
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "chef-hat",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\chef-hat.png",
+      "source_bbox": [
+        1612,
+        298,
+        1798,
+        426
+      ],
+      "size": [
+        186,
+        128
+      ],
+      "area": 18947,
+      "candidate_anchor": [
+        93.0,
+        127
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    },
+    {
+      "id": "cowboy-hat",
+      "file": "D:\\claude-pet\\assets\\source\\outfits\\extracted\\cowboy-hat.png",
+      "source_bbox": [
+        1867,
+        308,
+        2134,
+        422
+      ],
+      "size": [
+        267,
+        114
+      ],
+      "area": 19811,
+      "candidate_anchor": [
+        133.5,
+        113
+      ],
+      "anchor_note": "bottom-center candidate only; manually refine by accessory type before final registration"
+    }
+  ],
+  "minor_components": [
+    {
+      "bbox": [
+        1524,
+        403,
+        1536,
+        415
+      ],
+      "area": 143
+    },
+    {
+      "bbox": [
+        1519,
+        416,
+        1533,
+        436
+      ],
+      "area": 158
+    },
+    {
+      "bbox": [
+        1533,
+        436,
+        1544,
+        448
+      ],
+      "area": 132
+    }
+  ]
+}

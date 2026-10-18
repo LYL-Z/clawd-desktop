@@ -1,0 +1,32 @@
+{
+  "recordedAt": "2026-10-16T09:22:12.136563+00:00",
+  "atlasSha256": "096fdd396bb9796b4a04c8d024fd939aa68d81d594dbaefcf26e1f56a153cada",
+  "atlasBytes": 5276,
+  "atlasValidationOk": true,
+  "petQualityOk": true,
+  "blindDirectionsOk": true,
+  "localCodexActuallyLoaded": false,
+  "installedOrSelected": false,
+  "reports": {
+    "atlas": {
+      "path": "assets/source/pet-run/final/validation-extended.json",
+      "sha256": "3febeeff797b5934b6c45934bebbd0931e302fdd3483e71c3a50ba0bfdd75c63"
+    },
+    "quality": {
+      "path": "assets/source/pet-run/qa/pet-quality.json",
+      "sha256": "d78cda2d00f7a63042c8884cad37154d46214c75eada7c69abea12e6aa5d11cf"
+    },
+    "blind": {
+      "path": "assets/source/pet-run/qa/direction-blind-validation.json",
+      "sha256": "385af5a9c528d3085fc5d092ac5ac313c0cdde2c9ecb3bdac68f0c5bf73076eb"
+    },
+    "blindKey": {
+      "path": "assets/source/pet-run/qa/direction-blind-key.json",
+      "sha256": "0164478f34dc7be8e5050775b967ebe7712f6dc4dcad1061c559e004b30961ce"
+    },
+    "previews": {
+      "path": "exports/previews/codex-v2/preview-report.json",
+      "sha256": "f0a1e362d2e8fd402bd81fbf16373db40838170a51e98d3beff0d3030f2400b1"
+    }
+  }
+}
