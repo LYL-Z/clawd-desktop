@@ -2,7 +2,7 @@
 
 这是按委托用户要求公开可见的 Claude / Clawd 非官方粉丝项目，与 Anthropic、OpenAI 无隶属或背书关系。
 
-**本仓库没有授予开源、公开再分发或商业使用许可。** 仓库公开可见仅允许浏览 GitHub 页面和源码，不自动授予复制、修改、镜像、重新打包、分发或商业化的权利。`package.json` 使用 `UNLICENSED`。如需超出个人查看范围的使用，请事先取得相应权利人的书面许可。
+**本仓库没有授予开源、公开再分发或商业使用许可。** 根据[GitHub 许可说明](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository)，公开仓库可由 GitHub 用户查看并在 GitHub 上 fork；这不构成通用开源许可。除 GitHub 服务条款允许的查看与 fork 外，本项目未授予源码的独立复制、修改、镜像、重新打包、再分发或商业化许可。`package.json` 使用 `UNLICENSED`。涉及 Claude / Clawd 等第三方素材的使用仍须由相应权利人授权。
 
 本项目自行编写的程序、时间轴与构图文件可由本次委托用户在本地使用和修改；该委托范围不扩展为公众许可。
 
