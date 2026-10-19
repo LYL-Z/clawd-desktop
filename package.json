@@ -16,7 +16,7 @@
     "studio": "npm run build && electron . --studio",
     "pack": "npm run build && python scripts/make-icon.py && electron-builder --win dir --x64 --publish never",
     "release": "npm run build && python scripts/make-icon.py && electron-builder --win portable --x64 --publish never",
-    "deploy:updates": "wrangler deploy --config cloudflare-updates/wrangler.jsonc"
+    "deploy:updates": "npx --yes wrangler@4.151.2 deploy --config cloudflare-updates/wrangler.jsonc"
   },
   "build": {
     "appId": "local.clawd.fan.desktop",
@@ -60,7 +60,6 @@
     "esbuild": "0.28.2",
     "playwright-core": "^1.64.1",
     "tsx": "4.23.15",
-    "typescript": "7.0.2",
-    "wrangler": "4.151.2"
+    "typescript": "7.0.2"
   }
 }
