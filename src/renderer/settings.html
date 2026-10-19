@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'">
+  <meta name="color-scheme" content="light dark">
+  <title>Clawd 设置</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="brand-copy"><strong>Clawd</strong><span>桌面伙伴设置</span></div>
+      <div class="scene-pill" id="scene-pill"><i></i><span>正在读取桌面状态…</span></div>
+      <button class="quiet-button" id="show-pet" type="button">显示 Clawd</button>
+    </header>
+    <div class="layout">
+      <nav class="side-nav" role="tablist" aria-label="设置分类" aria-orientation="vertical">
+        <button class="nav-item active" role="tab" aria-selected="true" aria-controls="page-general" id="tab-general" data-page="general"><span class="nav-icon">◌</span>桌面</button>
+        <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-appearance" id="tab-appearance" data-page="appearance" tabindex="-1"><span class="nav-icon">▧</span>外观</button>
+        <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-behavior" id="tab-behavior" data-page="behavior" tabindex="-1"><span class="nav-icon">✳</span>行为</button>
+        <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-scenes" id="tab-scenes" data-page="scenes" tabindex="-1"><span class="nav-icon">▣</span>游戏与场景</button>
+        <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-about" id="tab-about" data-page="about" tabindex="-1"><span class="nav-icon">i</span>隐私与关于</button>
+        <div class="nav-foot"><span class="offline-dot"></span>本机运行 · 不连接云端</div>
+      </nav>
+      <main class="content" id="content">
+        <section class="page active" id="page-general" role="tabpanel" aria-labelledby="tab-general">
+          <p class="eyebrow">YOUR DESKTOP COMPANION</p>
+          <h1>让 Clawd 恰好在场</h1>
+          <p class="lead">它会在桌边陪你，也懂得在你需要专注时安静退场。</p>
+          <div class="card status-card">
+            <div class="card-symbol">✦</div>
+            <div class="card-copy"><strong id="visibility-title">桌面状态</strong><p id="visibility-detail">正在读取本机前台应用状态。</p></div>
+            <span class="status-tag" id="visibility-tag">检查中</span>
+          </div>
+          <div class="section-heading"><div><h2>启动偏好</h2><p>这些选项只影响这台电脑上的 Clawd。</p></div></div>
+          <div class="setting-row">
+            <div><strong>登录 Windows 时启动</strong><p>仅适用于已打包的 Windows 版本。</p></div>
+            <label class="switch"><input id="startup" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">登录 Windows 时启动 Clawd</span></label>
+          </div>
+          <div class="setting-row">
+            <div><strong>开机后自动显示</strong><p>关闭后 Clawd 仍会运行，可从系统托盘重新显示。</p></div>
+            <label class="switch"><input id="start-visible" type="checkbox" checked><span aria-hidden="true"></span><span class="sr-only">开机后自动显示 Clawd</span></label>
+          </div>
+          <div class="note-box"><span>提示</span><p>托盘菜单中的“隐藏 Clawd”只控制手动显示状态。游戏、全屏、锁屏和系统挂起由各自的场景规则独立处理。</p></div>
+        </section>
+
+        <section class="page" id="page-appearance" role="tabpanel" aria-labelledby="tab-appearance" hidden>
+          <p class="eyebrow">A LITTLE PERSONALITY</p>
+          <h1>给小蟹换个模样</h1>
+          <p class="lead">选择造型，Clawd 会立即穿上；像素身体仍保持原来的比例与陶土色。</p>
+          <div class="wardrobe-layout">
+            <div class="preview-card"><canvas id="outfit-preview" width="240" height="250" aria-label="Clawd 造型动画预览"></canvas><span id="preview-caption">欢迎蟹 · 待机</span></div>
+            <div class="wardrobe-panel"><div class="section-heading compact"><div><h2>衣柜</h2><p id="outfit-caption">选择一套造型查看预览</p></div></div><div class="outfit-grid" id="outfit-grid"></div></div>
+          </div>
+          <div class="section-heading"><div><h2>桌面尺寸</h2><p>只改变桌宠在桌面上的显示大小。</p></div><output id="scale-value">100%</output></div>
+          <input class="range" id="scale" type="range" min="0.75" max="1.5" step="0.25" aria-label="桌宠大小">
+          <div class="range-labels"><span>小巧</span><span>标准</span><span>醒目</span></div>
+        </section>
+
+        <section class="page" id="page-behavior" role="tabpanel" aria-labelledby="tab-behavior" hidden>
+          <p class="eyebrow">QUIETLY ALIVE</p>
+          <h1>调整陪伴节奏</h1>
+          <p class="lead">Clawd 的动作以安静待机为主。你可以关闭巡游、减弱动态，或让它暂时休息。</p>
+          <div class="card-list">
+            <div class="setting-row"><div><strong>沿着屏幕边缘巡游</strong><p>允许 Clawd 在一段自主动作中缓慢横向移动。</p></div><label class="switch"><input data-setting="roam" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">沿着屏幕边缘巡游</span></label></div>
+            <div class="setting-row"><div><strong>减弱动态效果</strong><p>减少位移、跳跃和粒子动画，保留静态反馈。</p></div><label class="switch"><input data-setting="reducedMotion" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">减弱动态效果</span></label></div>
+            <div class="setting-row"><div><strong>暂停全部动画</strong><p>角色保持当前画面；鼠标拖拽和手动操作仍然可用。</p></div><label class="switch"><input data-setting="paused" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">暂停全部动画</span></label></div>
+            <div class="setting-row"><div><strong>本地任务状态桥</strong><p>读取用户主动写入的本地 status.json；不读取 Codex 或 Claude 内部数据。</p></div><label class="switch"><input data-setting="bridge" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">启用本地任务状态桥</span></label></div>
+          </div>
+          <div class="note-box"><span>安静模式</span><p>关闭巡游并减弱动态，可得到低干扰的待机效果。更完整的“一键安静模式”与行为频率控制会在后续阶段评估。</p></div>
+        </section>
+
+        <section class="page" id="page-scenes" role="tabpanel" aria-labelledby="tab-scenes" hidden>
+          <p class="eyebrow">AWARE OF THE MOMENT</p>
+          <h1>游戏时自动退场</h1>
+          <p class="lead">Clawd 只使用前台窗口和你添加的 EXE 规则。它不会读取画面、游戏内存或键盘输入。</p>
+          <div class="mode-grid" role="radiogroup" aria-label="自动隐藏模式">
+            <label class="mode-card"><input type="radio" name="hide-mode" value="smart"><span class="mode-check"></span><strong>智能模式</strong><small>在已配置的游戏前台或全屏应用前自动隐藏，离开后恢复。</small></label>
+            <label class="mode-card"><input type="radio" name="hide-mode" value="game-running"><span class="mode-check"></span><strong>游戏运行期间</strong><small>只要已配置的游戏进程仍在运行，就保持隐藏，包括切回桌面时。</small></label>
+            <label class="mode-card"><input type="radio" name="hide-mode" value="manual"><span class="mode-check"></span><strong>手动控制</strong><small>关闭游戏和全屏自动隐藏；锁屏及系统挂起仍会隐藏。</small></label>
+          </div>
+          <div class="card-list scene-options">
+            <div class="setting-row"><div><strong>全屏应用时隐藏</strong><p>全屏浏览器、视频和游戏都会触发；不是游戏识别结论。</p></div><label class="switch"><input id="hide-fullscreen" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">全屏应用时隐藏</span></label></div>
+            <div class="setting-row delay-row"><div><strong>离开游戏后的恢复延迟</strong><p>避免 Alt+Tab 或短暂切屏时频繁闪现。</p></div><label class="delay-control"><input id="restore-delay" type="range" min="500" max="2000" step="100"><output id="restore-delay-value">0.9 秒</output></label></div>
+          </div>
+          <div class="section-heading rules-heading"><div><h2>应用规则</h2><p>默认不扫描已安装应用；只有你明确添加的规则才会匹配。</p></div></div>
+          <div class="rules-toolbar"><button class="primary-button" data-add-rule="game" type="button">＋ 添加游戏</button><button class="secondary-button" data-add-rule="exception" type="button">添加例外应用</button></div>
+          <div class="rule-list" id="rule-list"></div>
+          <div class="note-box privacy-note"><span>本地与隐私</span><p>规则路径只保存在本机的 Clawd 设置文件中，不上传或写入诊断日志。路径匹配默认精确到完整 EXE；你可以将规则切换为按文件名匹配，但这会包含不同目录下的同名程序。</p></div>
+        </section>
+
+        <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about" hidden>
+          <p class="eyebrow">MADE WITH CARE</p>
+          <h1>关于 Clawd</h1>
+          <p class="lead">一只从欢迎屏走出来、安静待在桌边的小小像素蟹。</p>
+          <div class="about-hero"><div class="about-crab" aria-hidden="true"><span class="eye eye-left"></span><span class="eye eye-right"></span><span class="claw claw-left"></span><span class="claw claw-right"></span><span class="leg leg-a"></span><span class="leg leg-b"></span><span class="leg leg-c"></span><span class="leg leg-d"></span></div><div><span class="version-label">桌面伙伴</span><strong>Clawd Desktop</strong><small id="version-line">版本信息载入中</small></div></div>
+          <div class="update-card">
+            <div class="update-copy"><strong>软件更新</strong><p>只有点击检查时才会连接 GitHub；不会自动下载、安装或替换正在运行的程序。</p><div class="update-result" id="update-result" role="status" aria-live="polite">尚未检查 · 当前版本以本机显示为准</div><pre class="release-notes" id="release-notes" hidden></pre></div>
+            <div class="update-actions"><button class="secondary-button" id="check-updates" type="button">检查新版本</button><button class="primary-button" id="open-release" type="button" hidden>打开下载页</button></div>
+          </div>
+          <div class="card-list">
+            <div class="about-row"><strong>非官方粉丝作品</strong><p>Clawd 是受 Claude / Clawd 参考启发的非官方衍生项目，不与 Anthropic、OpenAI 建立隶属或背书关系。</p></div>
+            <div class="about-row"><strong>离线与隐私</strong><p>日常运行不联网、不调用模型，也不读取屏幕内容、剪贴板、键盘输入或私人文件。只有点击版本检查时，Clawd 才向 GitHub 请求公开 Release 版本信息；不会随请求上传用户设置或应用规则。</p></div>
+            <div class="about-row"><strong>项目与使用边界</strong><p>源代码公开可查看，但仓库没有授予一般再分发或商业使用的通用许可。Claude / Clawd 品牌与相关视觉仍受第三方权利约束。</p><code>github.com/LYL-Z/clawd-desktop</code></div>
+          </div>
+        </section>
+        <div class="toast" id="toast" role="status" aria-live="polite"></div>
+      </main>
+    </div>
+  </div>
+  <script src="settings.js"></script>
+</body>
+</html>

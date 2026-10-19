@@ -1,11 +1,10 @@
 import assert from 'node:assert/strict';
-import {createRequire} from 'node:module';
 import {mkdir,readFile,writeFile,rm} from 'node:fs/promises';
 import path from 'node:path';
 import {beginEvidence,retainEvidence} from './qa-evidence.mjs';
+import {loadElectronDriver} from './qa-support.mjs';
 
-const require=createRequire('C:/Users/Lenovo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/package.json');
-const {_electron}=require('playwright'),root=process.cwd(),out=path.join(root,'qa/runtime');
+const _electron=loadElectronDriver(),root=process.cwd(),out=path.join(root,'qa/runtime');
 const onlyAction=process.argv.find(arg=>arg.startsWith('--action='))?.slice(9);
 const preview=process.argv.includes('--performances-only'),label=onlyAction?`motion-${onlyAction}`:preview?'performance-review':'motion';
 if(onlyAction&&!/^[a-z-]+$/.test(onlyAction))throw new Error('Invalid action id');

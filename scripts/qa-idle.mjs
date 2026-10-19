@@ -1,4 +1,3 @@
-import {createRequire} from 'node:module';
 import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import os from 'node:os';
@@ -6,9 +5,9 @@ import path from 'node:path';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {beginEvidence,retainEvidence} from './qa-evidence.mjs';
+import {loadElectronDriver} from './qa-support.mjs';
 const exec=promisify(execFile);
-const require=createRequire('C:/Users/Lenovo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/package.json');
-const {_electron}=require('playwright'),root=process.cwd(),out=path.join(root,'qa/runtime'),userData=path.join(out,'user-data','idle-benchmark');
+const _electron=loadElectronDriver(),root=process.cwd(),out=path.join(root,'qa/runtime'),userData=path.join(out,'user-data','idle-benchmark');
 const sampleSeconds=Number(process.env.CLAWD_QA_SECONDS??20),label=sampleSeconds>20?'stability-qa':'idle-benchmark';
 if(!Number.isInteger(sampleSeconds)||sampleSeconds<20||sampleSeconds>600)throw new Error('Sample duration must be an integer from 20 to 600 seconds');
 await mkdir(userData,{recursive:true});await writeFile(path.join(userData,'settings.json'),JSON.stringify({welcomeSeen:true,outfit:'none',roam:false,paused:false,reducedMotion:false}));

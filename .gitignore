@@ -16,4 +16,3 @@ __pycache__/
 /scripts/write-delivery-docs.py
 /scripts/inspect-host-*.mjs
 /scripts/qa-host-loader.mjs
-/scripts/qa-evidence.mjs

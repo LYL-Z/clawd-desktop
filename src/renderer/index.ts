@@ -24,6 +24,8 @@ class Runtime {
   private accumulator=0;
   private paused=isStudio;
   private systemPause=false;
+  private hostVisible=true;
+  private animationFrame=0;
   private sleeping=false;
   private manualSleep=false;
   private sleepNotBefore=0;
@@ -59,6 +61,7 @@ class Runtime {
   private marks=new Map<string,HTMLImageElement>();
   constructor(env:Environment,assets:Assets){
     this.env=env;this.assets=assets;this.windowOrigin={x:env.windowBounds.x,y:env.windowBounds.y};
+    this.hostVisible=env.visibility?.visible??true;
     const area=env.workArea;this.body={position:env.settings.position??{x:area.x+area.width/2,y:area.y+area.height},velocity:{x:0,y:0},airborne:false,halfWidth:70*env.settings.scale};recover(this.body,area);
     this.body.position.y=area.y+area.height;
   }
@@ -67,18 +70,19 @@ class Runtime {
     await Promise.all(['mark.png','chorus.webp'].map(name=>new Promise<void>((resolve,reject)=>{const img=new Image();img.onload=()=>{this.marks.set(name,img);resolve();};img.onerror=()=>reject(new Error(`演出素材无法载入：${name}`));img.src=`assets/${name}`;})));
     this.resize();this.configureStudio();this.bindInput();
     window.clawd.onCommand(c=>this.command(c));window.clawd.onCursor((point,bounds,down)=>{
+      if(!this.hostVisible)return;
       this.windowOrigin={x:bounds.x,y:bounds.y};this.width=bounds.width;this.height=bounds.height;
       this.pointing=point;this.mouseDown=down;if(this.drag){this.updateDrag(point);if(!down&&performance.now()-this.pressedAt>100)this.finishDrag(false);}
       this.hitCheck(point.x-bounds.x,point.y-bounds.y);
     });
     window.addEventListener('resize',()=>this.resize());
-    window.clawdDebug={snapshot:()=>this.snapshot(),action:name=>this.startAction(name,true),performance:name=>this.startPerformance(name,true),time:ms=>{this.paused=true;this.animationTime=Math.max(0,ms);this.clock=this.actionSince+ms;if(this.performance)this.performanceSince=this.clock-ms;this.render();},outfit:name=>this.changeOutfit(name),hitPoints:()=>this.hitPoints()};
+    if(isStudio||this.env.debugMode)window.clawdDebug={snapshot:()=>this.snapshot(),action:name=>this.startAction(name,true),performance:name=>this.startPerformance(name,true),time:ms=>{this.paused=true;this.animationTime=Math.max(0,ms);this.clock=this.actionSince+ms;if(this.performance)this.performanceSince=this.clock-ms;this.render();},outfit:name=>this.changeOutfit(name),hitPoints:()=>this.hitPoints()};
     text('#status','素材已载入。点击播放，或拖动时间轴检查。');
     const readyActions=Object.keys(this.assets.manifest.animations).filter(name=>this.exists(name)).length;
     text('#asset-count',`${readyActions} 个可用动作 · ${OUTFITS.filter(o=>o.id==='none'||this.assets.manifest.outfits?.[o.id]).length} 套造型${this.assets.manifest.look?'':' · 十六向注视待交付'}`);
     window.clawd.ready();
     if(!isStudio&&!this.env.settings.welcomeSeen){this.startPerformance('welcome',true);this.env.settings.welcomeSeen=true;window.clawd.save({welcomeSeen:true});}
-    requestAnimationFrame(t=>this.tick(t));
+    if(this.hostVisible)this.animationFrame=requestAnimationFrame(t=>this.tick(t));
   }
   private reduced(){return this.env.settings.reducedMotion||this.env.systemReducedMotion;}
   private pixelScale(){return Math.max(1,Math.round(this.env.settings.scale*this.dpr))/this.dpr;}
@@ -127,6 +131,7 @@ class Runtime {
         break;
       }
       case'recover':{this.finishDrag(true);this.stopPerformance();const area=command.value as Environment['workArea'];this.env.workArea=area;this.body.position={x:area.x+area.width/2,y:area.y+area.height};this.body.velocity={x:0,y:0};this.body.airborne=false;this.action='idle';break;}
+      case'visibility':this.setHostVisibility(command.value as Environment['visibility']);break;
       case'pause-system':this.systemPause=true;this.finishDrag(true);this.stopPerformance();this.clicks.cancel();break;
       case'resume-system':{
         this.systemPause=false;this.accumulator=0;this.last=performance.now();
@@ -136,7 +141,21 @@ class Runtime {
       }
       case'task':this.applyTask(command.value as TaskEvent|null);break;
     }
-    this.render();
+    if(this.hostVisible)this.render();
+  }
+  private setHostVisibility(snapshot:Environment['visibility']){
+    const visible=snapshot?.visible??true;if(visible===this.hostVisible)return;
+    this.hostVisible=visible;
+    if(!visible){
+      if(this.animationFrame)cancelAnimationFrame(this.animationFrame);this.animationFrame=0;
+      this.finishDrag(true);this.stopPerformance();this.clicks.cancel();this.roamUntil=0;
+      this.body.velocity={x:0,y:0};this.interactive=false;this.nativeCaptured=false;window.clawd.interactive(false,false);
+      return;
+    }
+    this.accumulator=0;this.last=performance.now();this.roamUntil=0;
+    this.action=this.sleeping?'sleep':({thinking:'review',working:'running',waiting:'waiting'} as Record<string,string>)[this.task?.state??'']??'idle';
+    this.actionSince=this.clock;this.animationTime=0;this.render();
+    this.animationFrame=requestAnimationFrame(t=>this.tick(t));
   }
   private applyTask(event:TaskEvent|null){
     if(this.drag||this.body.airborne){this.pendingTask=event;return;}
@@ -148,6 +167,7 @@ class Runtime {
     this.sleeping=false;this.manualSleep=false;this.action=({idle:'idle',thinking:'review',working:'running',waiting:'waiting',done:'waving',failed:'failed'} as const)[event.state];this.actionSince=this.clock;
   }
   private tick(now:number){
+    if(!this.hostVisible){this.animationFrame=0;return;}
     const elapsed=this.last?Math.min((now-this.last)/1000,.1):0;this.last=now;
     const frozen=this.systemPause||this.env.settings.paused||(isStudio&&this.paused);
     if(!frozen){this.clock+=elapsed*1000;this.animationTime=this.clock-this.actionSince;this.accumulator+=elapsed;
@@ -158,7 +178,7 @@ class Runtime {
     if(now-this.lastDraw>=interval){this.render();this.lastDraw=now;}
     if(!isStudio&&now-this.lastMove>30){window.clawd.move(this.body.position,Boolean(this.performance));this.lastMove=now;}
     if(now-this.lastReport>1000){window.clawd.report(this.snapshot());this.lastReport=now;}
-    requestAnimationFrame(t=>this.tick(t));
+    this.animationFrame=requestAnimationFrame(t=>this.tick(t));
   }
   private update(dt:number){
     if(isStudio)return;
@@ -278,7 +298,7 @@ class Runtime {
     if(isStudio){text('#clock',`${(this.animationTime/1000).toFixed(2)} s`);const timeline=document.querySelector<HTMLInputElement>('#timeline')!;if(document.activeElement!==timeline)timeline.value=String(this.performance?this.clock-this.performanceSince:this.animationTime);}
   }
   private hitCheck(x:number,y:number){
-    if(isStudio)return;const px=Math.floor(x*this.dpr),py=Math.floor(y*this.dpr);
+    if(isStudio||!this.hostVisible)return;const px=Math.floor(x*this.dpr),py=Math.floor(y*this.dpr);
     // The cursor needs one alpha value. Reading the entire high-DPI mask every
     // rendered frame allocated megabytes repeatedly even while standing still.
     const hit=px>=0&&py>=0&&px<mask.width&&py<mask.height&&maskCtx.getImageData(px,py,1,1).data[3]!>127;

@@ -1,13 +1,12 @@
 import assert from 'node:assert/strict';
-import {createRequire} from 'node:module';
 import {mkdir,writeFile,readFile,rm} from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {execFile,spawn} from 'node:child_process';
 import {promisify} from 'node:util';
 import {beginEvidence,retainEvidence} from './qa-evidence.mjs';
-const runtimeRequire=createRequire('C:/Users/Lenovo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/package.json');
-const {_electron}=runtimeRequire('playwright');
+import {loadElectronDriver,runPython} from './qa-support.mjs';
+const _electron=loadElectronDriver();
 const exec=promisify(execFile),root=process.cwd(),out=path.join(root,'qa/runtime');
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 const mode=process.argv[2]??'studio',tag=process.env.CLAWD_QA_EXE?`packaged-${mode}`:mode,report={mode,tag,startedAt:new Date().toISOString(),checks:[],errors:[]};
@@ -22,7 +21,7 @@ const args=process.env.CLAWD_QA_EXE?[]:[root];if(mode==='studio')args.push('--st
 let app,page,originalCursor,recorder;
 const finishRecording=async()=>{if(!recorder)return;const running=recorder;recorder=undefined;if(running.exitCode!==null)return;const stopped=new Promise(resolve=>running.once('close',resolve));running.stdin.write('q\n');await stopped;};
 const check=(name,data={})=>report.checks.push({name,passed:true,...data});
-const native=async steps=>{const result=await exec('C:/Users/Lenovo/Miniconda3/python.exe',[path.join(root,'scripts/qa-native-input.py'),JSON.stringify(steps)],{windowsHide:true});return JSON.parse(result.stdout);};
+const native=async steps=>{const result=await runPython(path.join(root,'scripts/qa-native-input.py'),[JSON.stringify(steps)]);return JSON.parse(result.stdout);};
 const screenPoint=async p=>app.evaluate(({screen},point)=>screen.dipToScreenPoint({x:Math.round(point.x),y:Math.round(point.y)}),p);
 const moveTo=async p=>{const physical=await screenPoint(p);const moved=await native([{type:'move',...physical,wait:160}]);if(Math.hypot(moved.cursor.x-physical.x,moved.cursor.y-physical.y)>8){report.externalCursorMovement=true;throw new Error('External cursor movement interrupted the OS-input test; no product verdict for this run.');}};
 const click=async p=>{await moveTo(p);return await native([{type:'down',wait:45},{type:'up',wait:120}]);};

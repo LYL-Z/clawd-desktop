@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
-import {createRequire} from 'node:module';
 import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {beginEvidence,retainEvidence} from './qa-evidence.mjs';
-const require=createRequire('C:/Users/Lenovo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/package.json'),{_electron}=require('playwright'),root=process.cwd(),out=path.join(root,'qa/runtime'),userData=path.join(out,'user-data','recovery');
+import {loadElectronDriver} from './qa-support.mjs';
+const _electron=loadElectronDriver(),root=process.cwd(),out=path.join(root,'qa/runtime'),userData=path.join(out,'user-data','recovery');
 await mkdir(userData,{recursive:true});await writeFile(path.join(userData,'settings.json'),JSON.stringify({welcomeSeen:true,bridge:true}));
-const env={...process.env,CLAWD_TEST_USER_DATA:userData};delete env.ELECTRON_RUN_AS_NODE;
+const env={...process.env,CLAWD_TEST_USER_DATA:userData,CLAWD_AUTOTEST:'1'};delete env.ELECTRON_RUN_AS_NODE;
 const app=await _electron.launch({executablePath:process.env.CLAWD_QA_EXE??path.join(root,'node_modules/electron/dist/electron.exe'),args:process.env.CLAWD_QA_EXE?[]:[root],cwd:root,env}),page=await app.firstWindow(),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 if(process.env.CLAWD_QA_HIDE)await app.evaluate(({BrowserWindow})=>BrowserWindow.getAllWindows().forEach(win=>win.hide()));
 const report={startedAt:new Date().toISOString(),scope:'Real renderer and status watcher; host commands injected through trusted main process, no OS mouse input',checks:[]};

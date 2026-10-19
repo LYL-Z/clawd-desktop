@@ -1,6 +1,6 @@
 {
   "name": "clawd-desktop",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
   "description": "CLAWD — 从欢迎屏走出的传奇，本地 Claude 粉丝桌宠",
   "author": "Clawd fan project",
@@ -10,6 +10,8 @@
     "build": "node scripts/build.mjs",
     "check": "tsc --noEmit",
     "test": "node --import tsx --test tests/*.test.ts",
+    "qa:probe": "node --import tsx scripts/qa-probe.mjs",
+    "checksums": "node scripts/create-checksums.mjs",
     "start": "npm run build && electron .",
     "studio": "npm run build && electron . --studio",
     "pack": "npm run build && python scripts/make-icon.py && electron-builder --win dir --x64 --publish never",
@@ -55,6 +57,7 @@
     "electron": "44.7.2",
     "electron-builder": "26.15.3",
     "esbuild": "0.28.2",
+    "playwright-core": "^1.64.1",
     "tsx": "4.23.15",
     "typescript": "7.0.2"
   }
