@@ -1,0 +1,67 @@
+# Clawd 1.0.1 基线审计与 1.1.0 改动记录
+
+审计日期：2026-10-19
+仓库：`LYL-Z/clawd-desktop`
+审计基线：`main` / `v1.0.1` / `1a2c12a97ae6cca4401eabe3b3b8d70fb1cd10`
+实施分支：`codex/reliability-upgrade`
+
+## 范围与证据边界
+
+审计覆盖真实仓库源码、配置、QA 脚本、现有图集 Manifest 和本地发行目录。它区分源码实现、自动化检查、单机桌面运行和用户实际体验；静态分析及模拟状态测试不能替代真实游戏、多显示器、锁屏或长时间运行验证。
+
+基线检查在改动前通过：`npm run check`、8 项 `npm test`、4 项 Python 图像测试、`npm run build`。README 中约 182 秒空闲 CPU/内存记录属于先前单机样本，本轮没有重新测量，不用它推导性能提升。
+
+## 基线问题与处理
+
+| 编号 | 源码证据与影响 | 优先级 | 本轮处理 | 当前证据边界 |
+| --- | --- | --- | --- | --- |
+| AUDIT-001 | `main.ts` 的锁屏、恢复、探针和托盘路径各自控制窗口，恢复事件可能覆盖其他隐藏原因 | P0 | 引入集中式 `VisibilityController`，用原因集合合并游戏、全屏、手动、锁屏和挂起状态 | 共享状态规则有单元测试；完整 Win32 场景矩阵仍待目标机验收 |
+| CORE-001 | 原生探针只输出全屏与鼠标状态，不报告进程身份、游戏运行规则或心跳 | P0 | 改为有版本的 JSON 观测协议，支持用户明确添加的 EXE 规则、全屏几何、健康超时及退避重启 | 本机 C# 编译和 Windows 原生冒烟通过；测试用当前 Node 进程路径规则命中，具体游戏和反作弊兼容未验证 |
+| CORE-002 | 窗口显示、隐藏与位置恢复职责混在事件处理路径中 | P0 | 所有宠物窗口显示/隐藏统一由可见性仲裁回调处理；“收回当前屏幕”只修复位置 | 代码检查与规则测试通过；焦点、托盘和锁屏需要 Windows 实际验收 |
+| PERF-001 | Renderer 在隐藏后仍可能继续执行动画帧与命中更新 | P1 | 隐藏时取消动画循环、鼠标采样只在可见时发送，重新显示时从安全状态恢复 | 源码与单元测试通过；隐藏时资源变化未重新量测 |
+| DATA-001 | 设置读取和保存没有独立迁移、损坏恢复、并发写入策略 | P1 | 新增版本化归一化、串行合并、临时文件原子替换和损坏文件备份 | 覆盖迁移、并发更新、损坏与超大配置的本地测试通过 |
+| UX-001 | 托盘菜单随功能扩展而变长，缺少游戏规则与场景状态入口 | P1 | 增加独立设置中心、衣柜预览、游戏/例外 EXE 规则、可见性提示和受限托盘快捷项 | TypeScript 构建通过；设置窗口人工视觉检查尚未完成 |
+| BUILD-001 | `scripts/build.mjs` 将 C# 编译器固定到单一 Windows 用户环境路径 | P1 | 支持 `CLAWD_CSC`、PATH、.NET Framework 与 Visual Studio Build Tools 常见位置探测 | 当前 Windows 本地构建通过；其他 runner 环境由 CI 验证 |
+| QA-001 | 公开 QA 文件依赖未被 Git 跟踪的 `qa-evidence.mjs`，部分脚本曾引用开发机绝对路径 | P1 | 补入可移植的 Python/Playwright 查找辅助模块；将安全的证据清单辅助文件纳入仓库 | 已扫描公开脚本，不再发现用户目录硬编码；各 E2E 场景仍需逐项运行 |
+| CI-001 | 仓库没有 GitHub Actions 自动化 | P1 | 新增 Windows CI：依赖安装、类型检查、单元测试、图像测试、原生构建、portable 打包与 SHA-256 清单 | 工作流文件已添加；首次 GitHub Hosted Runner 结果尚未产生 |
+| UPDATE-001 | 便携版没有版本检查；直接自动替换正在运行的 portable EXE 没有可靠方案 | P2 | 添加用户主动查询 GitHub 正式 Release、查看更新说明和打开官方下载页 | 比较与错误路径有单元测试；实际公开版本只有在 GitHub Release 创建后才能完整验证 |
+
+## 当前改动的职责边界
+
+- `ForegroundAppMonitor` 只收集前台进程元数据、窗口几何、鼠标左键状态和用户明确配置的游戏运行状态；不读取画面、键盘文本或进程内存。
+- `classifyScene` 根据 EXE 完整路径或用户选择的文件名匹配，生成桌面/游戏/全屏场景和自动隐藏原因。
+- `VisibilityController` 是宠物窗口可见性的单一仲裁者；系统锁屏/挂起立即阻止显示，手动隐藏与自动原因互相独立。
+- `SettingsStore` 负责设置迁移、边界校验、串行写入与损坏文件恢复。
+- `UpdateChecker` 仅由设置中心按钮触发，请求固定的公开 GitHub Release API。它不读取或上传用户设置，也不执行下载安装。
+
+## 本轮验证结果
+
+| 检查 | 结果 | 范围 |
+| --- | --- | --- |
+| TypeScript 类型检查 | 通过 | 主进程、Preload、Renderer、共享模块 |
+| Node 测试 | 25 项通过 | 现有动画/物理/状态逻辑，加场景、配置和版本比较 |
+| Python 图像测试 | 4 项通过 | 既有图像测量与分类回归 |
+| Windows 应用构建 | 通过 | Electron 包装与本机 C# 原生探针编译 |
+| 原生探针冒烟测试 | 通过 | 实际启动 Windows EXE，读取连续 JSON 心跳并以受限权限按完整路径识别 QA Node 进程；该测试曾捕获并修复多余结束括号 |
+| GitHub Release API | 通过 | 手动调用公开 latest-release endpoint；本机 `1.1.0` 当前高于公开正式版 `1.0.1` |
+| portable 包启动冒烟 | 通过 | `release/v1.1.0/Clawd-1.1.0-windows-x64.exe` 实际启动；五张图集和原生探针可用，正常关闭应用与便携启动器 |
+| 打包应用桌面场景 | 通过 | 通过 `win-unpacked/Clawd.exe` 执行真实 Electron Renderer 检查：28 个动作、8 种造型、16 个方向、4 段演出、减少动态效果及离线资源重载 |
+| Playwright 直接附加 portable 启动器 | 未通过 | 自解压 portable 包没有在 Playwright 30 秒内提供可附加会话；此结果不等于启动失败，portable 启动由上一行单独验证，打包应用场景由解包后的正式 app EXE 验证 |
+| GitHub Actions | 通过 | PR #1 的实现提交 `1ea20f9` 完成 Windows Hosted Runner 全流程，包括打包和 Actions artifact 上传；文档同步提交会触发复跑 |
+| 真实游戏、锁屏、多屏和 DPI | 未验收 | 需在具体 Windows 配置中逐项实际操作 |
+| 长稳与性能对比 | 未验收 | 本轮未进行小时级测试，也未重新测量 CPU/内存 |
+
+## 后续必要工作
+
+1. 在 Windows 桌面人工检查设置窗口的版式、游戏规则编辑和更新检查结果；自动化已覆盖动作、造型与场景渲染，但不能代替人工视觉验收。
+2. 用至少一个真实游戏分别核对前台游戏、Alt+Tab、游戏退出和后台运行策略。
+3. 在单屏/多屏、不同缩放率、锁屏与恢复环境进行验收并记录设备配置。
+4. 将分支提交并运行 Windows CI；公开 Release 与资产校验和需要单独确认发布时点。
+
+## 2026-10-19 更新分发增补
+
+后续需求将 UPDATE-001 扩展为用户主动的“检查并可选择下载”：设置中心先请求固定 Clawd 边缘入口，失败时回退 GitHub；下载器只接受固定仓库与严格匹配的 Windows x64 Release URL，按 Range 续传，完成后检查文件长度与 SHA-256。Renderer 不接触文件系统或任意 URL；主进程仅接受设置窗口的无参数下载命令，所有更新请求仍由用户点击触发。程序不会自动执行、安装或替换正在运行的 EXE。
+
+本地新增检查为 `npm run check`、`npm test`（34 项）、4 项 Python 图像测试、`npm run qa:probe`、Wrangler `--dry-run`，以及用最终 portable 候选包运行 `scripts/qa-portable.mjs`，均通过。候选包大小 99,961,650 bytes，SHA-256 为 `6259cba20101cc2b7b7c98fd72e28c73e36f051ea8f16e73d4e3c693ef8bcbb4`。真实 Windows 更新下载、公开 Worker 部署、目标更新域名 HTTPS 验收和中国境内运营商实测仍须分别记录。普通 Cloudflare 全球入口不能被描述为中国全网可达，SHA-256 不能替代签名。
+
+Cloudflare API 复核（2026-10-19）发现最初考虑的主机名已由另一项服务使用，因此取消该目标；没有修改 Cloudflare 资源。只读检查确认 `clawd-updates.chronokalamos.com` 没有精确 DNS 记录、Worker Custom Domain、通配符 DNS 或同名 Worker；已有主域路由只匹配主机名本身。Clawd 配置仅新增独立 Worker 与这个精确子域。部署后还要再次比对既有 Worker、DNS 与 route 清单，确保没有被修改。

@@ -2,18 +2,18 @@
 
 **同一套 Claude / Clawd 衍生陶土像素身体，既是 Codex 本地宠物图集，也是拥有独立互动系统的 Windows 桌面小蟹。**
 
-![Version 1.0.1](https://img.shields.io/badge/version-1.0.1-d97757)
+![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-d97757)
 ![Windows x64](https://img.shields.io/badge/platform-Windows%20x64-0078D4)
 ![Electron 44.7.2](https://img.shields.io/badge/Electron-44.7.2-47848F)
 ![TypeScript 7.0.2](https://img.shields.io/badge/TypeScript-7.0.2-3178C6)
 ![License UNLICENSED](https://img.shields.io/badge/license-UNLICENSED-red)
-![CI not configured](https://img.shields.io/badge/CI-not%20configured-lightgrey)
+![Windows CI configured](https://img.shields.io/badge/Windows%20CI-configured-blue)
 
 > **从欢迎屏跃出，住进你的桌面。**
 
 Clawd 是本地 Claude / Clawd 粉丝作品，非 Anthropic 或 OpenAI 官方产品，未获其背书。仓库按用户要求公开可见；公开可见不代表获得再分发或商用许可。请先阅读 [LICENSE.md](LICENSE.md) 与[元素来源记录](docs/element-provenance.md)。
 
-> **版本边界：**当前源码与最新 Windows 程序为 1.0.1。工作区另有早期生成的 1.0.0 便携包，但它早于当前源码。本仓库从 1.0.1 开始记录 Git 历史，不会把新源码伪标为 1.0.0；旧包作为明确标注的历史下载资产保留。
+> **版本边界：**源码按 1.1.0 维护；公开版本、可下载资产和校验值以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases) 为准。本仓库从 1.0.1 开始记录 Git 历史，不会把新源码伪标为 1.0.0；更早的 1.0.0 便携包不代表当前源码。
 
 ## 一、项目概览
 
@@ -21,7 +21,7 @@ Clawd 将用户提供的 Claude / Clawd 参考统一为一只陶土色像素小�
 
 | 载体 | 能力 | 边界 |
 | --- | --- | --- |
-| Windows 独立桌宠 | 透明置顶、鼠标交互、拖拽抛掷、衣柜、动作菜单、主题演出、动作剧场、本地状态桥 | 不接入云端模型，不自动读取 Codex/Claude 内部任务 |
+| Windows 独立桌宠 | 透明置顶、鼠标交互、拖拽抛掷、衣柜、动作菜单、主题演出、动作剧场、本地状态桥、游戏/全屏场景隐藏和恢复、独立设置中心、手动检查与选择性下载 | 不接入云端模型，不自动读取 Codex/Claude 内部任务；游戏检测依赖用户配置的 EXE 规则；更新不会自动安装 |
 | Codex 本地宠物 V2 | 九类基础状态的图集及 16 向注视素材 | 宿主控制状态与动作；不含 Windows 程序的衣柜、长按菜单、物理和四场演出 |
 | 静态壁纸 | 浅色、深色各一张 3840×2160 PNG | 不含动态壁纸引擎，不自动更改系统背景 |
 
@@ -41,7 +41,7 @@ Clawd 将用户提供的 Claude / Clawd 参考统一为一只陶土色像素小�
 
 1. **角色一致性：**所有造型叠加同一身体，动画与服饰分层注册，避免变成多个不相关角色。
 2. **宿主边界清晰：**Codex 包只交付宿主可读的 pet 描述和图集，扩展交互放在独立桌宠中。
-3. **本地优先：**状态和设置留在本机；没有遥测、模型 API、账号服务或自动更新。
+3. **本地优先：**状态和设置留在本机；没有遥测、模型 API 或账号服务。只有用户主动检查或下载更新时，才请求 Clawd 独立更新入口或 GitHub 的公开 Release 文件；请求不携带用户设置或应用规则。
 4. **用户掌控：**原地、无声为默认；巡游、任务状态桥和开机启动需用户主动打开。
 5. **安全边界明确：**Electron renderer 沙箱隔离，Preload 只暴露窄 IPC 接口。
 6. **像素保真：**Canvas 禁用图像平滑，以确定性图集和锚点渲染。
@@ -63,11 +63,11 @@ flowchart LR
   J --> H[Codex 宿主动画与触发]
 ```
 
-- **主进程**管理透明窗口、托盘、菜单、工作区、系统暂停/恢复与本地状态文件。
+- **主进程**管理透明窗口、托盘、菜单、工作区、场景可见性仲裁、设置持久化、本地状态文件与用户主动触发的版本检查。
 - **Preload** 通过 contextBridge 暴露白名单调用；renderer 没有 Node.js 访问权。
 - **Renderer** 绘制像素图集，处理时间轴、动作、注视、菜单交互与演出。
 - **shared** 模块实现帧选择、点击仲裁、方向索引、抛掷物理和状态验证。
-- **原生探针**辅助识别前台全屏窗口和左键状态，不读取屏幕内容或键盘文本。
+- **原生探针**读取前台窗口几何与进程元数据，并按用户规则检测已配置的游戏；不读取屏幕内容、游戏内存或键盘文本。
 - **Codex 包**不运行本项目代码；宿主读取宠物描述和 WebP 图集，决定实际播放。
 
 无数据库、远程 API、分布式组件、插件协议或公开 SDK。
@@ -93,6 +93,9 @@ flowchart LR
 | 方向图集 | 16 向控制与动作剧场检查 | 少量中间角度警告仍保留 |
 | Codex 宠物 | 九类基础状态和 16 向图集 | 只提供素材；状态触发由 Codex 宿主决定 |
 | 任务桥 | 本地 JSON 文件与 PowerShell 写入器 | 手动演示，不是 Codex/Claude 自动集成 |
+| 游戏与全屏场景 | 本地 Win32 探针、EXE 路径/文件名规则、可见性原因集合 | 智能、游戏运行期间、手动三种模式；未知场景不宣称已识别 |
+| 设置中心 | 造型预览、启动选项、行为与场景规则 | 规则留在本机，显式操作后即时保存 |
+| 版本更新 | 用户点击后查询 Clawd 独立边缘入口，失败时回退 GitHub；可选分块断点下载 | 下载完整后校验 SHA-256；用户关闭旧程序并手动运行新文件，不自动替换 portable EXE |
 | 壁纸 | 浅/深 4K PNG | 用户自行设置为静态壁纸 |
 
 状态桥示例：
@@ -111,16 +114,17 @@ flowchart LR
 | Canvas 2D / HTML / CSS | 浏览器内置 | 简单像素绘制，不引入 3D 或远程 UI 框架 |
 | esbuild | 0.28.2 | 快速打包主进程、Preload 与 renderer |
 | electron-builder | 26.15.3 | Windows x64 便携 EXE |
-| C# / .NET Framework v4 编译器 | Windows 构建机 | 窄范围 Win32 前台窗口和输入状态探针 |
+| C# / .NET Framework v4 编译器 | Windows 构建机，自动探测常见编译器位置或通过 `CLAWD_CSC` 指定 | 窄范围 Win32 前台窗口和输入状态探针 |
+| Playwright Core | 1.64.1（开发测试依赖） | Electron 桌面 QA，不作为运行时依赖 |
 | Node test runner / Python unittest | 锁文件与系统运行时 | 共享逻辑与图像测量分类回归 |
 
-完整依赖见 package.json 与 package-lock.json。运行发行包不需要 Node.js；源码构建需要 Windows x64、Node.js、npm 和脚本指定的 C# 编译器。
+完整依赖见 package.json 与 package-lock.json。运行发行包不需要 Node.js。Windows 源码构建需要 Node.js、npm、Python 3 与 Pillow（图标和图像测试）以及 .NET Framework C# 编译器或 Visual Studio Build Tools。构建脚本支持 `CLAWD_CSC` 覆盖编译器路径。
 
 ## 七、性能与测试证据
 
 在一台 Windows x64 设备上约 182 秒空闲采样：平均 CPU 0.50%，进程树私有内存平均 239.2 MiB、峰值 244.9 MiB。该样本不是跨设备基准，不能证明小时级稳定或无内存泄漏；不同长度的旧采样不用于宣称性能提升比例。
 
-当前验收记录包括 8 项共享逻辑测试、4 项腿缝测量分类回归、Windows 发行版启动与交互、状态恢复、28 项动作/8 套造型/16 向控制/4 场演出及软件布局组合检查。Codex 宿主证据限于用户确认 Clawd 显示且会动；基础状态和各方向未逐项在宿主验收。仓库未配置 CI、代码覆盖率或第三方安全扫描。
+本地验收包括 34 项 Node 测试、4 项 Python 图像测试、TypeScript 类型检查、Electron 应用与 C# 探针构建，以及原生探针启动和 JSON 样本校验。Windows GitHub Actions 工作流会在 PR 与主线提交上运行测试并打包 portable 测试产物。Codex 宿主证据限于用户确认 Clawd 显示且会动；基础状态和各方向未逐项在宿主验收。真实游戏、物理多屏、锁屏/恢复和长稳性能仍需目标 Windows 设备验收。
 
 ## 八、快速开始
 
@@ -129,19 +133,22 @@ flowchart LR
     npm ci
     npm run check
     npm test
+    python -m unittest discover -s tests
     npm start
 
 npm start 会先构建再运行；npm run studio 打开动作剧场。首次安装依赖需联网，程序运行素材与状态留在本地。
 
 ## 九、安装与更新
 
-本项目当前提供**便携 EXE，不是 MSI/NSIS 安装向导**。在公开仓库的 [Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) 下载最新源码对应的 Clawd-1.0.1-windows-x64.exe。程序未签名，Windows 可能提示未知发布者；核对 SHA-256 后再运行，不要为此关闭系统保护。
+本项目当前提供**便携 EXE，不是 MSI/NSIS 安装向导**。设置中心“隐私与关于”可手动查询最新正式 Release；发现更新后可以选择在 Clawd 中下载，也可以打开 GitHub 备用页。下载支持 HTTP Range 断点续传，完整文件通过 SHA-256 校验后才会显示在文件夹中。程序不会自动安装或替换自身：请先关闭 Clawd，再手动运行新便携版。程序未签名，Windows 可能提示未知发布者；核对项目 Release 中的哈希后再运行，不要为此关闭系统保护。版本和发布资产以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) 为准。
+
+Clawd 使用独立 Worker `clawd-updates` 与专用子域 `clawd-updates.chronokalamos.com`，为中国及其他地区提供 GitHub 之外的下载入口；GitHub 仍是唯一正式发布源，Worker 仅流式转发固定仓库的 Release 文件，不使用 R2。该普通全球边缘入口属于尽力改善，无法保证中国大陆所有运营商和网络时段始终可达。网络环境无法访问边缘入口时，程序会尝试 GitHub 备用源。实现、部署隔离与费用边界见[更新分发设计](docs/update-delivery.md)。
 
 Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，也可在 Windows 运行本地复制脚本：
 
     powershell -NoProfile -File .\scripts\install-pet.ps1
 
-脚本会校验宠物包，并备份同名旧目录；它不会替用户改变当前选择。安装细节见[两个版本怎么用](docs/两个版本怎么用.md)。没有云同步、自动更新、灰度升级、迁移工具、Docker 或 Kubernetes 部署。
+脚本会校验宠物包，并备份同名旧目录；它不会替用户改变当前选择。安装细节见[两个版本怎么用](docs/两个版本怎么用.md)。没有云同步、自动下载/安装、灰度升级、迁移工具、Docker 或 Kubernetes 部署。
 
 1.0.0 便携 EXE 是当前源码之前的历史构建，文件名仍保留版本号并随 1.0.1 Release 明确标注。未捕获其独立源码快照，因此仓库不提供虚假的 1.0.0 源码 Tag。
 
@@ -156,12 +163,12 @@ Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，
 | 右键角色 | 设置和衣柜 |
 | 托盘菜单 | 退出、减少动态、收回当前屏幕、可选功能 |
 
-原地与无声为默认。全屏应用、锁屏和系统挂起时暂停；沿边巡游、任务桥和开机启动由用户主动开启。Codex 菜单与衣柜不是本项目可以安装到宿主中的功能。
+原地与无声为默认。智能模式下，已配置游戏的前台窗口和启用的全屏规则会使 Clawd 隐藏；离开后延迟恢复。游戏运行期间模式会在配置的游戏进程仍运行时保持隐藏。锁屏和系统挂起始终隐藏。沿边巡游、任务桥、游戏规则和开机启动由用户主动配置。Codex 菜单与衣柜不是本项目可以安装到宿主中的功能。
 
 ## 十一、安全、隐私与威胁模型
 
 - Electron 使用 contextIsolation=true、nodeIntegration=false、sandbox=true；主进程验证 IPC 来源。
-- 默认会拦截非本地资源请求；无遥测、模型 API、账号或自动更新。
+- Renderer 默认会拦截非本地资源请求；无遥测、模型 API 或账号。只有用户主动检查或选择下载时，主进程才连接固定的 Clawd 更新子域与 GitHub 公共 Releases 资产地址。请求不包含设置与应用规则；更新下载完成后先校验 SHA-256，不会自动执行文件。
 - 不读取终端、窗口标题、屏幕、剪贴板、键盘文本或用户文件。探针限于前台窗口几何/全屏和左键状态。
 - 状态文件经过大小、字段、枚举、时间和 TTL 校验；错误或过期输入被丢弃。
 - 本地风险包括未签名 EXE、用户本地文件篡改和依赖供应链问题。没有代码签名、SBOM、持续漏洞扫描、独立审计或响应 SLA。
@@ -172,17 +179,22 @@ Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，
 | 现象 | 说明 |
 | --- | --- |
 | Codex 里没有换装/互动菜单 | 宿主包只有图集；请运行独立 Windows 桌宠 |
+| Clawd 没有按游戏规则隐藏 | 确认设置中心已添加实际游戏 EXE、规则已启用，并查看前台/游戏运行模式；全屏规则和游戏规则彼此独立 |
+| 自动场景检测不可用 | Windows 原生探针未启动或无心跳；Clawd 仍可手动使用，尝试重启程序或切换手动模式 |
+| 游戏切回桌面后桌宠不恢复 | 游戏运行期间模式会持续隐藏，直到配置的游戏进程退出；智能模式按恢复延迟显示 |
+| 版本检查失败 | 检查网络连接；边缘入口与 GitHub 备用源都不可用或尚无正式 Release 时可稍后重试，也可手动打开 Release 页面 |
+| 更新下载中断 | 再次点击下载可从本机 `.part` 文件继续；完成后必须通过 SHA-256 校验，之后手动关闭旧程序并运行新文件 |
 | Codex 预览正确，Mini 未更新 | 先确认宿主当前读取状态；项目不清理 Codex 缓存或修改宿主内部文件 |
 | 桌宠无法点击 | 透明空白区域会穿透；检查是否位于角色实体区域 |
 | 桌宠离屏 | 在托盘选择“收回当前屏幕” |
 | 任务状态没变化 | 状态桥默认关闭，需用户开启并写入有效且未过期的 JSON |
 | Windows 提示未知发布者 | 程序未签名；只从本项目 Release 下载并核对哈希 |
 
-目前没有稳定的公开错误码体系。
+目前没有稳定的公开错误码体系。架构审计与场景协议见[审计报告](docs/architecture-audit.md)和[可见性设计](docs/visibility-and-scenes.md)。
 
 ## 十三、治理与路线图
 
-当前为个人维护的公开可见项目，无外部贡献者等级、公开支持 SLA、社区会议或赞助渠道，也未配置 CI。已交付 1.0.1：Windows 桌宠、Codex V2 图集包、两张 4K 壁纸、本机测试记录（未公开）。签名安装器、跨设备测试与更多宿主验证尚未排期，不构成发布承诺。仓库没有通用开源或再分发许可；GitHub 上查看与 fork 受 GitHub 服务条款约束，其他用途未获授权。
+当前为个人维护的公开可见项目，无外部贡献者等级、公开支持 SLA、社区会议或赞助渠道。1.1.0 的 Windows Hosted CI 已在实现提交 `1ea20f9` 通过，包含 portable 打包和短期构建产物上传；真实多设备和长时间性能测试仍未完成。仓库没有通用开源或再分发许可；GitHub 上查看与 fork 受 GitHub 服务条款约束，其他用途未获授权。
 
 ## 十四、架构决策记录（ADR）
 
@@ -192,6 +204,8 @@ Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，
 | 动画表达 | 共享身体 + 数据驱动图集 | 身份稳定；非每个动作独立绘制 |
 | Codex 适配 | 宠物图集与 Windows 程序分开 | 诚实遵循宿主边界；两载体功能不相同 |
 | 任务状态 | 默认关闭的本地 JSON 文件协议 | 易校验且不依赖私有 API；需用户主动写入 |
+| 系统场景 | 进程元数据、用户规则与可见性原因仲裁 | 游戏识别透明且可配置；未列入规则的窗口化游戏不会被可靠识别 |
+| 版本更新 | 用户主动检查、选择分块续传；Clawd Worker 优先、GitHub 备用；SHA-256 校验后手动替换 | 平时保持离线；不自动安装；依赖免费边缘平台配额与 GitHub 源可用性，不能承诺中国网络全线可达 |
 | 发布形态 | 未签名 portable EXE | 免安装；缺少签名信任与集中卸载体验 |
 
 ## 十五、生态、案例与局限
@@ -206,4 +220,4 @@ LICENSE.md 当前标记为 UNLICENSED：程序与编排文件仅供本次委托�
 
 ---
 
-**资源：**[Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) · [动作目录](docs/action-catalog.md) · [来源记录](docs/element-provenance.md) · [SHA-256 清单](SHA256SUMS.txt)
+**资源：**[Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) · [1.1.0 变更说明](docs/RELEASE-NOTES-v1.1.0.md) · [动作目录](docs/action-catalog.md) · [场景架构审计](docs/architecture-audit.md) · [来源记录](docs/element-provenance.md) · 历史 1.0.1/1.0.0 包校验清单：`SHA256SUMS.txt`

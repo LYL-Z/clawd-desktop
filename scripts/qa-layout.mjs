@@ -1,11 +1,10 @@
 import assert from 'node:assert/strict';
-import {createRequire} from 'node:module';
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {beginEvidence,retainEvidence} from './qa-evidence.mjs';
-const require=createRequire('C:/Users/Lenovo/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/package.json');
-const {_electron}=require('playwright'),root=process.cwd(),out=path.join(root,'qa/runtime/layout');
+import {loadElectronDriver} from './qa-support.mjs';
+const _electron=loadElectronDriver(),root=process.cwd(),out=path.join(root,'qa/runtime/layout');
 const manifest=JSON.parse(await readFile(path.join(root,'assets/runtime/animations.json'),'utf8'));
 const report={startedAt:new Date().toISOString(),scope:'Real Electron renderer with forced software DPR profiles; no Windows display setting changed and no OS mouse input',profiles:[],passed:false};
 report.evidence=await beginEvidence(root,'layout',['layout-qa.json','layout']);

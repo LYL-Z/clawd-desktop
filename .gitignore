@@ -1,6 +1,7 @@
 /node_modules/
 /app/
 /release/
+/cloudflare-updates/release/
 /qa/
 /brief/
 /CHECKPOINT.md
@@ -16,4 +17,3 @@ __pycache__/
 /scripts/write-delivery-docs.py
 /scripts/inspect-host-*.mjs
 /scripts/qa-host-loader.mjs
-/scripts/qa-evidence.mjs
