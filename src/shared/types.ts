@@ -7,10 +7,14 @@ export type AppRule={id:string;kind:'game'|'exception';match:'path'|'name';exeNa
 export type VisibilityReason='game'|'fullscreen'|'user'|'lock'|'suspend';
 export type SceneKind='desktop'|'game'|'fullscreen'|'unknown';
 export type VisibilitySnapshot={visible:boolean;reasons:VisibilityReason[];scene:SceneKind;foregroundName?:string;probeHealthy:boolean;updatedAt?:number};
+export type UpdateSource={kind:'edge'|'github';url:string};
+export type UpdateArtifact={fileName:string;size:number;sha256:string;sources:UpdateSource[]};
 export type UpdateCheckResult=
-  |{status:'available';currentVersion:string;latestVersion:string;releaseName:string;releaseNotes:string;publishedAt:string}
+  |{status:'available';currentVersion:string;latestVersion:string;releaseName:string;releaseNotes:string;publishedAt:string;artifact:UpdateArtifact}
   |{status:'current'|'ahead';currentVersion:string;latestVersion:string;releaseName:string;releaseNotes:string;publishedAt:string}
   |{status:'unavailable';currentVersion:string;message:string};
+export type UpdateDownloadProgress={completedBytes:number;totalBytes:number;source:'edge'|'github'};
+export type UpdateDownloadResult={ok:true;filePath:string;sha256:string}|{ok:false;message:string;cancelled?:boolean};
 export type ActionDef={row:number;startFrame?:number;count:number;durations:number[];atlas?:string;loop?:boolean;label?:string;outfit?:Outfit};
 export type OutfitDef={atlas:string;overlay?:boolean;hidden?:boolean;bodyOffsetY?:number;followHead?:boolean;groundRegionY?:number;row?:number;count?:number;durations?:number[];animations?:Record<string,ActionDef>};
 export type Manifest={version:number;cellWidth:number;cellHeight:number;atlas:string;anchor?:Point;animations:Record<string,ActionDef>;look?:{startRow:number;count:number};outfits?:Partial<Record<Outfit,OutfitDef>>};
@@ -29,6 +33,10 @@ export interface ClawdBridge {
   setStartup(enabled:boolean):Promise<boolean>;
   setUserHidden(hidden:boolean):Promise<boolean>;
   checkForUpdates():Promise<UpdateCheckResult>;
+  downloadUpdate():Promise<UpdateDownloadResult>;
+  cancelUpdateDownload():Promise<boolean>;
+  showDownloadedUpdate():Promise<boolean>;
+  onUpdateDownloadProgress(callback:(progress:UpdateDownloadProgress)=>void):()=>void;
   openReleasePage():Promise<boolean>;
   ready():void;
   report(data:unknown):void;

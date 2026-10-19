@@ -1,6 +1,6 @@
 import {Assets} from './assets';
 import {frameAt,durationOf} from '../shared/animation';
-import {OUTFITS,type AppRule,type ClawdBridge,type Environment,type HostCommand,type Settings,type UpdateCheckResult,type VisibilitySnapshot} from '../shared/types';
+import {OUTFITS,type AppRule,type ClawdBridge,type Environment,type HostCommand,type Settings,type UpdateCheckResult,type UpdateDownloadProgress,type VisibilitySnapshot} from '../shared/types';
 
 declare global{interface Window{clawd:ClawdBridge;}}
 
@@ -91,8 +91,8 @@ function updatePreviewCaption():void{
 }
 
 function renderUpdateResult(result:UpdateCheckResult):void{
-  const status=$<HTMLDivElement>('#update-result'),notes=$<HTMLPreElement>('#release-notes'),open=$<HTMLButtonElement>('#open-release');
-  notes.hidden=true;notes.textContent='';
+  const status=$<HTMLDivElement>('#update-result'),notes=$<HTMLPreElement>('#release-notes'),open=$<HTMLButtonElement>('#open-release'),download=$<HTMLButtonElement>('#download-update'),show=$<HTMLButtonElement>('#show-downloaded'),bar=$<HTMLProgressElement>('#update-progress'),label=$<HTMLDivElement>('#update-progress-label');
+  notes.hidden=true;notes.textContent='';download.hidden=true;show.hidden=true;bar.hidden=true;bar.value=0;label.hidden=true;
   if(result.status==='unavailable'){
     status.textContent=result.message;status.className='update-result warning';open.hidden=false;open.textContent='查看 Release 页面';return;
   }
@@ -102,7 +102,18 @@ function renderUpdateResult(result:UpdateCheckResult):void{
   else status.textContent=`当前已是最新公开正式版 ${result.latestVersion}。`;
   status.className=`update-result ${result.status}`;
   if(result.releaseNotes){notes.textContent=result.releaseNotes;notes.hidden=false;}
-  open.hidden=false;open.textContent=result.status==='available'?'选择是否更新':'查看 Release 页面';
+  open.hidden=false;open.textContent=result.status==='available'?'GitHub 备用下载页':'查看 Release 页面';
+  download.hidden=result.status!=='available';
+}
+
+function renderDownloadProgress(progress:UpdateDownloadProgress):void{
+  const bar=$<HTMLProgressElement>('#update-progress'),label=$<HTMLDivElement>('#update-progress-label'),status=$<HTMLDivElement>('#update-result');
+  const percent=progress.totalBytes>0?Math.min(100,Math.floor(progress.completedBytes/progress.totalBytes*100)):0;
+  bar.value=percent;bar.hidden=false;label.hidden=false;
+  const source=progress.source==='edge'?'Clawd 边缘入口':'GitHub 备用源';
+  const received=(progress.completedBytes/1024/1024).toFixed(1),total=(progress.totalBytes/1024/1024).toFixed(1);
+  label.textContent=`${source} · ${received} / ${total} MiB · ${percent}%`;
+  status.textContent='正在下载更新；可以取消后稍后从已下载位置继续。';status.className='update-result';
 }
 
 function drawPreview(now:number):void{
@@ -198,10 +209,29 @@ function bindControls():void{
   };
   $<HTMLButtonElement>('#check-updates').onclick=async event=>{
     const button=event.currentTarget as HTMLButtonElement;button.disabled=true;button.textContent='正在查询…';
+    $<HTMLButtonElement>('#download-update').hidden=true;$<HTMLButtonElement>('#show-downloaded').hidden=true;
     try{renderUpdateResult(await window.clawd.checkForUpdates());}
     catch{const status=$<HTMLDivElement>('#update-result');status.textContent='暂时无法检查版本，请稍后重试。';status.className='update-result warning';}
     finally{button.disabled=false;button.textContent='重新检查';}
   };
+  $<HTMLButtonElement>('#download-update').onclick=async event=>{
+    const button=event.currentTarget as HTMLButtonElement,cancel=$<HTMLButtonElement>('#cancel-update'),show=$<HTMLButtonElement>('#show-downloaded'),bar=$<HTMLProgressElement>('#update-progress'),label=$<HTMLDivElement>('#update-progress-label'),check=$<HTMLButtonElement>('#check-updates');
+    button.disabled=true;check.disabled=true;cancel.hidden=false;bar.value=0;bar.hidden=false;label.textContent='正在连接更新源…';label.hidden=false;
+    try{
+      const result=await window.clawd.downloadUpdate();
+      if(result.ok){
+        $<HTMLDivElement>('#update-result').textContent='下载完成，SHA-256 校验通过。请关闭 Clawd 后手动运行新文件完成更新。';
+        $<HTMLDivElement>('#update-result').className='update-result current';label.textContent=`已保存：${result.filePath}`;bar.value=100;show.hidden=false;
+      }else{
+        $<HTMLDivElement>('#update-result').textContent=result.message;$<HTMLDivElement>('#update-result').className='update-result warning';
+      }
+    }catch{
+      $<HTMLDivElement>('#update-result').textContent='更新下载失败；已下载部分会保留，可稍后重试。';$<HTMLDivElement>('#update-result').className='update-result warning';
+    }finally{button.disabled=false;check.disabled=false;cancel.hidden=true;}
+  };
+  $<HTMLButtonElement>('#cancel-update').onclick=async()=>{await window.clawd.cancelUpdateDownload();};
+  $<HTMLButtonElement>('#show-downloaded').onclick=async()=>{const opened=await window.clawd.showDownloadedUpdate();if(!opened)toast('找不到已校验的更新文件，请重新检查版本。');};
+  window.clawd.onUpdateDownloadProgress(renderDownloadProgress);
   $<HTMLButtonElement>('#open-release').onclick=async()=>{
     const opened=await window.clawd.openReleasePage();toast(opened?'已在浏览器打开 GitHub Release 页面。':'无法打开浏览器，请稍后重试。');
   };

@@ -59,8 +59,8 @@ Clawd 采用保守、可解释的场景策略。Windows 没有通用可靠的“
 
 ## 版本检查与更新
 
-设置中心“隐私与关于”页面的“检查新版本”按钮会按需请求 GitHub 的公开 latest-release API。该 API 返回最近发布的正式版，不包含草稿和预发布版本；应用使用 SemVer 比较本机版本和 Release tag。[GitHub 官方 API 文档](https://docs.github.com/en/rest/releases/releases#get-the-latest-release)
+设置中心“隐私与关于”页面的“检查新版本”按钮会按需请求 Clawd 独立边缘入口 `clawd-updates.chronokalamos.com`；边缘入口不可用时，应用回退到 GitHub 公开 latest-release API。两者只读取 `LYL-Z/clawd-desktop` 的最新正式版，不包含草稿和预发布版本；应用使用 SemVer 比较本机版本与 Release tag。[GitHub 官方 API 文档](https://docs.github.com/en/rest/releases/releases#get-the-latest-release)
 
-版本检查不会自动运行、下载或替换程序。发现新版本后，用户可以自行打开固定的项目 Release 页面，核对版本说明、文件和 SHA-256，再决定是否下载。portable EXE 需要先退出旧版本，再自行放置并启动新文件。
+版本检查不会自动运行或下载程序。发现新版本后，用户可以选择在设置页下载，或打开固定的 GitHub Release 页面。下载器将 EXE 写入 `%APPDATA%\Clawd\updates\<version>`，优先请求 Clawd 边缘下载入口，失败时回退至 GitHub；支持 HTTP Range 续传和取消后保留 `.part` 文件。完整下载后需同时通过字节长度和 Release `SHA256SUMS.txt` 中的 SHA-256 校验，校验通过才显示“打开文件位置”。portable EXE 不会自动安装或替换自身，用户需关闭 Clawd 后手动运行新文件。
 
-请求只发送固定的 API 地址、应用版本化 User-Agent 和 GitHub 所需请求头；不会附带设置、应用规则或个人路径。网络服务仍会接收到正常 HTTPS 请求元数据，例如来源 IP。没有网络、未发布正式 Release 或达到 GitHub 公共请求限制时，应用给出本地提示并保持现有版本可用。
+请求只发送固定服务地址、应用版本化 User-Agent、HTTP Range 和 GitHub 所需请求头；不会附带设置、应用规则或个人路径。网络服务仍会接收到正常 HTTPS 请求元数据，例如来源 IP。没有网络、未发布正式 Release、GitHub 公共请求受限或 Worker 配额不足时，应用给出本地提示并保持现有版本可用。普通全球边缘网络可改善部分连接，不代表中国大陆全部运营商/线路始终可达；中国境内网络覆盖仍须按设备和运营商实测。

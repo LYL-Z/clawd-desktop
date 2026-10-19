@@ -3,8 +3,9 @@ import {readFile,stat,writeFile} from 'node:fs/promises';
 import {SettingsStore} from './services/SettingsStore';
 import {ForegroundAppMonitor} from './services/ForegroundAppMonitor';
 import {UpdateChecker} from './services/UpdateChecker';
+import {UpdateDownloader} from './services/UpdateDownloader';
 import {classifyScene,VisibilityController} from '../shared/visibility';
-import {DEFAULTS,OUTFITS,CORE_ACTIONS,EXT_ACTIONS,PERFORMANCES,type Settings,type Point,type HostCommand,type Environment,type VisibilitySnapshot} from '../shared/types';
+import {DEFAULTS,OUTFITS,CORE_ACTIONS,EXT_ACTIONS,PERFORMANCES,type Settings,type Point,type HostCommand,type Environment,type VisibilitySnapshot,type UpdateArtifact} from '../shared/types';
 import type {ForegroundSample} from '../shared/probe';
 import {parseStatus} from '../shared/status';
 import path from 'node:path';
@@ -24,6 +25,8 @@ let settings:Settings={...DEFAULTS};
 let store:SettingsStore|undefined;
 let monitor:ForegroundAppMonitor|undefined;
 const updateChecker=new UpdateChecker();
+const updatesDirectory=path.join(app.getPath('userData'),'updates');
+const updateDownloader=new UpdateDownloader(updatesDirectory);
 let visibility:VisibilityController|undefined;
 let latestSample:ForegroundSample|undefined;
 let probeHealthy=false;
@@ -38,6 +41,8 @@ let lastMenuWasActions=false;
 let manifest:Environment['manifest'];
 let shutdownRequested=false;
 let lastEnvironmentKey='';
+let latestUpdateArtifact:UpdateArtifact|undefined;
+let downloadedUpdatePath:string|undefined;
 const timers:ReturnType<typeof setInterval>[]=[];
 
 const settingsPath=()=>path.join(app.getPath('userData'),'settings.json');
@@ -187,7 +192,7 @@ function createWindow(kind:WindowKind):BrowserWindow{
   win.on('closed',()=>{
     if(win===pet)pet=undefined;
     if(win===studio)studio=undefined;
-    if(win===settingsWindow)settingsWindow=undefined;
+    if(win===settingsWindow){updateDownloader.cancel();settingsWindow=undefined;}
   });
   if(kind==='settings')void win.loadFile(path.join(__dirname,'settings.html'));
   else void win.loadFile(path.join(__dirname,'index.html'),{query:{mode:isStudio?'studio':'pet'}});
@@ -246,7 +251,30 @@ function setupIPC():void{
     if(event.sender!==settingsWindow?.webContents||typeof enabled!=='boolean')return false;
     return setStartup(enabled);
   });
-  ipcMain.handle('clawd:updates:check',event=>event.sender===settingsWindow?.webContents?updateChecker.check(app.getVersion()):{status:'unavailable',currentVersion:app.getVersion(),message:'请求来源无效。'});
+  ipcMain.handle('clawd:updates:check',async event=>{
+    if(event.sender!==settingsWindow?.webContents)return{status:'unavailable',currentVersion:app.getVersion(),message:'请求来源无效。'};
+    const result=await updateChecker.check(app.getVersion());
+    latestUpdateArtifact=result.status==='available'?result.artifact:undefined;
+    downloadedUpdatePath=undefined;
+    return result;
+  });
+  ipcMain.handle('clawd:updates:download',async event=>{
+    if(event.sender!==settingsWindow?.webContents)return{ok:false,message:'请求来源无效。'};
+    if(!latestUpdateArtifact)return{ok:false,message:'请先检查到可用的新版本。'};
+    const artifact=latestUpdateArtifact;
+    const result=await updateDownloader.download(artifact,progress=>{
+      if(settingsWindow&&!settingsWindow.isDestroyed()&&!settingsWindow.webContents.isDestroyed())settingsWindow.webContents.send('clawd:update-download-progress',progress);
+    });
+    if(result.ok)downloadedUpdatePath=result.filePath;
+    return result;
+  });
+  ipcMain.handle('clawd:updates:cancel-download',event=>event.sender===settingsWindow?.webContents?updateDownloader.cancel():false);
+  ipcMain.handle('clawd:updates:show-downloaded',async event=>{
+    if(event.sender!==settingsWindow?.webContents||!downloadedUpdatePath)return false;
+    const relative=path.relative(updatesDirectory,downloadedUpdatePath);
+    if(path.isAbsolute(relative)||relative==='..'||relative.startsWith(`..${path.sep}`))return false;
+    try{if(!(await stat(downloadedUpdatePath)).isFile())return false;shell.showItemInFolder(downloadedUpdatePath);return true;}catch{return false;}
+  });
   ipcMain.handle('clawd:updates:open-release',async event=>{
     if(event.sender!==settingsWindow?.webContents)return false;
     try{await shell.openExternal('https://github.com/LYL-Z/clawd-desktop/releases/latest');return true;}catch{return false;}

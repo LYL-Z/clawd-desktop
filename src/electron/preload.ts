@@ -1,5 +1,5 @@
 import {contextBridge,ipcRenderer} from 'electron';
-import type {ClawdBridge,HostCommand,Point,Rect} from '../shared/types';
+import type {ClawdBridge,HostCommand,Point,Rect,UpdateDownloadProgress} from '../shared/types';
 const bridge:ClawdBridge={
   init:()=>ipcRenderer.invoke('clawd:init'),
   move:(point,expanded)=>ipcRenderer.send('clawd:move',{point,expanded}),
@@ -11,6 +11,10 @@ const bridge:ClawdBridge={
   setStartup:enabled=>ipcRenderer.invoke('clawd:settings:set-startup',Boolean(enabled)),
   setUserHidden:hidden=>ipcRenderer.invoke('clawd:visibility:set-user-hidden',Boolean(hidden)),
   checkForUpdates:()=>ipcRenderer.invoke('clawd:updates:check'),
+  downloadUpdate:()=>ipcRenderer.invoke('clawd:updates:download'),
+  cancelUpdateDownload:()=>ipcRenderer.invoke('clawd:updates:cancel-download'),
+  showDownloadedUpdate:()=>ipcRenderer.invoke('clawd:updates:show-downloaded'),
+  onUpdateDownloadProgress:callback=>{const listener=(_:unknown,progress:UpdateDownloadProgress)=>callback(progress);ipcRenderer.on('clawd:update-download-progress',listener);return()=>ipcRenderer.removeListener('clawd:update-download-progress',listener);},
   openReleasePage:()=>ipcRenderer.invoke('clawd:updates:open-release'),
   ready:()=>ipcRenderer.send('clawd:ready'),
   report:data=>ipcRenderer.send('clawd:report',data),

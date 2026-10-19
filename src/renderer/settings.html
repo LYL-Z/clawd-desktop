@@ -98,12 +98,12 @@
           <p class="lead">一只从欢迎屏走出来、安静待在桌边的小小像素蟹。</p>
           <div class="about-hero"><div class="about-crab" aria-hidden="true"><span class="eye eye-left"></span><span class="eye eye-right"></span><span class="claw claw-left"></span><span class="claw claw-right"></span><span class="leg leg-a"></span><span class="leg leg-b"></span><span class="leg leg-c"></span><span class="leg leg-d"></span></div><div><span class="version-label">桌面伙伴</span><strong>Clawd Desktop</strong><small id="version-line">版本信息载入中</small></div></div>
           <div class="update-card">
-            <div class="update-copy"><strong>软件更新</strong><p>只有点击检查时才会连接 GitHub；不会自动下载、安装或替换正在运行的程序。</p><div class="update-result" id="update-result" role="status" aria-live="polite">尚未检查 · 当前版本以本机显示为准</div><pre class="release-notes" id="release-notes" hidden></pre></div>
-            <div class="update-actions"><button class="secondary-button" id="check-updates" type="button">检查新版本</button><button class="primary-button" id="open-release" type="button" hidden>打开下载页</button></div>
+            <div class="update-copy"><strong>软件更新</strong><p>手动检查时先尝试 Clawd 边缘入口，必要时回退到 GitHub；只有你点击下载后才传输程序。文件会断点续传并在下载完成后校验 SHA-256，不会自动安装或替换正在运行的程序。</p><div class="update-result" id="update-result" role="status" aria-live="polite">尚未检查 · 当前版本以本机显示为准</div><progress class="update-progress" id="update-progress" max="100" value="0" hidden></progress><div class="update-progress-label" id="update-progress-label" hidden></div><pre class="release-notes" id="release-notes" hidden></pre></div>
+            <div class="update-actions"><button class="secondary-button" id="check-updates" type="button">检查新版本</button><button class="primary-button" id="download-update" type="button" hidden>下载更新</button><button class="secondary-button" id="cancel-update" type="button" hidden>取消下载</button><button class="secondary-button" id="show-downloaded" type="button" hidden>打开文件位置</button><button class="secondary-button" id="open-release" type="button" hidden>打开 GitHub 备用页</button></div>
           </div>
           <div class="card-list">
             <div class="about-row"><strong>非官方粉丝作品</strong><p>Clawd 是受 Claude / Clawd 参考启发的非官方衍生项目，不与 Anthropic、OpenAI 建立隶属或背书关系。</p></div>
-            <div class="about-row"><strong>离线与隐私</strong><p>日常运行不联网、不调用模型，也不读取屏幕内容、剪贴板、键盘输入或私人文件。只有点击版本检查时，Clawd 才向 GitHub 请求公开 Release 版本信息；不会随请求上传用户设置或应用规则。</p></div>
+              <div class="about-row"><strong>离线与隐私</strong><p>日常运行不联网、不调用模型，也不读取屏幕内容、剪贴板、键盘输入或私人文件。只有点击版本检查时，Clawd 才向 Clawd 更新边缘入口查询公开 Release 版本信息，并在必要时回退到 GitHub；只有点击下载后才传输公开程序文件。不会随请求上传用户设置或应用规则。</p></div>
             <div class="about-row"><strong>项目与使用边界</strong><p>源代码公开可查看，但仓库没有授予一般再分发或商业使用的通用许可。Claude / Clawd 品牌与相关视觉仍受第三方权利约束。</p><code>github.com/LYL-Z/clawd-desktop</code></div>
           </div>
         </section>

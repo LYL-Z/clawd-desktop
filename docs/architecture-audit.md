@@ -57,3 +57,11 @@
 2. 用至少一个真实游戏分别核对前台游戏、Alt+Tab、游戏退出和后台运行策略。
 3. 在单屏/多屏、不同缩放率、锁屏与恢复环境进行验收并记录设备配置。
 4. 将分支提交并运行 Windows CI；公开 Release 与资产校验和需要单独确认发布时点。
+
+## 2026-10-19 更新分发增补
+
+后续需求将 UPDATE-001 扩展为用户主动的“检查并可选择下载”：设置中心先请求固定 Clawd 边缘入口，失败时回退 GitHub；下载器只接受固定仓库与严格匹配的 Windows x64 Release URL，按 Range 续传，完成后检查文件长度与 SHA-256。Renderer 不接触文件系统或任意 URL；主进程仅接受设置窗口的无参数下载命令，所有更新请求仍由用户点击触发。程序不会自动执行、安装或替换正在运行的 EXE。
+
+本地新增检查为 `npm run check`、`npm test`（34 项）、4 项 Python 图像测试、`npm run qa:probe`、Wrangler `--dry-run`，以及用最终 portable 候选包运行 `scripts/qa-portable.mjs`，均通过。候选包大小 99,961,650 bytes，SHA-256 为 `6259cba20101cc2b7b7c98fd72e28c73e36f051ea8f16e73d4e3c693ef8bcbb4`。真实 Windows 更新下载、公开 Worker 部署、目标更新域名 HTTPS 验收和中国境内运营商实测仍须分别记录。普通 Cloudflare 全球入口不能被描述为中国全网可达，SHA-256 不能替代签名。
+
+Cloudflare API 复核（2026-10-19）发现最初考虑的主机名已由另一项服务使用，因此取消该目标；没有修改 Cloudflare 资源。只读检查确认 `clawd-updates.chronokalamos.com` 没有精确 DNS 记录、Worker Custom Domain、通配符 DNS 或同名 Worker；已有主域路由只匹配主机名本身。Clawd 配置仅新增独立 Worker 与这个精确子域。部署后还要再次比对既有 Worker、DNS 与 route 清单，确保没有被修改。
