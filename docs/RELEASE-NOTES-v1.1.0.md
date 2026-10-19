@@ -20,7 +20,7 @@
 - `npm run build`：本机 Windows 构建与 C# 探针编译通过。
 - `release/v1.1.0/Clawd-1.1.0-windows-x64.exe`：本地 portable 候选包已生成，99,946,131 bytes（约 95.3 MiB）；SHA-256：`6fee169fd0ea3ecf9f79c88d2974bf4434869de6d4cf1d7228c375e1c960e51f`。
 - portable 实际启动冒烟与打包应用动作/造型/方向/演出离线资源桌面自动化：通过；证据范围与限制见 `docs/architecture-audit.md`。
-- Windows GitHub Actions Hosted Runner：待分支推送后首次运行。
+- Windows GitHub Actions Hosted Runner：实现提交 `1ea20f9` 的检查、原生探针、portable 打包、SHA 清单和 artifact 上传均通过；后续文档同步提交会再次触发 CI。
 - 真实游戏、多显示器、DPI、锁屏与长时间运行：本版本尚未完成目标设备验收。
 
 ## 发布范围

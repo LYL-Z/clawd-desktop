@@ -47,7 +47,7 @@
 | portable 包启动冒烟 | 通过 | `release/v1.1.0/Clawd-1.1.0-windows-x64.exe` 实际启动；五张图集和原生探针可用，正常关闭应用与便携启动器 |
 | 打包应用桌面场景 | 通过 | 通过 `win-unpacked/Clawd.exe` 执行真实 Electron Renderer 检查：28 个动作、8 种造型、16 个方向、4 段演出、减少动态效果及离线资源重载 |
 | Playwright 直接附加 portable 启动器 | 未通过 | 自解压 portable 包没有在 Playwright 30 秒内提供可附加会话；此结果不等于启动失败，portable 启动由上一行单独验证，打包应用场景由解包后的正式 app EXE 验证 |
-| GitHub Actions | 待首次运行 | 工作流已配置；本地代码尚未发布到分支或 PR |
+| GitHub Actions | 通过 | PR #1 的实现提交 `1ea20f9` 完成 Windows Hosted Runner 全流程，包括打包和 Actions artifact 上传；文档同步提交会触发复跑 |
 | 真实游戏、锁屏、多屏和 DPI | 未验收 | 需在具体 Windows 配置中逐项实际操作 |
 | 长稳与性能对比 | 未验收 | 本轮未进行小时级测试，也未重新测量 CPU/内存 |
 
