@@ -33,7 +33,8 @@ function metadataErrorDetails(error) {
   const rawMessage = error instanceof Error ? error.message : "";
   const message = rawMessage
     .replace(/https?:\/\/[^\s"'<>]+/gi, "[url]")
-    .replace(/\b(?:authorization|bearer|token|secret|password)\s*[:=]?\s*\S+/gi, "[redacted]")
+    .replace(/["']?[\w.-]*(?:proxy[_-]?authorization|authorization|token|secret|password|passwd|api[_-]?key|access[_-]?key|key)["']?\s*(?::|=|\s)\s*(?:(?:bearer|basic)\s+)?(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|[^\s"',;}]+)/gi, "[redacted]")
+    .replace(/\b(?:bearer|basic)\s+\S+/gi, "[redacted]")
     .replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, "[email]")
     .replace(/\b[a-f0-9]{32,}\b/gi, "[redacted]")
     .replace(/[\r\n\t]+/g, " ")
