@@ -4,15 +4,17 @@
 
 ### 版本决策
 
-任务书第十八章明确要求“版本号必须按照实际变更与项目版本约定确定”，并说明不得仅因任务书称为 Clawd 2.0 就强制把 `package.json` 改为 2.0.0。本轮从仓库公开的 1.0.1 基线继续增量开发，保留旧设置迁移与原有功能兼容，因此候选包按 SemVer 次版本递增为 **1.1.0**。它是正式版本候选，不是临时过渡包；只有发布门槛通过后才会建立 1.1.0 tag 和 GitHub Release。
+任务书第十八章明确要求“版本号必须按照实际变更与项目版本约定确定”，并说明不得仅因任务书称为 Clawd 2.0 就强制把 `package.json` 改为 2.0.0。本轮从公开的 1.0.1 基线增量开发，保留旧设置迁移与原有功能兼容，因此按 SemVer 次版本递增为正式版本 **1.1.0**。该版本已于 2026-10-20 发布；“Clawd 2.0”是任务书/升级方案名称，不代表已发布 2.0.0。
 
 ## 结论与证据口径
 
 ### 最新状态补记（2026-10-20）
 
-GitHub 仓库 [LYL-Z/clawd-desktop](https://github.com/LYL-Z/clawd-desktop) 已确认为 PUBLIC。PR #3 仍为草稿；最近一次本地与 Windows CI 完整验证的提交为 `ef724406fe9fb6a7efc558f62c290d1ec9ae1788`，两条 Windows CI 均成功（run `39425639194`、`39425646351`，分别用时 3 分 18 秒和 3 分 32 秒）。这之后的唯一变更是本任务书状态补记。GitHub Release 尚未创建。30 分钟普通模式测试对应较早候选 SHA-256 `9aff3f54b09f9b93be0706a06b29ecb24d7c305971441a0d0eaaeaa8b523e39f`、源码提交 `6e15f741ef25d88f37ed7ec5e71e376131e25678`，完成 1,800 秒/61 次采样；平均进程树私有内存 259.3 MiB、峰值 264.8 MiB、归一化 CPU 均值 0.639%，响应和原生探针均 61/61，无异常诊断。之后从 `77b27b5d6429bed1f98040144fcd7372939b9707` 重建的当前本地包 SHA-256 为 `e14a0533b1832872a987ec92c48eba719291ce2d600a529e9ed8899db0e89731`，为文档变更后的重打包；该精确包只完成约 20 秒冒烟（3 次样本），不能记为 30 分钟通过。`6e15…` 至 `77b…` 的源码差异仅包含文档文件。4 小时观察使用较早候选运行 3,481 秒/59 次样本后按用户要求停止；这是部分观察，不计为四小时通过。停止前最新样本响应、探针在线，进程树私有内存约 261.8 MiB。
+GitHub 仓库 [LYL-Z/clawd-desktop](https://github.com/LYL-Z/clawd-desktop) 为公开仓库。PR #3「Clawd 1.1.0：验收证据与逐版本发布门禁」已合并，合并提交 `8b15542d53224cb6800b415909d5d921a92efe48`；PR head `fb8db6a593a5882dbdafe02b112b488fe6e0b0fa` 的两项 Windows CI 均通过。正式 [v1.1.0 Release](https://github.com/LYL-Z/clawd-desktop/releases/tag/v1.1.0) 已发布，包含 Windows x64 portable、Clawd Codex V2 宠物包、深色/浅色壁纸、manifest 与 SHA256SUMS。安装包为 99,967,264 字节，GitHub asset digest 与本机发布副本 SHA-256 均为 `e8b095cd95225fb7379783d0f9a7549cd3be71e6b19d67421a1c23735544daac`；本机包和远端 digest 一致。
 
-仓库内主要 P0/P1 改动、文档、本地自动化检查和 Windows x64 候选包已经完成。PR #2 在精确 SHA `7526a3b0d074318555ac206e4d35d8b8118fa50e` 的两次 Windows CI 均通过并已合并，合并提交为 `b5a2e1261e22beec1e6259cd60cb547bb17cd3ec`；合并树与已验收候选源码树一致。刘主席于 2026-10-20 明确回复“我已经验收完毕，可以！”，结合此前明确询问的 15 个目标设备场景，本记录将其记为**用户报告 15 项均已验收通过**。没有收到逐项日志、环境参数或截图，因此这是用户报告，不是我独立观测的设备证据。长稳证据分为：历史 302.9 秒隐藏态采样；较早候选 30 分钟普通模式采样通过；其后文档重打包的当前本地候选只完成约 20 秒冒烟；4 小时观察运行 3,481 秒/59 次样本后按用户要求停止，未达到四小时门槛；可选 24 小时未执行。GitHub Release 与独立边缘分发尚待完成，因此发布交付仍未闭环。
+本次跟进只修复更新 Worker 的上游读取路径与错误日志脱敏：旧线上 `/v1/healthz` 为 200，但 `/v1/latest.json` 因旧 `github.com/releases/latest` 上游路径返回 HTTP 525 而为 503；候选改为固定仓库的 GitHub Releases/asset REST API，并交叉核验 Release manifest、GitHub asset digest 和大小。13 项 Worker 定向测试、48 项完整 Node 测试、类型/发布说明检查、Worker dry-run、本机真实 Release API 与单字节 Range 探测均通过；Security Review 没有可执行发现。该修复仍需 PR 精确 SHA CI、合并、部署及线上验证。用户报告的 15 项目标 Windows 场景通过仍按用户报告记录，未收到逐项设备日志。
+
+长稳证据仍有限：历史 302.9 秒隐藏态采样；较早候选 30 分钟普通模式采样通过（1,800 秒/61 次）；4 小时观察运行 3,481 秒/59 次采样后按用户要求停止，未达到四小时门槛；可选 24 小时未执行。故不能把所有稳定性目标写成已通过。中国境内不同运营商实测也尚未取得。用户报告 Workers Free；OAuth 没有 Billing Read 权限，因此套餐/账单余量没有独立核实。
 
 | 状态 | 含义 |
 | --- | --- |
@@ -37,7 +39,7 @@ GitHub 仓库 [LYL-Z/clawd-desktop](https://github.com/LYL-Z/clawd-desktop) 已�
 | 动画、换装、物理无明显回归 | 视觉布局 QA 覆盖 5 个任务书 DPR、4 种角色尺寸、8 套服饰（含无服饰）及 8 类动作；物理、注视和动作测试通过 | 自动化通过；动态道具人工审美复核待验收 |
 | 任务状态桥保持兼容 | 原 schema v1 状态桥仍保留并测试过期、大小、格式和状态语义 | 自动化通过 |
 | 构建不依赖开发机目录 | 编译器通过环境变量/PATH/常见工具位置发现；本地 Windows 构建通过 | 本地通过；PR #2 精确 SHA 两次 Windows CI 通过并已合并 |
-| 建立必要自动化测试、处理已知重大缺陷 | 当前 40 项 Node 测试、4 项 Python 图像测试及 Electron/原生探针 QA；缺陷与边界写入审计 | 本地自动化通过；15 项目标设备场景由用户报告通过；长稳证据按本表另记 |
+| 建立必要自动化测试、处理已知重大缺陷 | 当前 48 项 Node 测试（包含更新服务与日志脱敏回归）、4 项 Python 图像测试及 Electron/原生探针 QA；缺陷与边界写入审计 | 本地自动化通过；15 项目标设备场景由用户报告通过；长稳证据按本表另记 |
 
 ### 必须在目标 Windows 设备逐项完成的 15 个场景
 
@@ -69,7 +71,7 @@ GitHub 仓库 [LYL-Z/clawd-desktop](https://github.com/LYL-Z/clawd-desktop) 已�
 | 注视方向迟滞 | 方向切换添加约 5°迟滞并测试邻界输入 | 全部 16 向素材的艺术一致性仍需人工检查 |
 | 本地诊断隐私 | 有限轮转本地日志；导出前显示脱敏预览，用户确认后另存 | 导出前人工检查动作已设计；目前未做多用户隐私评估 |
 | 崩溃与恢复 | renderer 异常记日志并限次重载；超过阈值隐藏宠物；探针独立重启 | 目标机故障注入、退出无孤儿进程尚未完整验收 |
-| 资源占用和长稳 | 302.9 秒隐藏态历史采样；较早候选 30 分钟普通模式采样 1,800 秒/61 个样本通过，平均私有内存 259.3 MiB、峰值 264.8 MiB、归一化 CPU 均值 0.639%；文档重打包的当前候选只完成约 20 秒冒烟；后续 4 小时观察运行 3,481 秒/59 次样本后按用户要求停止 | 30 分钟结果为较早候选的单机有限观察；当前重打包仅短测；4 小时未完成、不计通过；可选 24 小时未执行 |
+| 资源占用和长稳 | 历史 302.9 秒隐藏态采样；较早候选 30 分钟普通模式采样 1,800 秒/61 个样本通过，平均私有内存 259.3 MiB、峰值 264.8 MiB、归一化 CPU 均值 0.639%；4 小时观察在 3,481 秒/59 次样本后按用户要求停止 | 30 分钟是较早候选的单机有限观察；公开版精确包尚无同等时长证据；4 小时未完成、不计通过；可选 24 小时未执行 |
 | 隐私、权限和焦点边界 | 不读屏幕、窗口标题、键盘、文档或游戏内存；不要求管理员，不上传场景/设置；增加用户选择的 focus 应用隐藏规则 | 用户手动触发网络检查/下载会向固定服务请求，服务方会看到常规 HTTPS 元数据 |
 | 任务书第 17.C 禁止项 | 可见性原因集合、进程不注入、明确 EXE 规则、迁移与安全设置处理 | 真实游戏与焦点实测未完成前，不声明对所有游戏 100% 准确 |
 
@@ -83,36 +85,36 @@ GitHub 仓库 [LYL-Z/clawd-desktop](https://github.com/LYL-Z/clawd-desktop) 已�
 | 第 4–5 章 P0 场景、窗口、多屏 | 可见性原因集合、前台 EXE 规则、全屏策略、系统锁屏/挂起、DPI/显示器状态与恢复实现；单元和布局模拟通过 | 实现与模拟通过；15 项真实场景由用户报告通过，未逐项留存设备记录 |
 | 第 6 章 P1 设置与操作 | 快捷托盘与设置中心、游戏/专注/例外规则、频率、双击、安静模式、诊断预览/导出 | 自动化 UI 通过；键盘可访问性待人工 |
 | 第 7–9 章视觉、动作、交互 | 视觉规范、衣柜、16 向迟滞、原有动作/演出/物理保留；28 动作与衣柜图像回归通过 | 资源与 Renderer 自动化通过；实体交互由用户报告通过，未逐项留存记录 |
-| 第 10–11 章性能、稳定性、架构 | 隐藏帧暂停、生命周期治理、原生探针恢复、崩溃日志；Renderer 连续崩溃加入持久安全隐藏原因并有回归测试；较早候选完成 30 分钟普通模式采样，当前文档重打包包完成约 20 秒冒烟 | 自动化与较早候选 30 分钟单机观察通过；当前重打包仅短测；4 小时观察按用户要求提前停止，故未完成；故障注入待设备 |
-| 第 12 章测试与工程 | 跨机器编译器发现、40 项 Node 测试、Python 资产测试、原生探针、Electron QA、Windows CI | 本机通过；提交 `ef724406fe9fb6a7efc558f62c290d1ec9ae1788` 的两次精确 SHA Windows CI 均通过。本次跟进仅更新任务书状态 |
-| 第 13 章安全、隐私、发布 | 本地诊断脱敏；用户主动查询/下载更新；版本哈希清单；未签名告知；来源和版权边界保留 | 代码和文档完成；边缘服务待部署/验收，EXE 未签名 |
+| 第 10–11 章性能、稳定性、架构 | 隐藏帧暂停、生命周期治理、原生探针恢复、崩溃日志；Renderer 连续崩溃加入持久安全隐藏原因并有回归测试；较早候选完成 30 分钟普通模式采样 | 自动化与较早候选 30 分钟单机观察通过；4 小时观察按用户要求提前停止，未完成；故障注入仍缺少设备记录 |
+| 第 12 章测试与工程 | 跨机器编译器发现、48 项 Node 测试、Python 资产测试、原生探针、Electron QA、Windows CI | 本地通过；PR #3 已合并，head 精确 SHA 的两项 Windows CI 通过；本次 Worker 跟进 PR/CI 尚未完成 |
+| 第 13 章安全、隐私、发布 | 本地诊断脱敏；用户主动查询/下载更新；版本哈希清单；未签名告知；来源和版权边界保留；Worker 日志脱敏通过安全复审 | v1.1.0 已公开发布，EXE 未签名；Worker 修复待合并、部署和线上验收 |
 | 第 14 章 P2 与第 15 章禁止项 | P2 保留为可选路线；未加入天气/云同步/监控/游戏注入/私有 API | 依原文顺序暂不实现 P2；禁止项遵守 |
-| 第 16 章阶段 0–6 | 阶段 0–4 的代码和自动化已完成；阶段 5 候选包已生成，用户报告 15 项目标设备验收通过；较早候选 30 分钟采样通过，当前重打包仅短测 | PR #3 截至 77b head 的 CI 已通过；任务书本次修订后的新 head 仍待 CI；GitHub Release、边缘更新入口和 4 小时稳定性完整观察尚未闭环；4 小时试验按用户要求停止，阶段 6 可选 |
+| 第 16 章阶段 0–6 | 阶段 0–5 代码和主要自动化已交付；阶段 5 的 1.1.0 安装包与宠物包已公开，用户报告 15 项设备验收通过；阶段 6 可选 | PR #3 和 v1.1.0 Release 已闭环；本次 Worker 修复仍待 PR 精确 SHA CI、部署与线上验证；4 小时稳定性、可选 24 小时与中国多运营商实测仍未完成 |
 
 ## 第十八章：交付物检查
 
 | 交付项 | 结果 |
 | --- | --- |
-| 完整源码与 PR | [公开仓库](https://github.com/LYL-Z/clawd-desktop) 的 [PR #3](https://github.com/LYL-Z/clawd-desktop/pull/3) 仍为草稿；提交 `ef724406fe9fb6a7efc558f62c290d1ec9ae1788` 的两次精确 SHA Windows CI 均通过；随后仅追加本任务书状态补记 |
-| Windows x64 运行版 | 较早候选 SHA-256 `9aff3f54b09f9b93be0706a06b29ecb24d7c305971441a0d0eaaeaa8b523e39f` 完成 30 分钟普通模式采样；当前文档重打包 SHA-256 `e14a0533b1832872a987ec92c48eba719291ce2d600a529e9ed8899db0e89731` 仅完成约 20 秒冒烟。4 小时观察运行 3,481 秒后按用户要求停止，未达四小时门槛 |
+| 完整源码与 PR | [公开仓库](https://github.com/LYL-Z/clawd-desktop) 的 [PR #3](https://github.com/LYL-Z/clawd-desktop/pull/3) 已合并，合并 SHA `8b15542d53224cb6800b415909d5d921a92efe48`；本次更新 Worker 修复的分支与 PR 尚待 CI |
+| Windows x64 运行版 | 正式 v1.1.0 安装包已发布；本机文件 99,967,264 字节，SHA-256 `e8b095cd95225fb7379783d0f9a7549cd3be71e6b19d67421a1c23735544daac`，与 GitHub Release asset digest 相同。30 分钟普通模式和 4 小时观察证据分别见历史记录，后者未达四小时门槛 |
 | 架构、场景与配置文档 | `docs/architecture-audit.md`、`docs/visibility-and-scenes.md`、本文及 `docs/visual-system.md` |
 | README 与 Windows 说明 | 更新游戏/专注规则、安静模式、双击配置、诊断导出、更新限制与排障 |
 | 测试证据 | [30 分钟通过及四小时部分观察记录](qa/2026-10-20-v1.1.0-windows-stability.md)；4 小时部分观察 3,481 秒/59 次采样未通过完整时长门槛；用户报告的 15 项实机验收仍单独标为用户报告 |
-| 公开版本和哈希 | GitHub Release 尚未创建；候选资产哈希已本机复算，发布后仍需下载远端副本复核 |
+| 公开版本和哈希 | [v1.1.0 GitHub Release](https://github.com/LYL-Z/clawd-desktop/releases/tag/v1.1.0) 已公开；本机 EXE 哈希与 GitHub asset API digest 匹配 |
 
 ### 当前本地候选资产快照
 
-当前候选输出位于被 Git 忽略的本地 `release/`，不会混入源码提交。交付物包括 Windows x64 portable、Codex V2 ZIP、深色与浅色 4K 壁纸，以及 `release-manifest-v1.1.0.json` 和 `SHA256SUMS.txt`。实际构建源码提交、每个文件的大小与 SHA-256 以同次构建生成的 manifest 和校验清单为准，不在任务书内重复维护易过期的二进制哈希。
+发布用输出位于被 Git 忽略的本地 `release/`，不会混入源码提交。交付物包括 Windows x64 portable、Codex V2 ZIP、深色与浅色 4K 壁纸，以及 `release-manifest-v1.1.0.json` 和 `SHA256SUMS.txt`；这些资产已经上传至正式 v1.1.0 Release。
 
-当前候选目录的 `release-manifest-v1.1.0.json` 与 `SHA256SUMS.txt` 记录此次构建的源码 SHA、文件大小和校验值。宠物 ZIP 经过内容白名单与 ZIP 完整性检查，只包含 `clawd/pet.json`、`clawd/spritesheet.webp`、`clawd/README.txt`；本地盲审、失败样本及 QA 记录没有放入面向用户的 ZIP。上述是本地候选快照，不代表已上传到 GitHub。30 分钟普通模式测试属于较早候选；当前文档重打包 EXE 只完成约 20 秒冒烟。本地 QA JSON 未放入公开宠物包。
+`release-manifest-v1.1.0.json` 与 `SHA256SUMS.txt` 记录发布源码 SHA、文件大小和校验值。宠物 ZIP 经过内容白名单与 ZIP 完整性检查，只包含 `clawd/pet.json`、`clawd/spritesheet.webp`、`clawd/README.txt`；本地盲审、失败样本及 QA 记录没有放入面向用户的 ZIP。本地发布副本与 Release EXE 的公开 digest 相符。本地 QA JSON 未放入公开宠物包。
 
 ## 更新分发与地域范围
 
-桌面更新器支持用户主动查询、选择下载、HTTP Range 续传、双来源回退和长度/SHA-256 校验。GitHub Release 是版本与安装包唯一发布源。最新只读预检确认 `chronokalamos.com` 是 Active Free Website zone，精确子域 `clawd-updates.chronokalamos.com` 没有 DNS 记录或 Worker Custom Domain；账号已有的 `jiuxiao-ses-callback` 未修改。当前 Wrangler CLI 未认证，因此未执行部署；Cloudflare OAuth 的订阅接口因缺少 Billing Read/Write scope 返回 403，不能据此断言 Workers 账户级套餐或账单。未执行 Cloudflare 写操作，不升级 Workers 计划或创建 R2/付费资源。更新入口仍未闭环。
+桌面更新器支持用户主动查询、选择下载、HTTP Range 续传、双来源回退和长度/SHA-256 校验。GitHub Release 是版本与安装包唯一发布源。独立 Worker `clawd-updates` 已部署至 `clawd-updates.chronokalamos.com`；线上 `/v1/healthz` 返回 200，但旧 `/v1/latest.json` 因访问 GitHub 网页发布入口时上游 HTTP 525 返回 503。当前候选修复改走固定仓库 Releases/asset API，已通过本地测试与 dry-run，仍需 PR 精确 SHA CI、合并、部署及线上验证。部署授权仅针对 Clawd Worker，不修改 GlassDesk、九霄、DNS、zone routes 或其他 Worker。用户报告 Workers Free；OAuth 缺少 Billing Read 权限，不能独立核对账单或余量。本轮不升级计划、不创建 R2/付费资源。
 
 普通全球边缘网络可尝试改善对 GitHub 的访问，但不能承诺中国大陆所有网络都能下载。Cloudflare 官方说明 China Network 属 Enterprise 计划下的单独订阅，且需 ICP 与内容审核；这不符合本项目未经重新授权不得产生新增费用的约束。中国境内下载须另外进行多运营商实测，不能仅由源码、CI 或海外请求通过推断。
 
-## 历史验证记录（PR #2；PR #3 当前状态见上文）
+## 历史验证记录（PR #2 与 PR #3）
 
 PR #2 的最新 head SHA `7526a3b0d074318555ac206e4d35d8b8118fa50e` 有两次成功的 Windows CI；随后已合并到 `main`，合并 SHA 为 `b5a2e1261e22beec1e6259cd60cb547bb17cd3ec`，Git tree 与 PR head 一致。候选包 `Clawd-1.1.0-windows-x64.exe` SHA-256 为 `854f89dd543e3e112d2db9f49d333977446f7d590acb1460a2a5178b633ed5fd`；本轮直接启动该精确文件，确认五张图集、28 个动作描述、原生探针可用及正常退出。另有 40 项 Node 测试、4 项 Python 图像测试、类型检查、构建、探针、4,608 组布局断言、1,344 组 hit-mask 断言、6 项设置 UI 与 10 项状态恢复检查通过。自动化与 CI 不取代用户实机证据。
 
