@@ -6,6 +6,24 @@ const MAX_NOTES_CHARS = 12_000;
 const RELEASE_TAG = /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const EXECUTABLE_NAME = /^Clawd-(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)-windows-x64\.exe$/;
 
+const METADATA_ERROR_CODES = new Set([
+  "invalid_release",
+  "windows_asset_missing",
+  "checksum_asset_missing",
+  "checksum_asset_size_invalid",
+  "checksum_url_rejected",
+  "checksum_unavailable",
+  "checksum_missing",
+  "checksum_mismatch",
+  "release_not_found",
+  "release_unavailable",
+]);
+
+function metadataErrorCode(error) {
+  const code = error instanceof Error ? error.message : "";
+  return METADATA_ERROR_CODES.has(code) ? code : "upstream_error";
+}
+
 function json(data, status = 200, extra = {}) {
   const headers = new Headers({
     "access-control-allow-origin": "*",
@@ -132,12 +150,15 @@ export async function handleUpdateRequest(request, fetcher = fetch) {
   if (url.pathname === "/v1/healthz") return json({ service: "clawd-updates", status: "ok" }, 200, { "cache-control": "no-store" });
 
   if (url.pathname === "/v1/latest.json") {
+    let stage = "release_lookup";
     try {
       const release = await readRelease("", fetcher);
+      stage = "release_validation";
       const result = await releaseMetadata(release, fetcher);
       const response = json(result);
       return request.method === "HEAD" ? new Response(null, { status: response.status, headers: response.headers }) : response;
-    } catch {
+    } catch (error) {
+      console.error("clawd_update_metadata_failed", { stage, code: metadataErrorCode(error) });
       return json({ code: "release_metadata_unavailable" }, 503, { "retry-after": "60" });
     }
   }
