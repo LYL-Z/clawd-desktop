@@ -15,7 +15,8 @@ if (!notes) {
   throw new Error(`Missing version-specific release notes: docs/RELEASE-NOTES-v${version}.md`);
 }
 
-if (!notes.startsWith(`# Clawd Desktop ${version}\n`)) {
+const normalizedNotes = notes.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+if (!normalizedNotes.startsWith(`# Clawd Desktop ${version}\n`)) {
   throw new Error(`Release notes title must match package version ${version}`);
 }
 
@@ -31,7 +32,7 @@ const requiredHeadings = [
   '## 发布文件与校验',
   '## 分发与地域范围',
 ];
-const noteLines = notes.replaceAll('\r\n', '\n').split('\n');
+const noteLines = normalizedNotes.split('\n');
 const missingHeadings = requiredHeadings.filter((heading) => !noteLines.includes(heading));
 if (missingHeadings.length > 0) {
   throw new Error(`Release notes for ${version} are missing required sections: ${missingHeadings.join(', ')}`);

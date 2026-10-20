@@ -1,15 +1,27 @@
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
-import {readdir,writeFile} from 'node:fs/promises';
+import {readFile,readdir,writeFile} from 'node:fs/promises';
 import path from 'node:path';
 
 const outputDirectory=path.resolve(process.argv[2]??'release');
-const approved=/^(?:Clawd-(?:\d+\.\d+\.\d+-windows-x64\.exe|Codex-V2\.zip|(?:light|dark)-3840x2160\.png)|release-manifest-v\d+\.\d+\.\d+\.json)$/i;
+const pkg=JSON.parse(await readFile(path.resolve('package.json'),'utf8'));
+const version=pkg.version;
+const currentExecutable=`Clawd-${version}-windows-x64.exe`;
+const approved=new Set([
+  currentExecutable,
+  'Clawd-Codex-V2.zip',
+  'Clawd-dark-3840x2160.png',
+  'Clawd-light-3840x2160.png',
+  `release-manifest-v${version}.json`,
+]);
 const files=(await readdir(outputDirectory,{withFileTypes:true}))
-  .filter(entry=>entry.isFile()&&approved.test(entry.name))
+  .filter(entry=>entry.isFile()&&approved.has(entry.name))
   .map(entry=>entry.name)
   .sort((a,b)=>a.localeCompare(b,'en'));
-if(files.filter(name=>/^Clawd-\d+\.\d+\.\d+-windows-x64\.exe$/i.test(name)).length!==1)throw new Error(`Expected exactly one Clawd Windows x64 portable EXE in ${outputDirectory}.`);
+for(const required of approved){
+  if(!files.includes(required))throw new Error(`Required ${version} release asset is missing: ${required}`);
+}
+if(files.filter(name=>name===currentExecutable).length!==1)throw new Error(`Expected exactly one ${currentExecutable} in ${outputDirectory}.`);
 const lines=[];
 for(const name of files){
   const hash=createHash('sha256');
