@@ -68,7 +68,7 @@ test('checksum mismatch and prerelease metadata fail closed',async()=>{
     console.error=originalError;
   }
   assert.equal(response.status,503);
-  assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'invalid_release'}]]);
+  assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'invalid_release',errorName:'Error'}]]);
 });
 
 test('latest metadata failures log only a bounded diagnostic code',async()=>{
@@ -79,7 +79,7 @@ test('latest metadata failures log only a bounded diagnostic code',async()=>{
     const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw new Error('private-sentinel');});
     assert.equal(response.status,503);
     assert.equal((await response.text()).includes('private-sentinel'),false);
-    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'upstream_error'}]]);
+    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'upstream_error',errorName:'Error'}]]);
   }finally{
     console.error=originalError;
   }
