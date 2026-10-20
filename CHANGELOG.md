@@ -34,5 +34,5 @@
 
 尚无 `v1.1.0` 标签或 GitHub Release。下方候选文件信息不是公开下载承诺，只有在版本专属说明、精确 SHA CI、候选包验证与发布资产远端复核全部完成后，才会将此项改为正式发布日期并发布资产。
 
-本机候选 Windows x64 便携包由源码提交 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0` 构建；实际文件字节数与 SHA-256 以该构建生成的 `release/release-manifest-v1.1.0.json` 和 `release/SHA256SUMS.txt` 为准。正式 Release 尚未创建。
+本机候选 Windows x64 便携包的实际源码提交、文件字节数与 SHA-256 以 `release/release-manifest-v1.1.0.json` 和 `release/SHA256SUMS.txt` 为准。正式 Release 尚未创建。
 

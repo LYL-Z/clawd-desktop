@@ -70,10 +70,10 @@ Clawd 1.1.0 在 1.0.1 基础上增量完善 Windows 场景管理、设置体验�
 
 ## 发布文件与校验
 
-候选输出位于本机忽略目录 `release/`，由源码提交 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0` 构建；该输出不是已发布的正式 Release。可下载文件为：`Clawd-1.1.0-windows-x64.exe`（Windows x64 portable）、`Clawd-Codex-V2.zip`（Codex 宠物包）、`Clawd-dark-3840x2160.png` 与 `Clawd-light-3840x2160.png`（4K 壁纸）。正式构建会同时生成 `release-manifest-v1.1.0.json` 与 `SHA256SUMS.txt`。实际字节数和 SHA-256 以同一构建产生的 manifest 与校验清单为准，避免在版本说明中维护易过期的重复副本；manifest 自身由 `SHA256SUMS.txt` 校验，不在自身内部自引用。
+本机候选输出位于忽略目录 `release/`，不代表已发布的正式 Release。可下载文件为：`Clawd-1.1.0-windows-x64.exe`（Windows x64 portable）、`Clawd-Codex-V2.zip`（Codex 宠物包）、`Clawd-dark-3840x2160.png` 与 `Clawd-light-3840x2160.png`（4K 壁纸）。正式构建会同时生成 `release-manifest-v1.1.0.json` 与 `SHA256SUMS.txt`。实际源码提交、文件字节数和 SHA-256 以同一构建产生的 manifest 与校验清单为准，避免在版本说明中维护易过期的重复副本；manifest 自身由 `SHA256SUMS.txt` 校验，不在自身内部自引用。
 
 ## 分发与地域范围
 
 独立 Clawd Worker 源码和配置已准备，但发布时尚未部署或进行公网验证；当前更新器可经 GitHub Releases 查询和下载。普通全球边缘网络若后续启用，可能增加一个与 GitHub 独立的访问入口，但不能保证中国大陆所有运营商和线路稳定可达，需要按运营商和地区实测。Cloudflare China Network 是另一项 Enterprise 服务，不属于本次零新增费用方案。
 
-PR #3 当前为草稿。提交 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0` 的两次 Windows CI 均失败于验证包附件不完整；已在当前未提交改动中修复 CI 打包顺序，更新提交后的精确 SHA 结果尚待取得。正式 GitHub Release 尚未创建；发布包须先通过精确 SHA CI、审核和候选包门禁，发布后再下载远端副本复核。普通模式 30 分钟测试已因桌面出现重复宠物而中止，4 小时稳定性测试未执行；两者都不能标记为通过。
+PR #3 当前为草稿。先前 head 的两次 Windows CI 因验证包附件不完整而失败；工作流已修复为检出 PR head、生成源码 manifest、暂存所有附件后再计算 SHA-256。正式 GitHub Release 尚未创建；发布包须先通过修正后当前 head 的精确 SHA CI、审核和候选包门禁，发布后再下载远端副本复核。普通模式 30 分钟测试已因桌面出现重复宠物而中止，4 小时稳定性测试未执行；两者都不能标记为通过。

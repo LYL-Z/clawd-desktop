@@ -10,7 +10,7 @@
 
 ### 最新状态补记（2026-10-20）
 
-PR #3 仍为草稿，head 为 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0`，b4f9adc 的两次 Windows CI 均因校验附件缺失而失败；CI 打包顺序已在未提交改动中修复，更新 SHA 的重跑结果待取得。GitHub Release 未创建。本机已从该提交生成 portable 与 Codex/壁纸资产，manifest 和 `SHA256SUMS.txt` 已生成，但本轮没有启动当前 portable。可见常规模式采样运行约 1,021 秒、35 个样本后因旧版和候选版同时显示造成双宠物而中止；我只停止了自己的候选实例，用户旧版仍在运行。该中断不构成 30 分钟通过，4 小时稳定性尚未执行。后续可见验收应避免同时启动两版。
+PR #3 仍为草稿。先前 head 的两次 Windows CI 因校验附件缺失而失败；分支已修复为精确检出 PR head、暂存完整附件并生成 manifest 后再校验，更新提交须取得通过的精确 SHA CI。GitHub Release 未创建。本机已从该提交生成 portable 与 Codex/壁纸资产，manifest 和 `SHA256SUMS.txt` 已生成，但本轮没有启动当前 portable。可见常规模式采样运行约 1,021 秒、35 个样本后因旧版和候选版同时显示造成双宠物而中止；我只停止了自己的候选实例，用户旧版仍在运行。该中断不构成 30 分钟通过，4 小时稳定性尚未执行。后续可见验收应避免同时启动两版。
 
 仓库内的主要 P0/P1 改动、文档、本地自动化检查和 Windows x64 候选包已经完成。PR #2 在精确 SHA `7526a3b0d074318555ac206e4d35d8b8118fa50e` 的两次 Windows CI 均通过，并已合并，合并提交为 `b5a2e1261e22beec1e6259cd60cb547bb17cd3ec`；合并树与已验收候选源码树一致。刘主席于 2026-10-20 明确回复“我已经验收完毕，可以！”，结合此前明确询问的 15 个目标设备场景，本记录将其记为**用户报告 15 项均已验收通过**。没有收到逐项记录、环境参数或截图，因此这是用户报告，不是我独立观测的设备证据。长稳部分仍需区分：历史 302.9 秒有限采样已记录；本轮 30 分钟普通模式采样已运行约 1,021 秒、35 个样本后中止，不计为通过，4 小时稳定性和可选 24 小时长测尚无当前证据。GitHub Release 与独立边缘分发尚待完成，因此发布交付仍未闭环。
 
@@ -84,7 +84,7 @@ PR #3 仍为草稿，head 为 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0`，b4f9a
 | 第 6 章 P1 设置与操作 | 快捷托盘与设置中心、游戏/专注/例外规则、频率、双击、安静模式、诊断预览/导出 | 自动化 UI 通过；键盘可访问性待人工 |
 | 第 7–9 章视觉、动作、交互 | 视觉规范、衣柜、16 向迟滞、原有动作/演出/物理保留；28 动作与衣柜图像回归通过 | 资源与 Renderer 自动化通过；实体交互由用户报告通过，未逐项留存记录 |
 | 第 10–11 章性能、稳定性、架构 | 隐藏帧暂停、生命周期治理、原生探针恢复、崩溃日志；Renderer 连续崩溃加入持久安全隐藏原因并有回归测试 | 自动化通过；更长稳定性/故障注入待设备 |
-| 第 12 章测试与工程 | 跨机器编译器发现、40 项 Node 测试、Python 资产测试、原生探针、Electron QA、Windows CI | 本机通过；PR #3 当前 head 的精确 SHA Windows CI 尚在运行，未合并 |
+| 第 12 章测试与工程 | 跨机器编译器发现、40 项 Node 测试、Python 资产测试、原生探针、Electron QA、Windows CI | 本机通过；PR #3 更新 head 的精确 SHA Windows CI 必须通过后才可发布 |
 | 第 13 章安全、隐私、发布 | 本地诊断脱敏；用户主动查询/下载更新；版本哈希清单；未签名告知；来源和版权边界保留 | 代码和文档完成；边缘服务待部署/验收，EXE 未签名 |
 | 第 14 章 P2 与第 15 章禁止项 | P2 保留为可选路线；未加入天气/云同步/监控/游戏注入/私有 API | 依原文顺序暂不实现 P2；禁止项遵守 |
 | 第 16 章阶段 0–6 | 阶段 0–4 的代码和自动化已完成；阶段 5 候选包已生成，用户报告 15 项目标设备验收通过 | PR #3 更新 SHA CI、GitHub Release、边缘更新入口和 30 分钟/4 小时稳定性记录仍待闭环；阶段 6 可选 |
@@ -93,7 +93,7 @@ PR #3 仍为草稿，head 为 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0`，b4f9a
 
 | 交付项 | 结果 |
 | --- | --- |
-| 完整源码与 PR | [PR #3](https://github.com/LYL-Z/clawd-desktop/pull/3) 仍为草稿；head b4f9adc 的两次 Windows CI 失败，已修复打包顺序，更新 head 的重跑结果待取得 |
+| 完整源码与 PR | [PR #3](https://github.com/LYL-Z/clawd-desktop/pull/3) 仍为草稿；先前 head 的 CI 失败已定位并修复工作流，当前版本仍须通过精确 head CI |
 | Windows x64 运行版 | 当前 head 的 portable 候选已构建但未启动；较早候选的启动/退出 QA 不能替代当前二进制验收 |
 | 架构、场景与配置文档 | `docs/architecture-audit.md`、`docs/visibility-and-scenes.md`、本文及 `docs/visual-system.md` |
 | README 与 Windows 说明 | 更新游戏/专注规则、安静模式、双击配置、诊断导出、更新限制与排障 |
@@ -102,14 +102,7 @@ PR #3 仍为草稿，head 为 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0`，b4f9a
 
 ### 当前本地候选资产快照
 
-当前候选输出位于被 Git 忽略的本地 `release/`，来源为提交 `b4f9adc85b69876f26f07a4f99071ec824f3f2d0`，不会混入源码提交：
-
-| 文件 | 大小 | SHA-256 |
-| --- | ---: | --- |
-| `Clawd-1.1.0-windows-x64.exe` | 99,968,421 bytes | `f0f86f54e11fc013cc5d33b943d193b9be6cc82eaafa04dcef4712b34e9a82fc` |
-| `Clawd-Codex-V2.zip` | 6,167 bytes | `1fdea3cf9be79dc6303c96b009f617eed2dbb29b49e50ddce8290a60d737d704` |
-| `Clawd-dark-3840x2160.png` | 57,533 bytes | `8480a99e45c8bc3389d43a98382402e836fac40513e0c14fb2d684fee8ddcfdc` |
-| `Clawd-light-3840x2160.png` | 61,706 bytes | `dcff77e0b376a2f75367010c64922deae9bde246b0670b6ae42ab2d733ea44b8` |
+当前候选输出位于被 Git 忽略的本地 `release/`，不会混入源码提交。交付物包括 Windows x64 portable、Codex V2 ZIP、深色与浅色 4K 壁纸，以及 `release-manifest-v1.1.0.json` 和 `SHA256SUMS.txt`。实际构建源码提交、每个文件的大小与 SHA-256 以同次构建生成的 manifest 和校验清单为准，不在任务书内重复维护易过期的二进制哈希。
 
 当前候选目录的 `release-manifest-v1.1.0.json` 与 `SHA256SUMS.txt` 记录本次构建的源码 SHA、文件大小和校验值。宠物 ZIP 经过内容白名单与 ZIP 完整性检查，只包含 `clawd/pet.json`、`clawd/spritesheet.webp`、`clawd/README.txt`；本地盲审、失败样本及 QA 记录没有放入面向用户的 ZIP。上述是本地候选快照，不代表已上传到 GitHub。本轮未启动当前 EXE；先前启动/退出冒烟针对更早候选，不可替代当前包验收。
 
