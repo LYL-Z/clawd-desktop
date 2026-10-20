@@ -22,6 +22,7 @@
         <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-appearance" id="tab-appearance" data-page="appearance" tabindex="-1"><span class="nav-icon">▧</span>外观</button>
         <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-behavior" id="tab-behavior" data-page="behavior" tabindex="-1"><span class="nav-icon">✳</span>行为</button>
         <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-scenes" id="tab-scenes" data-page="scenes" tabindex="-1"><span class="nav-icon">▣</span>游戏与场景</button>
+        <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-advanced" id="tab-advanced" data-page="advanced" tabindex="-1"><span class="nav-icon">⌘</span>高级与诊断</button>
         <button class="nav-item" role="tab" aria-selected="false" aria-controls="page-about" id="tab-about" data-page="about" tabindex="-1"><span class="nav-icon">i</span>隐私与关于</button>
         <div class="nav-foot"><span class="offline-dot"></span>本机运行 · 不连接云端</div>
       </nav>
@@ -66,11 +67,14 @@
           <p class="lead">Clawd 的动作以安静待机为主。你可以关闭巡游、减弱动态，或让它暂时休息。</p>
           <div class="card-list">
             <div class="setting-row"><div><strong>沿着屏幕边缘巡游</strong><p>允许 Clawd 在一段自主动作中缓慢横向移动。</p></div><label class="switch"><input data-setting="roam" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">沿着屏幕边缘巡游</span></label></div>
+            <div class="setting-row"><div><strong>一键安静模式</strong><p>保持桌面位置，停止自主巡游并显著降低自主动作频率；低频待机与手动互动仍可使用。</p></div><label class="switch"><input data-setting="quietMode" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">启用安静模式</span></label></div>
+            <div class="setting-row"><div><strong>自主动作频率</strong><p>只影响自动出现的短动作，不限制你手动触发动作。</p></div><select class="setting-select" id="autonomy-frequency" aria-label="自主动作频率"><option value="calm">安静</option><option value="standard">标准</option><option value="lively">活泼</option></select></div>
             <div class="setting-row"><div><strong>减弱动态效果</strong><p>减少位移、跳跃和粒子动画，保留静态反馈。</p></div><label class="switch"><input data-setting="reducedMotion" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">减弱动态效果</span></label></div>
             <div class="setting-row"><div><strong>暂停全部动画</strong><p>角色保持当前画面；鼠标拖拽和手动操作仍然可用。</p></div><label class="switch"><input data-setting="paused" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">暂停全部动画</span></label></div>
+            <div class="setting-row"><div><strong>双击角色时</strong><p>默认播放海报演出；你可以改为短动作或关闭特殊反馈。</p></div><select class="setting-select" id="double-click-action" aria-label="双击角色动作"><option value="performance">播放主题演出</option><option value="waving">挥手</option><option value="sway">歪头</option><option value="none">不执行特殊动作</option></select></div>
             <div class="setting-row"><div><strong>本地任务状态桥</strong><p>读取用户主动写入的本地 status.json；不读取 Codex 或 Claude 内部数据。</p></div><label class="switch"><input data-setting="bridge" type="checkbox"><span aria-hidden="true"></span><span class="sr-only">启用本地任务状态桥</span></label></div>
           </div>
-          <div class="note-box"><span>安静模式</span><p>关闭巡游并减弱动态，可得到低干扰的待机效果。更完整的“一键安静模式”与行为频率控制会在后续阶段评估。</p></div>
+          <div class="note-box"><span>状态说明</span><p>安静模式与“暂停全部动画”相互独立：前者保留低频待机与手动互动，后者冻结动画。减少动态仍遵循 Windows 与应用设置。</p></div>
         </section>
 
         <section class="page" id="page-scenes" role="tabpanel" aria-labelledby="tab-scenes" hidden>
@@ -87,9 +91,9 @@
             <div class="setting-row delay-row"><div><strong>离开游戏后的恢复延迟</strong><p>避免 Alt+Tab 或短暂切屏时频繁闪现。</p></div><label class="delay-control"><input id="restore-delay" type="range" min="500" max="2000" step="100"><output id="restore-delay-value">0.9 秒</output></label></div>
           </div>
           <div class="section-heading rules-heading"><div><h2>应用规则</h2><p>默认不扫描已安装应用；只有你明确添加的规则才会匹配。</p></div></div>
-          <div class="rules-toolbar"><button class="primary-button" data-add-rule="game" type="button">＋ 添加游戏</button><button class="secondary-button" data-add-rule="exception" type="button">添加例外应用</button></div>
+          <div class="rules-toolbar"><button class="primary-button" data-add-rule="game" type="button">＋ 添加游戏</button><button class="secondary-button" data-add-rule="focus" type="button">添加专注时隐藏的应用</button><button class="secondary-button" data-add-rule="exception" type="button">添加例外应用</button></div>
           <div class="rule-list" id="rule-list"></div>
-          <div class="note-box privacy-note"><span>本地与隐私</span><p>规则路径只保存在本机的 Clawd 设置文件中，不上传或写入诊断日志。路径匹配默认精确到完整 EXE；你可以将规则切换为按文件名匹配，但这会包含不同目录下的同名程序。</p></div>
+          <div class="note-box privacy-note"><span>本地与隐私</span><p>规则路径只保存在本机的 Clawd 设置文件中，不上传或写入诊断日志。游戏规则用于游戏场景，专注应用在其成为前台应用时隐藏桌宠，例外应用优先取消智能模式下的应用和全屏隐藏。路径匹配默认精确到完整 EXE；按文件名匹配会包含不同目录下的同名程序。</p></div>
         </section>
 
         <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about" hidden>
@@ -106,6 +110,18 @@
               <div class="about-row"><strong>离线与隐私</strong><p>日常运行不联网、不调用模型，也不读取屏幕内容、剪贴板、键盘输入或私人文件。只有点击版本检查时，Clawd 才向 Clawd 更新边缘入口查询公开 Release 版本信息，并在必要时回退到 GitHub；只有点击下载后才传输公开程序文件。不会随请求上传用户设置或应用规则。</p></div>
             <div class="about-row"><strong>项目与使用边界</strong><p>源代码公开可查看，但仓库没有授予一般再分发或商业使用的通用许可。Claude / Clawd 品牌与相关视觉仍受第三方权利约束。</p><code>github.com/LYL-Z/clawd-desktop</code></div>
           </div>
+        </section>
+
+        <section class="page" id="page-advanced" role="tabpanel" aria-labelledby="tab-advanced" hidden>
+          <p class="eyebrow">LOCAL TROUBLESHOOTING</p>
+          <h1>高级与诊断</h1>
+          <p class="lead">诊断信息只在你主动查看和导出时生成。先检查下方预览，再决定是否保存并分享给维护者。</p>
+          <div class="card-list">
+            <div class="setting-row"><div><strong>本地诊断日志</strong><p>保留最近的程序启动、可见性变化、探针状态与配置恢复事件，日志有大小上限。</p></div><button class="secondary-button" id="preview-diagnostics" type="button">查看诊断预览</button></div>
+            <div class="setting-row"><div><strong>导出诊断文件</strong><p>仅导出你刚才检查过的这份预览；保存位置由你选择。</p></div><button class="primary-button" id="export-diagnostics" type="button" disabled>导出已检查的预览</button></div>
+          </div>
+          <pre class="diagnostics-preview" id="diagnostics-preview" hidden aria-label="本地诊断信息预览"></pre>
+          <div class="note-box privacy-note"><span>隐私范围</span><p>预览包含版本、系统平台、显示器尺寸与缩放、应用资源概况、当前隐藏原因、非敏感设置和受限日志。不包含游戏或专注应用名称/路径、任务内容、文档、截图、窗口标题或原始进程路径。导出前请自行核对预览。</p></div>
         </section>
         <div class="toast" id="toast" role="status" aria-live="polite"></div>
       </main>

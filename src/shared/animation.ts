@@ -9,6 +9,16 @@ export function lookIndex(dx:number,dy:number):number|null {
   if(Math.hypot(dx,dy)<45)return null;
   const angle=(Math.atan2(dx,-dy)*180/Math.PI+360)%360;return Math.round(angle/22.5)%16;
 }
+/** Keep the current 16-way gaze sector until the pointer clears a small angular hysteresis band. */
+export function stableLookIndex(dx:number,dy:number,current:number|null,hysteresisDegrees=5):number|null{
+  const distance=Math.hypot(dx,dy);if(distance<45)return null;
+  const angle=(Math.atan2(dx,-dy)*180/Math.PI+360)%360;
+  const next=Math.round(angle/22.5)%16;
+  if(current===null||!Number.isInteger(current)||current<0||current>15)return next;
+  const center=current*22.5;
+  const delta=((angle-center+540)%360)-180;
+  return Math.abs(delta)<=11.25+Math.max(0,Math.min(10,hysteresisDegrees))?current:next;
+}
 export class ClickArbiter {
   private pending:ReturnType<typeof setTimeout>|undefined;
   private last=0;

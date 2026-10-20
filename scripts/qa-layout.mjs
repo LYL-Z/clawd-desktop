@@ -12,7 +12,7 @@ await mkdir(out,{recursive:true});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let app;
 try{
-  for(const dpr of [1,1.25,1.5,2]){
+  for(const dpr of [1,1.25,1.5,1.75,2,2.5]){
     const userData=path.join(root,'qa/runtime/user-data',`layout-${dpr}`);
     await mkdir(userData,{recursive:true});await writeFile(path.join(userData,'settings.json'),JSON.stringify({welcomeSeen:true,bridge:false,paused:true,outfit:'none'}));
     const env={...process.env,CLAWD_TEST_USER_DATA:userData};delete env.ELECTRON_RUN_AS_NODE;

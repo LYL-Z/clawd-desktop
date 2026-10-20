@@ -36,12 +36,12 @@ function describeVisibility():void{
   const button=$<HTMLButtonElement>('#show-pet');
   pill.classList.toggle('hidden',!visibility.visible);
   pill.classList.toggle('unknown',!visibility.probeHealthy);
-  const reasons:Record<string,string>={game:'游戏进行中',fullscreen:'全屏应用',user:'你手动隐藏',lock:'Windows 锁屏',suspend:'系统挂起'};
+  const reasons:Record<string,string>={game:'游戏进行中',focus:'专注应用',fullscreen:'全屏应用',user:'你手动隐藏',lock:'Windows 锁屏',suspend:'系统挂起',renderer:'显示进程异常'};
   const why=visibility.reasons.map(reason=>reasons[reason]??reason).join('、');
   title.textContent=visibility.visible?(visibility.probeHealthy?'桌面陪伴中':'桌面陪伴中 · 场景检测不可用'):`因${why||'系统场景'}隐藏`;
   text('#visibility-title',visibility.visible?'Clawd 正在桌边':'Clawd 已暂时退场');
   text('#visibility-detail',visibility.visible
-    ?visibility.probeHealthy?`当前场景：${sceneName(visibility.scene)}。离开游戏或全屏应用后会自动恢复。`:'场景探针不可用；当前没有可靠的自动隐藏判断。'
+    ?visibility.probeHealthy?`当前场景：${sceneName(visibility.scene)}。离开触发隐藏的应用或全屏场景后会自动恢复。`:'场景探针不可用；当前没有可靠的自动隐藏判断。'
     :`触发原因：${why||'未知'}。你可以从托盘检查当前场景或调整规则。`);
   const tag=$<HTMLSpanElement>('#visibility-tag');tag.textContent=visibility.visible?'在线':'已隐藏';tag.classList.toggle('hidden',!visibility.visible);
   const manuallyHidden=visibility.reasons.includes('user');
@@ -52,7 +52,7 @@ function describeVisibility():void{
 }
 
 function sceneName(scene:VisibilitySnapshot['scene']):string{
-  return({desktop:'普通桌面',game:'已配置的游戏',fullscreen:'全屏应用',unknown:'未能识别'})[scene];
+  return({desktop:'普通桌面',game:'已配置的游戏',focus:'专注应用',fullscreen:'全屏应用',unknown:'未能识别'})[scene];
 }
 
 function updateSettingsControls():void{
@@ -64,6 +64,8 @@ function updateSettingsControls():void{
   $<HTMLInputElement>('#restore-delay').value=String(settings.restoreDelayMs);
   text('#restore-delay-value',`${(settings.restoreDelayMs/1000).toFixed(1)} 秒`);
   document.querySelectorAll<HTMLInputElement>('input[name="hide-mode"]').forEach(input=>input.checked=input.value===settings.autoHideMode);
+  $<HTMLSelectElement>('#autonomy-frequency').value=settings.autonomyFrequency;
+  $<HTMLSelectElement>('#double-click-action').value=settings.doubleClickAction;
   document.querySelectorAll<HTMLInputElement>('[data-setting]').forEach(input=>{
     const key=input.dataset.setting as keyof Settings|undefined;if(!key)return;
     input.checked=Boolean(settings[key]);
@@ -141,7 +143,7 @@ function renderRules():void{
     const card=document.createElement('article');card.className='rule-card';
     const copy=document.createElement('div');copy.className='rule-copy';
     const heading=document.createElement('div');heading.className='rule-title';
-    const badge=document.createElement('span');badge.className=`rule-badge ${rule.kind}`;badge.textContent=rule.kind==='game'?'游戏':'例外';
+    const badge=document.createElement('span');badge.className=`rule-badge ${rule.kind}`;badge.textContent=rule.kind==='game'?'游戏':rule.kind==='focus'?'专注隐藏':'例外';
     const name=document.createElement('strong');name.textContent=rule.exeName;
     heading.append(badge,name);
     const pathLabel=document.createElement('code');pathLabel.textContent=rule.exePath;
@@ -201,6 +203,22 @@ function bindControls():void{
     const shown=await window.clawd.setUserHidden(!manuallyHidden);
     if(!shown&&!manuallyHidden)toast('Clawd 正在遵循游戏或系统场景规则隐藏。');
   };
+  $<HTMLButtonElement>('#preview-diagnostics').onclick=async event=>{
+    const button=event.currentTarget as HTMLButtonElement;button.disabled=true;button.textContent='正在读取…';
+    try{
+      const preview=await window.clawd.getDiagnosticsPreview();
+      if(!preview){toast('暂时无法读取本地诊断信息。');return;}
+      $<HTMLPreElement>('#diagnostics-preview').textContent=preview;$<HTMLPreElement>('#diagnostics-preview').hidden=false;
+      $<HTMLButtonElement>('#export-diagnostics').disabled=false;button.textContent='刷新预览';
+    }catch{toast('读取本地诊断信息失败。');}
+    finally{button.disabled=false;}
+  };
+  $<HTMLButtonElement>('#export-diagnostics').onclick=async event=>{
+    const button=event.currentTarget as HTMLButtonElement;button.disabled=true;
+    try{const result=await window.clawd.exportDiagnostics();if(result.ok)toast('诊断信息已保存到你选择的位置。');else if(!result.cancelled)toast(result.message??'无法导出诊断信息。');}
+    catch{toast('无法导出诊断信息。');}
+    finally{button.disabled=false;}
+  };
   $<HTMLInputElement>('#startup').onchange=async event=>{
     const input=event.currentTarget as HTMLInputElement;
     const result=await window.clawd.setStartup(input.checked);
@@ -237,6 +255,8 @@ function bindControls():void{
   };
   $<HTMLInputElement>('#start-visible').onchange=event=>void save({startVisible:(event.currentTarget as HTMLInputElement).checked});
   document.querySelectorAll<HTMLInputElement>('[data-setting]').forEach(input=>input.onchange=()=>void save({[input.dataset.setting!]:input.checked}));
+  $<HTMLSelectElement>('#autonomy-frequency').onchange=event=>void save({autonomyFrequency:(event.currentTarget as HTMLSelectElement).value as Settings['autonomyFrequency']});
+  $<HTMLSelectElement>('#double-click-action').onchange=event=>void save({doubleClickAction:(event.currentTarget as HTMLSelectElement).value as Settings['doubleClickAction']});
   document.querySelectorAll<HTMLInputElement>('input[name="hide-mode"]').forEach(input=>input.onchange=()=>{if(input.checked)void save({autoHideMode:input.value as Settings['autoHideMode']});});
   $<HTMLInputElement>('#hide-fullscreen').onchange=event=>void save({hideFullscreen:(event.currentTarget as HTMLInputElement).checked});
   const scale=$<HTMLInputElement>('#scale');
