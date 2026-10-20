@@ -1,10 +1,10 @@
 const REPOSITORY = "LYL-Z/clawd-desktop";
 const GITHUB_BASE = `https://github.com/${REPOSITORY}`;
+const GITHUB_API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 const PUBLIC_BASE = "https://clawd-updates.chronokalamos.com/v1";
 const MAX_RELEASE_BYTES = 250 * 1024 * 1024;
+const MAX_RELEASE_METADATA_BYTES = 1024 * 1024;
 const MAX_MANIFEST_BYTES = 128 * 1024;
-const MAX_CHECKSUM_BYTES = 64 * 1024;
-const MAX_NOTES_BYTES = 64 * 1024;
 const MAX_NOTES_CHARS = 12_000;
 const RELEASE_TAG = /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 const EXECUTABLE_NAME = /^Clawd-(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)-windows-x64\.exe$/;
@@ -12,14 +12,22 @@ const SAFE_ERROR_CODES = new Set([
   "invalid_release",
   "release_not_found",
   "release_unavailable",
-  "release_redirect_rejected",
   "manifest_unavailable",
   "manifest_invalid",
   "upstream_redirect_rejected",
   "windows_asset_missing",
-  "checksum_unavailable",
-  "checksum_invalid",
   "checksum_mismatch",
+]);
+const SAFE_UPSTREAM_CAUSE_CODES = new Set([
+  "ECONNRESET",
+  "ECONNREFUSED",
+  "ENOTFOUND",
+  "EAI_AGAIN",
+  "ETIMEDOUT",
+  "UND_ERR_CONNECT_TIMEOUT",
+  "UND_ERR_HEADERS_TIMEOUT",
+  "UND_ERR_SOCKET",
+  "ERR_TLS_CERT_ALTNAME_INVALID",
 ]);
 
 function metadataErrorCode(error) {
@@ -30,7 +38,7 @@ function metadataErrorCode(error) {
 function metadataErrorDetails(error) {
   const allowedNames = new Set(["TypeError", "Error", "RangeError", "SyntaxError", "URIError"]);
   const name = error instanceof Error && allowedNames.has(error.name) ? error.name : "OtherError";
-  const causeCode = error && typeof error.cause?.code === "string" && /^[A-Z0-9_-]{1,32}$/.test(error.cause.code)
+  const causeCode = error && typeof error.cause?.code === "string" && SAFE_UPSTREAM_CAUSE_CODES.has(error.cause.code)
     ? error.cause.code
     : null;
   const upstreamStatus = Number.isSafeInteger(error?.upstreamStatus) && error.upstreamStatus >= 100 && error.upstreamStatus <= 599
@@ -105,7 +113,7 @@ function trustedUpstreamUrl(value) {
   let url;
   try { url = value instanceof URL ? new URL(value.href) : new URL(value); }
   catch { throw new Error("upstream_redirect_rejected"); }
-  const trustedHost = url.hostname === "github.com" || url.hostname.endsWith(".githubusercontent.com");
+  const trustedHost = url.hostname === "github.com" || url.hostname === "api.github.com" || url.hostname.endsWith(".githubusercontent.com");
   if (url.protocol !== "https:" || !trustedHost || url.username || url.password || url.port) throw new Error("upstream_redirect_rejected");
   return url;
 }
@@ -122,75 +130,120 @@ async function fetchTrustedUpstream(value, init, request) {
   throw new Error("upstream_redirect_rejected");
 }
 
-function parseSha256Manifest(text, assetName) {
-  const matches = [];
-  for (const line of text.split(/\r?\n/)) {
-    const match = /^([a-f0-9]{64})\s+\*?(.+?)\s*$/i.exec(line);
-    if (match?.[2] === assetName) matches.push(match[1].toLowerCase());
-  }
-  return matches.length === 1 ? matches[0] : null;
+function safeUpstreamError(code, error) {
+  const wrapped = new Error(code);
+  const causeCode = error && typeof error.cause?.code === "string" && SAFE_UPSTREAM_CAUSE_CODES.has(error.cause.code)
+    ? error.cause.code
+    : null;
+  if (causeCode) wrapped.cause = { code: causeCode };
+  return wrapped;
 }
 
-async function resolveLatestTag(request = fetch) {
-  let response;
-  try {
-    response = await request(`${GITHUB_BASE}/releases/latest`, {
-      redirect: "manual",
-      headers: { "user-agent": "ClawdDesktop-UpdateDelivery", accept: "text/html" },
-      cf: { cacheEverything: true, cacheTtl: 120 },
-    });
-  } catch {
-    throw new Error("release_unavailable");
-  }
-
-  let target;
-  if ([301, 302, 303, 307, 308].includes(response.status)) {
-    const location = response.headers.get("location");
-    if (!location) throw new Error("release_redirect_rejected");
-    try {
-      target = new URL(location, `${GITHUB_BASE}/releases/latest`);
-    } catch {
-      throw new Error("release_redirect_rejected");
-    }
-  } else if (response.status === 200 && typeof response.url === "string") {
-    // Some fetch runtimes expose the final URL even when a redirect was followed.
-    try { target = new URL(response.url); }
-    catch { target = null; }
-  } else {
-    const error = new Error(response.status === 404 ? "release_not_found" : "release_unavailable");
-    error.upstreamStatus = response.status;
-    throw error;
-  }
-
-  if (!target || target.protocol !== "https:" || target.hostname !== "github.com" || target.username || target.password || target.port || target.search || target.hash) {
-    throw new Error("release_redirect_rejected");
-  }
-  const match = /^\/LYL-Z\/clawd-desktop\/releases\/tag\/(v?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$/.exec(target.pathname);
-  if (!match) throw new Error("release_redirect_rejected");
-  return canonicalTag(match[1]);
+function apiAssetUrl(assetId) {
+  if (!Number.isSafeInteger(assetId) || assetId <= 0) throw new Error("manifest_invalid");
+  return `${GITHUB_API_BASE}/releases/assets/${assetId}`;
 }
 
-async function fetchReleaseText(url, request, maximumBytes, errorCode, cacheTtl) {
+async function fetchReleaseDescriptor(url, request, errorCode, cacheTtl) {
   let response;
   try {
     response = await fetchTrustedUpstream(url, {
-      headers: { "user-agent": "ClawdDesktop-UpdateDelivery", accept: "application/octet-stream" },
+      headers: {
+        "user-agent": "ClawdDesktop-UpdateDelivery",
+        accept: "application/vnd.github+json",
+        "x-github-api-version": "2022-11-28",
+      },
       cf: { cacheEverything: true, cacheTtl },
     }, request);
-  } catch {
+  } catch (error) {
+    throw safeUpstreamError(errorCode, error);
+  }
+  if (!response.ok) {
+    const error = new Error(response.status === 404 ? "release_not_found" : errorCode);
+    error.upstreamStatus = response.status;
+    throw error;
+  }
+  let data;
+  try {
+    const bytes = await readBounded(response, MAX_RELEASE_METADATA_BYTES, errorCode);
+    data = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+  } catch (error) {
+    if (error instanceof Error && error.message === errorCode) throw error;
     throw new Error(errorCode);
   }
-  if (!response.ok) throw new Error(response.status === 404 ? "release_not_found" : errorCode);
+  if (!data || typeof data !== "object" || Array.isArray(data)) throw new Error(errorCode);
+  return data;
+}
+
+function validateReleaseDescriptor(release, expectedTag) {
+  let tag;
+  try { tag = canonicalTag(release?.tag_name); }
+  catch { throw new Error("invalid_release"); }
+  if (
+    (expectedTag && tag !== canonicalTag(expectedTag)) ||
+    release.draft !== false || release.prerelease !== false ||
+    !Array.isArray(release.assets)
+  ) throw new Error("invalid_release");
+  return tag;
+}
+
+async function resolveLatestRelease(request = fetch) {
+  const release = await fetchReleaseDescriptor(`${GITHUB_API_BASE}/releases/latest`, request, "release_unavailable", 120);
+  validateReleaseDescriptor(release);
+  return release;
+}
+
+async function fetchReleaseAssetText(asset, request, maximumBytes, errorCode) {
+  let response;
+  try {
+    response = await fetchTrustedUpstream(apiAssetUrl(asset.id), {
+      headers: {
+        "user-agent": "ClawdDesktop-UpdateDelivery",
+        accept: "application/octet-stream",
+        "x-github-api-version": "2022-11-28",
+      },
+    }, request);
+  } catch (error) {
+    throw safeUpstreamError(errorCode, error);
+  }
+  if (!response.ok) {
+    const error = new Error(response.status === 404 ? "release_not_found" : errorCode);
+    error.upstreamStatus = response.status;
+    throw error;
+  }
   const bytes = await readBounded(response, maximumBytes, errorCode);
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
 
-async function readRelease(tagValue, request = fetch) {
-  const tag = canonicalTag(tagValue);
+function findReleaseAsset(release, name) {
+  const matches = release.assets.filter((asset) => asset?.name === name);
+  if (matches.length !== 1) return null;
+  const asset = matches[0];
+  if (asset.state !== "uploaded" || !Number.isSafeInteger(asset.id) || asset.id <= 0 || !Number.isSafeInteger(asset.size) || asset.size < 0) return null;
+  return asset;
+}
+
+async function readRelease(tagOrDescriptor, request = fetch) {
+  let descriptor;
+  if (typeof tagOrDescriptor === "string") {
+    const tag = canonicalTag(tagOrDescriptor);
+    descriptor = await fetchReleaseDescriptor(`${GITHUB_API_BASE}/releases/tags/${encodeURIComponent(tag)}`, request, "release_unavailable", 3600);
+  } else {
+    descriptor = tagOrDescriptor;
+  }
+  const tag = validateReleaseDescriptor(descriptor, typeof tagOrDescriptor === "string" ? tagOrDescriptor : undefined);
   const version = versionOf(tag);
   const expectedName = expectedExecutable(tag);
-  const manifestUrl = releaseAssetUrl(tag, `release-manifest-${tag}.json`);
-  const manifestText = await fetchReleaseText(manifestUrl, request, MAX_MANIFEST_BYTES, "manifest_unavailable", 3600);
+  const manifestAsset = findReleaseAsset(descriptor, `release-manifest-${tag}.json`);
+  const executableAsset = findReleaseAsset(descriptor, expectedName);
+  if (!manifestAsset || !executableAsset) throw new Error("windows_asset_missing");
+  if (
+    manifestAsset.size < 1 || manifestAsset.size > MAX_MANIFEST_BYTES ||
+    executableAsset.size < 1 || executableAsset.size > MAX_RELEASE_BYTES ||
+    typeof executableAsset.digest !== "string" || !/^sha256:[a-f0-9]{64}$/i.test(executableAsset.digest)
+  ) throw new Error("manifest_invalid");
+
+  const manifestText = await fetchReleaseAssetText(manifestAsset, request, MAX_MANIFEST_BYTES, "manifest_unavailable");
 
   let manifest;
   try {
@@ -213,49 +266,27 @@ async function readRelease(tagValue, request = fetch) {
     throw new Error("manifest_invalid");
   }
 
-  const sumsUrl = releaseAssetUrl(tag, "SHA256SUMS.txt");
-  let sums;
-  try {
-    sums = await fetchReleaseText(sumsUrl, request, MAX_CHECKSUM_BYTES, "checksum_unavailable", 3600);
-  } catch (error) {
-    if (error instanceof Error && error.message === "release_not_found") throw new Error("checksum_unavailable");
-    throw error;
-  }
-  const checksum = parseSha256Manifest(sums, expectedName);
-  if (!checksum) throw new Error("checksum_invalid");
-  if (checksum !== artifact.sha256.toLowerCase()) throw new Error("checksum_mismatch");
+  const checksum = artifact.sha256.toLowerCase();
+  const apiDigest = executableAsset.digest.slice("sha256:".length).toLowerCase();
+  if (executableAsset.size !== artifact.bytes || checksum !== apiDigest) throw new Error("checksum_mismatch");
 
   return {
     tag,
     manifest,
     artifact: { name: expectedName, size: artifact.bytes, sha256: checksum },
+    assetId: executableAsset.id,
+    release: descriptor,
   };
 }
 
-async function readReleaseNotes(tag, request = fetch) {
-  const version = versionOf(tag);
-  const notesUrl = `https://raw.githubusercontent.com/${REPOSITORY}/${tag}/docs/RELEASE-NOTES-v${version}.md`;
-  try {
-    const response = await fetchTrustedUpstream(notesUrl, {
-      headers: { "user-agent": "ClawdDesktop-UpdateDelivery", accept: "text/plain" },
-      cf: { cacheEverything: true, cacheTtl: 3600 },
-    }, request);
-    if (!response.ok) return "";
-    const bytes = await readBounded(response, MAX_NOTES_BYTES, "release_unavailable");
-    return new TextDecoder("utf-8", { fatal: true }).decode(bytes).slice(0, MAX_NOTES_CHARS);
-  } catch {
-    return "";
-  }
-}
-
-function metadataFor(release, notes = "") {
-  const { tag, manifest, artifact } = release;
+function metadataFor(release) {
+  const { tag, manifest, artifact, release: descriptor } = release;
   const fallbackUrl = releaseAssetUrl(tag, artifact.name);
   return {
     tag_name: tag,
     name: `Clawd Desktop ${versionOf(tag)}`,
-    body: notes,
-    published_at: "",
+    body: typeof descriptor.body === "string" ? descriptor.body.slice(0, MAX_NOTES_CHARS) : "",
+    published_at: typeof descriptor.published_at === "string" ? descriptor.published_at : "",
     draft: false,
     prerelease: false,
     artifact: {
@@ -272,8 +303,7 @@ function metadataFor(release, notes = "") {
 
 export async function releaseMetadata(tag, request = fetch) {
   const release = await readRelease(tag, request);
-  const notes = await readReleaseNotes(release.tag, request);
-  return metadataFor(release, notes);
+  return metadataFor(release);
 }
 
 function safeDownloadRequest(request) {
@@ -300,6 +330,7 @@ function downloadHeaders(source, name) {
 
 export async function handleUpdateRequest(request, fetcher = fetch) {
   const url = new URL(request.url);
+  if (url.search) return json({ code: "query_not_supported" }, 400);
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, HEAD, OPTIONS", "access-control-allow-headers": "Range, If-Range" } });
   if (request.method !== "GET" && request.method !== "HEAD") return json({ code: "method_not_allowed" }, 405, { allow: "GET, HEAD, OPTIONS" });
   if (url.pathname === "/v1/healthz") return json({ service: "clawd-updates", status: "ok" }, 200, { "cache-control": "no-store" });
@@ -307,12 +338,10 @@ export async function handleUpdateRequest(request, fetcher = fetch) {
   if (url.pathname === "/v1/latest.json") {
     let stage = "release_lookup";
     try {
-      const tag = await resolveLatestTag(fetcher);
+      const descriptor = await resolveLatestRelease(fetcher);
       stage = "release_validation";
-      const release = await readRelease(tag, fetcher);
-      stage = "release_notes";
-      const notes = await readReleaseNotes(release.tag, fetcher);
-      const response = json(metadataFor(release, notes));
+      const release = await readRelease(descriptor, fetcher);
+      const response = json(metadataFor(release));
       return request.method === "HEAD" ? new Response(null, { status: response.status, headers: response.headers }) : response;
     } catch (error) {
       console.error("clawd_update_metadata_failed", { stage, code: metadataErrorCode(error), ...metadataErrorDetails(error) });
@@ -331,10 +360,9 @@ export async function handleUpdateRequest(request, fetcher = fetch) {
         const value = request.headers.get(key);
         if (value) headers.set(key, value);
       }
-      const upstream = await fetchTrustedUpstream(releaseAssetUrl(release.tag, release.artifact.name), {
+      const upstream = await fetchTrustedUpstream(apiAssetUrl(release.assetId), {
         method: request.method,
-        headers,
-        cf: request.headers.has("range") ? undefined : { cacheEverything: true, cacheTtl: 3600 },
+        headers: new Headers({ ...Object.fromEntries(headers), accept: "application/octet-stream", "x-github-api-version": "2022-11-28" }),
       }, fetcher);
       if (upstream.status < 200 || upstream.status > 299) return json({ code: "release_asset_unavailable" }, upstream.status === 404 ? 404 : 502, { "retry-after": "60" });
       return new Response(request.method === "HEAD" ? null : upstream.body, { status: upstream.status, statusText: upstream.statusText, headers: downloadHeaders(upstream, release.artifact.name) });
