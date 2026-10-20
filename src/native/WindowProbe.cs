@@ -85,16 +85,18 @@ class WindowProbe {
       if(processName.Length==0) continue;
       Process[] processes;
       try { processes=Process.GetProcessesByName(processName); } catch { continue; }
+      bool matched=false;
       foreach(Process process in processes) {
         try {
-          if(rule.Match=="name") { result.Add(rule.Id); break; }
+          if(rule.Match=="name") { matched=true; continue; }
           // Reuse the low-privilege image-path query used for the foreground
           // window; Process.MainModule can fail when VM_READ access is denied.
           string image=ImagePath((uint)process.Id);
-          if(!String.IsNullOrEmpty(image)&&String.Equals(System.IO.Path.GetFullPath(image),System.IO.Path.GetFullPath(rule.Path),StringComparison.OrdinalIgnoreCase)) { result.Add(rule.Id); break; }
+          if(!String.IsNullOrEmpty(image)&&String.Equals(System.IO.Path.GetFullPath(image),System.IO.Path.GetFullPath(rule.Path),StringComparison.OrdinalIgnoreCase)) matched=true;
         } catch { /* Access denied or a process that exited is an unknown, non-match. */ }
         finally { process.Dispose(); }
       }
+      if(matched)result.Add(rule.Id);
     }
     return result;
   }

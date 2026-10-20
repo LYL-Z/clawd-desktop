@@ -20,6 +20,16 @@ test('name matching is used only when the user selected that rule mode',()=>{
   assert.deepEqual([...classifyScene(settings,sample({foregroundPath:'D:\\Tools\\Example.exe'})).automaticReasons],['game']);
 });
 
+test('focus rules hide only their matching foreground app in smart mode and remain visible in manual mode',()=>{
+  const focus:AppRule={...game,id:'focus-1',kind:'focus',exeName:'Editor.exe',exePath:'C:\\Tools\\Editor.exe'};
+  const smart=normalizeSettings({...DEFAULTS,appRules:[focus]});
+  const editor=sample({foregroundName:'Editor.exe',foregroundPath:'C:\\Tools\\Editor.exe'});
+  assert.deepEqual([...classifyScene(smart,editor).automaticReasons],['focus']);
+  assert.equal(classifyScene(smart,sample({foregroundName:'Editor.exe',foregroundPath:'D:\\Other\\Editor.exe'})).automaticReasons.size,0);
+  assert.deepEqual([...classifyScene(normalizeSettings({...smart,autoHideMode:'manual'}),editor).automaticReasons],[]);
+  assert.equal(classifyScene(smart,editor).scene,'focus');
+});
+
 test('an explicit exception wins over game and fullscreen auto-hide, but cannot override lock or user state',()=>{
   const settings=normalizeSettings({...DEFAULTS,appRules:[game,{...game,id:'allow-1',kind:'exception'}]});
   assert.equal(classifyScene(settings,sample({fullscreen:true})).automaticReasons.size,0);
@@ -61,12 +71,25 @@ test('manual show does not clear a game blocker and resume does not clear a sepa
   controller.destroy();
 });
 
+test('a repeated renderer crash stays hidden through later automatic and user visibility changes',()=>{
+  const controller=new VisibilityController(()=>{});
+  controller.setSystemBlocked('renderer',true);
+  controller.updateAutomatic([],900,true);
+  controller.setUserHidden(false);
+  assert.equal(controller.snapshot.visible,false);
+  assert.deepEqual(controller.snapshot.reasons,['renderer']);
+  controller.destroy();
+});
+
 test('settings migration preserves valid v1 choices and bounds malformed new values',()=>{
   const migrated=normalizeSettings({outfit:'wizard',scale:1.25,roam:true,position:{x:-300,y:900},appRules:[game,{...game,id:'bad|id'}],restoreDelayMs:9000});
   assert.equal(migrated.outfit,'wizard');assert.equal(migrated.roam,true);assert.equal(migrated.position?.x,-300);
+  assert.equal(migrated.schemaVersion,2);assert.equal(migrated.quietMode,false);assert.equal(migrated.autonomyFrequency,'standard');
   assert.equal(migrated.restoreDelayMs,5000);assert.deepEqual(migrated.appRules,[{...game,exePath:'c:\\games\\example.exe'}]);
   const patched=mergeSettings(migrated,{outfit:'invalid',scale:999,paused:true});
   assert.equal(patched.outfit,'wizard');assert.equal(patched.scale,1.25);assert.equal(patched.paused,true);
+  const v2=normalizeSettings({...migrated,quietMode:true,autonomyFrequency:'calm',doubleClickAction:'sway',appRules:[{...game,id:'focus-new',kind:'focus'}]});
+  assert.equal(v2.quietMode,true);assert.equal(v2.autonomyFrequency,'calm');assert.equal(v2.doubleClickAction,'sway');assert.equal(v2.appRules[0]?.kind,'focus');
 });
 
 test('oversized game-rule payloads cannot exceed the native probe protocol limit',()=>{

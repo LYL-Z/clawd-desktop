@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {ClickArbiter,frameAt,lookIndex} from '../src/shared/animation';
+import {ClickArbiter,frameAt,lookIndex,stableLookIndex} from '../src/shared/animation';
+import {autonomousActions,autonomyDelayMs,doubleClickIntent,mayAutonomouslyRoam} from '../src/shared/behaviour';
 import {integrate,throwVelocity,chooseArea,recover,type Body} from '../src/shared/physics';
 import {parseStatus} from '../src/shared/status';
 const area={x:-1280,y:0,width:1280,height:1000};
@@ -27,3 +28,18 @@ test('single and double click arbitration emits exactly one outcome',async()=>{
 });
 test('atlas frame timing preserves holds and frame order',()=>{const d={row:0,count:3,durations:[100,200,300]};assert.equal(frameAt(d,99),0);assert.equal(frameAt(d,100),1);assert.equal(frameAt(d,300),2);assert.equal(frameAt(d,600),0);assert.equal(frameAt(d,900,false),2);});
 test('look directions use up/right/down/left in screen coordinates',()=>{assert.equal(lookIndex(0,-100),0);assert.equal(lookIndex(100,0),4);assert.equal(lookIndex(0,100),8);assert.equal(lookIndex(-100,0),12);assert.equal(lookIndex(10,10),null);});
+test('gaze direction hysteresis prevents flip-flopping near a sector boundary',()=>{
+  const at=(degrees:number)=>({x:Math.sin(degrees*Math.PI/180)*100,y:-Math.cos(degrees*Math.PI/180)*100});
+  const before=at(14),after=at(17);
+  assert.equal(stableLookIndex(before.x,before.y,0),0);
+  assert.equal(stableLookIndex(after.x,after.y,0),1);
+  assert.equal(stableLookIndex(1,1,1),null);
+});
+test('quiet mode preserves manual input and low-frequency in-place actions while suppressing roaming',()=>{
+  assert.equal(autonomyDelayMs('standard',false,0),20000);assert.equal(autonomyDelayMs('lively',false,1),22000);
+  assert.equal(autonomyDelayMs('standard',true,0),60000);assert.equal(autonomyDelayMs('standard',true,1),90000);
+  assert.equal(mayAutonomouslyRoam(true,false),true);assert.equal(mayAutonomouslyRoam(true,true),false);
+  assert.deepEqual(autonomousActions(['waving','running-right','sway','skate'],true),['waving','sway']);
+  assert.deepEqual(doubleClickIntent('performance'),{type:'performance',value:'agreement'});
+  assert.deepEqual(doubleClickIntent('sway'),{type:'action',value:'sway'});assert.equal(doubleClickIntent('none'),null);
+});

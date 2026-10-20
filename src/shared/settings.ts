@@ -24,22 +24,24 @@ function normalizeRule(value:unknown):AppRule|null{
   const canonical=canonicalExecutablePath(exePath);
   const exeName=typeof rule.exeName==='string'?rule.exeName.trim():'';
   if(!/^[a-zA-Z0-9_-]{1,64}$/.test(id)||!canonical||!exeName||exeName.length>260||/[\0\r\n|/\\]/.test(exeName))return null;
-  if(rule.kind!=='game'&&rule.kind!=='exception')return null;
+  if(rule.kind!=='game'&&rule.kind!=='exception'&&rule.kind!=='focus')return null;
   if(rule.match!=='path'&&rule.match!=='name')return null;
   if(typeof rule.enabled!=='boolean')return null;
   return{id,kind:rule.kind,match:rule.match,exeName,exePath:canonical,enabled:rule.enabled};
 }
 
 /**
- * Versionless settings from v1.0.1 are treated as schema v1. Unknown and
+ * Versionless and schema-v1 settings are migrated to schema v2. Unknown and
  * malformed fields are ignored; valid existing user choices keep their values.
  */
 export function normalizeSettings(input:unknown):Settings{
   const value=record(input)??{};
   const result:Settings={...DEFAULTS};
-  for(const key of ['roam','reducedMotion','paused','bridge','welcomeSeen','startVisible','hideFullscreen'] as const){
+  for(const key of ['roam','reducedMotion','paused','quietMode','bridge','welcomeSeen','startVisible','hideFullscreen'] as const){
     if(typeof value[key]==='boolean')result[key]=value[key];
   }
+  if(value.autonomyFrequency==='calm'||value.autonomyFrequency==='standard'||value.autonomyFrequency==='lively')result.autonomyFrequency=value.autonomyFrequency;
+  if(value.doubleClickAction==='performance'||value.doubleClickAction==='waving'||value.doubleClickAction==='sway'||value.doubleClickAction==='none')result.doubleClickAction=value.doubleClickAction;
   if(OUTFITS.some(outfit=>outfit.id===value.outfit))result.outfit=value.outfit as Settings['outfit'];
   if(typeof value.scale==='number'&&SCALE_VALUES.includes(value.scale as typeof SCALE_VALUES[number]))result.scale=value.scale;
   if(value.position){
@@ -67,9 +69,11 @@ export function normalizeSettings(input:unknown):Settings{
 export function mergeSettings(current:Settings,patch:unknown):Settings{
   const incoming=record(patch);if(!incoming)return current;
   const candidate:Settings={...current};
-  for(const key of ['roam','reducedMotion','paused','bridge','welcomeSeen','startVisible','hideFullscreen'] as const){
+  for(const key of ['roam','reducedMotion','paused','quietMode','bridge','welcomeSeen','startVisible','hideFullscreen'] as const){
     if(typeof incoming[key]==='boolean')candidate[key]=incoming[key];
   }
+  if(incoming.autonomyFrequency==='calm'||incoming.autonomyFrequency==='standard'||incoming.autonomyFrequency==='lively')candidate.autonomyFrequency=incoming.autonomyFrequency;
+  if(incoming.doubleClickAction==='performance'||incoming.doubleClickAction==='waving'||incoming.doubleClickAction==='sway'||incoming.doubleClickAction==='none')candidate.doubleClickAction=incoming.doubleClickAction;
   if(OUTFITS.some(outfit=>outfit.id===incoming.outfit))candidate.outfit=incoming.outfit as Settings['outfit'];
   if(typeof incoming.scale==='number'&&SCALE_VALUES.includes(incoming.scale as typeof SCALE_VALUES[number]))candidate.scale=incoming.scale;
   if(incoming.position!==undefined){

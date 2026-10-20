@@ -4,6 +4,7 @@ import {SettingsStore} from './services/SettingsStore';
 import {ForegroundAppMonitor} from './services/ForegroundAppMonitor';
 import {UpdateChecker} from './services/UpdateChecker';
 import {UpdateDownloader} from './services/UpdateDownloader';
+import {LocalDiagnostics} from './services/LocalDiagnostics';
 import {classifyScene,VisibilityController} from '../shared/visibility';
 import {DEFAULTS,OUTFITS,CORE_ACTIONS,EXT_ACTIONS,PERFORMANCES,type Settings,type Point,type HostCommand,type Environment,type VisibilitySnapshot,type UpdateArtifact} from '../shared/types';
 import type {ForegroundSample} from '../shared/probe';
@@ -23,6 +24,8 @@ let settingsWindow:BrowserWindow|undefined;
 let tray:Tray|undefined;
 let settings:Settings={...DEFAULTS};
 let store:SettingsStore|undefined;
+let diagnostics:LocalDiagnostics|undefined;
+let diagnosticPreview:string|undefined;
 let monitor:ForegroundAppMonitor|undefined;
 const updateChecker=new UpdateChecker();
 const updatesDirectory=path.join(app.getPath('userData'),'updates');
@@ -40,7 +43,10 @@ let menuRequests=0;
 let lastMenuWasActions=false;
 let manifest:Environment['manifest'];
 let shutdownRequested=false;
+let rendererCrashTimes:number[]=[];
 let lastEnvironmentKey='';
+let lastVisibilityLogFingerprint='';
+let lastAssetAvailability:boolean|undefined;
 let latestUpdateArtifact:UpdateArtifact|undefined;
 let downloadedUpdatePath:string|undefined;
 const timers:ReturnType<typeof setInterval>[]=[];
@@ -56,13 +62,15 @@ function command(value:HostCommand):void{
 
 function environment():Environment{
   const area=screen.getDisplayNearestPoint(lastPoint??screen.getCursorScreenPoint()).workArea;
+  const displays=screen.getAllDisplays();
   return{
     workArea:area,
-    displays:screen.getAllDisplays().map(display=>display.workArea),
+    displays:displays.map(display=>display.workArea),
+    displayMetrics:displays.map(display=>({id:display.id,bounds:display.bounds,workArea:display.workArea,scaleFactor:display.scaleFactor})),
     settings,
     statusPath:statusPath(),
     systemReducedMotion:!systemPreferences.getAnimationSettings().shouldRenderRichAnimation,
-    idleSeconds:powerMonitor.getSystemIdleTime(),
+    idleSeconds:process.env.CLAWD_AUTOTEST==='1'?0:powerMonitor.getSystemIdleTime(),
     windowBounds:pet?.getBounds()??area,
     manifest,
     visibility:currentVisibility(),
@@ -74,11 +82,13 @@ function environment():Environment{
 }
 
 function reasonLabel(snapshot=currentVisibility()):string{
-  const names:Record<string,string>={game:'游戏',fullscreen:'全屏应用',user:'手动',lock:'锁屏',suspend:'系统挂起'};
+  const names:Record<string,string>={game:'游戏',focus:'专注应用',fullscreen:'全屏应用',user:'手动',lock:'锁屏',suspend:'系统挂起',renderer:'显示进程异常'};
   return snapshot.reasons.map(reason=>names[reason]??reason).join('、');
 }
 
 function applyVisibility(snapshot:VisibilitySnapshot):void{
+  const fingerprint=JSON.stringify({visible:snapshot.visible,scene:snapshot.scene,reasons:snapshot.reasons,probeHealthy:snapshot.probeHealthy});
+  if(fingerprint!==lastVisibilityLogFingerprint){lastVisibilityLogFingerprint=fingerprint;void diagnostics?.record('visibility',{visible:snapshot.visible,scene:snapshot.scene,reasons:snapshot.reasons.join(','),probeHealthy:snapshot.probeHealthy});}
   if(pet&&!pet.isDestroyed()){
     if(snapshot.visible){
       if(!pet.isVisible())pet.showInactive();
@@ -144,6 +154,7 @@ function menu(actions=false):void{
       {label:visibilityLabel,enabled:!sceneBlocked,click:()=>setUserHidden(snapshot.visible)},
       {label:'唤醒 / 睡眠',click:()=>command({type:'action',value:'sleep-toggle'})},
       {label:'暂停全部动画',type:'checkbox',checked:settings.paused,click:item=>{void updateSettings({paused:item.checked});}},
+      {label:'安静模式',type:'checkbox',checked:settings.quietMode,click:item=>{void updateSettings({quietMode:item.checked});}},
       {type:'separator'},
       {label:'自动隐藏模式',submenu:[
         {label:'智能模式',type:'radio',checked:settings.autoHideMode==='smart',click:()=>{void updateSettings({autoHideMode:'smart'});}},
@@ -188,6 +199,14 @@ function createWindow(kind:WindowKind):BrowserWindow{
   });
   win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   win.webContents.on('will-navigate',event=>event.preventDefault());
+  win.webContents.on('render-process-gone',(_event,details)=>{
+    void diagnostics?.record('renderer-gone',{windowKind:kind,reason:details.reason});
+    if(!isPet||shutdownRequested||win.isDestroyed())return;
+    const now=Date.now();rendererCrashTimes=rendererCrashTimes.filter(time=>now-time<60_000);rendererCrashTimes.push(now);
+    if(rendererCrashTimes.length<=2){setTimeout(()=>{if(!shutdownRequested&&!win.isDestroyed())win.webContents.reload();},500);return;}
+    visibility?.setSystemBlocked('renderer',true);
+    void dialog.showMessageBox({type:'warning',title:'Clawd 暂时无法显示',message:'Clawd 的显示进程连续异常退出。请保存其他工作后重新启动 Clawd。',buttons:['知道了']});
+  });
   win.on('blur',()=>{if(isPet&&dragging){dragging=false;command({type:'action',value:'cancel-drag'});}});
   win.on('closed',()=>{
     if(win===pet)pet=undefined;
@@ -242,6 +261,22 @@ async function updateSettings(input:unknown):Promise<{ok:boolean;settings?:Setti
 function setupIPC():void{
   ipcMain.handle('clawd:init',event=>trusted(event)?environment():null);
   ipcMain.handle('clawd:settings:update',async(event,input)=>trusted(event)?updateSettings(input):{ok:false,error:'请求来源无效。'});
+  ipcMain.handle('clawd:diagnostics:preview',async event=>{
+    if(event.sender!==settingsWindow?.webContents||!diagnostics)return null;
+    const safeSettings={outfit:settings.outfit,roam:settings.roam,reducedMotion:settings.reducedMotion,paused:settings.paused,quietMode:settings.quietMode,autonomyFrequency:settings.autonomyFrequency,doubleClickAction:settings.doubleClickAction,autoHideMode:settings.autoHideMode,hideFullscreen:settings.hideFullscreen,restoreDelayMs:settings.restoreDelayMs,appRuleCount:settings.appRules.length};
+    const displays=screen.getAllDisplays().map(display=>({bounds:display.bounds,workArea:display.workArea,scaleFactor:display.scaleFactor}));
+    const processes=app.getAppMetrics().map(({type,cpu,memory})=>({type,cpuPercent:Math.round(cpu.percentCPUUsage*100)/100,workingSetMiB:Math.round(memory.workingSetSize/1024/1024)}));
+    const state=currentVisibility();
+    diagnosticPreview=JSON.stringify({schemaVersion:1,createdAt:new Date().toISOString(),application:{name:'Clawd',version:app.getVersion(),platform:process.platform,architecture:process.arch,electron:process.versions.electron},visibility:{visible:state.visible,reasons:state.reasons,scene:state.scene,probeHealthy:state.probeHealthy,updatedAt:state.updatedAt},probeHealthy,settings:safeSettings,displayCount:displays.length,displays,processes,logs:await diagnostics.recentEntries(200),scope:'本地诊断预览。已排除应用规则名称与路径、用户文档、任务内容、截图、窗口标题和原始进程路径。'},null,2);
+    return diagnosticPreview;
+  });
+  ipcMain.handle('clawd:diagnostics:export',async event=>{
+    if(event.sender!==settingsWindow?.webContents||!diagnosticPreview||!settingsWindow)return{ok:false,message:'请先生成并检查诊断预览。'};
+    const result=await dialog.showSaveDialog(settingsWindow,{title:'导出 Clawd 诊断信息',defaultPath:'Clawd-diagnostics.json',filters:[{name:'JSON 文件',extensions:['json']}]});
+    if(result.canceled||!result.filePath)return{ok:false,cancelled:true};
+    try{await writeFile(result.filePath,diagnosticPreview,{encoding:'utf8',flag:'w'});diagnosticPreview=undefined;return{ok:true};}
+    catch{return{ok:false,message:'无法写入所选位置。请检查文件夹权限和可用空间。'};}
+  });
   ipcMain.handle('clawd:settings:select-executable',async event=>{
     if(event.sender!==settingsWindow?.webContents)return null;
     const result=await dialog.showOpenDialog(settingsWindow,{title:'选择要添加的 Windows 应用',properties:['openFile'],filters:[{name:'Windows 应用',extensions:['exe']}]});
@@ -301,7 +336,14 @@ function setupIPC():void{
   });
   ipcMain.on('clawd:report',(event,data)=>{
     if(!trusted(event))return;
-    try{const encoded=JSON.stringify(data);if(encoded&&encoded.length<65536)lastReport=data;}catch{}
+    try{
+      const encoded=JSON.stringify(data);if(!encoded||encoded.length>=65536)return;
+      lastReport=data;
+      if(data&&typeof data==='object'&&'sourceAvailable' in data&&typeof data.sourceAvailable==='boolean'&&data.sourceAvailable!==lastAssetAvailability){
+        lastAssetAvailability=data.sourceAvailable;void diagnostics?.record('artwork-load',{available:data.sourceAvailable});
+      }
+      if(data&&typeof data==='object'&&'error' in data)void diagnostics?.record('renderer-error',{windowKind:event.sender===pet?.webContents?'pet':'studio-or-settings'});
+    }catch{}
   });
 }
 
@@ -310,6 +352,7 @@ async function launchProbe():Promise<void>{
   const probePath=path.join(__dirname.replace(/app\.asar(?=[\\/])/,'app.asar.unpacked'),'window-probe.exe');
   monitor=new ForegroundAppMonitor(probePath,sample=>applyScene(sample,!pet),healthy=>{
     probeHealthy=healthy;
+    void diagnostics?.record('probe-health',{healthy});
     if(!healthy&&!latestSample)visibility?.setProbeState(false,'unknown',undefined);
     else if(!healthy)visibility?.setProbeState(false,'unknown',latestSample?.foregroundName??undefined);
   });
@@ -319,10 +362,16 @@ async function launchProbe():Promise<void>{
 }
 
 function updateEnvironment():void{
-  const env=environment();
-  const key=JSON.stringify({displays:env.displays,workArea:env.workArea,systemReducedMotion:env.systemReducedMotion,scale:settings.scale});
+  const before=environment();
+  const key=JSON.stringify({displayMetrics:before.displayMetrics,workArea:before.workArea,systemReducedMotion:before.systemReducedMotion,scale:settings.scale});
   if(key===lastEnvironmentKey)return;
-  lastEnvironmentKey=key;command({type:'environment',value:env});
+  const hadEnvironment=Boolean(lastEnvironmentKey);
+  lastEnvironmentKey=key;
+  if(hadEnvironment&&pet&&!pet.isDestroyed()){
+    const area=before.workArea;
+    moveWindow(lastPoint??settings.position??{x:area.x+area.width/2,y:area.y+area.height},expanded);
+  }
+  const env=environment();command({type:'environment',value:env});
   if(settingsWindow&&!settingsWindow.isDestroyed()&&!settingsWindow.webContents.isDestroyed())settingsWindow.webContents.send('clawd:command',{type:'environment',value:env} satisfies HostCommand);
 }
 
@@ -336,8 +385,10 @@ function setupTray():void{
 }
 
 async function main():Promise<void>{
-  store=new SettingsStore(settingsPath(),message=>console.error(message));
+  diagnostics=new LocalDiagnostics(path.join(app.getPath('userData'),'logs','clawd.jsonl'));
+  store=new SettingsStore(settingsPath(),message=>{console.error(message);void diagnostics?.record('settings-recovery');});
   settings=await store.load();
+  void diagnostics.record('startup',{version:app.getVersion(),packaged:app.isPackaged});
   try{manifest=JSON.parse(await readFile(path.join(__dirname,'assets','animations.json'),'utf8'));}catch{manifest=undefined;}
   session.defaultSession.webRequest.onBeforeRequest((details,callback)=>callback({cancel:!details.url.startsWith('file:')&&!details.url.startsWith('data:')&&!details.url.startsWith('devtools:')}));
   setupIPC();
@@ -381,7 +432,7 @@ else{
     if(studioOnly)showStudio();
     else{setUserHidden(false);recoverPosition();}
   });
-  app.whenReady().then(main).catch(error=>{console.error('Clawd startup failed:',error instanceof Error?error.name:'unknown');app.quit();});
+  app.whenReady().then(main).catch(error=>{console.error('Clawd startup failed:',error instanceof Error?error.name:'unknown');void diagnostics?.record('startup-failed',{errorType:error instanceof Error?error.name:'unknown'});app.quit();});
 }
 
 app.on('window-all-closed',()=>{if(studioOnly)app.quit();});
@@ -390,5 +441,5 @@ app.on('before-quit',event=>{
   event.preventDefault();shutdownRequested=true;
   timers.forEach(clearInterval);monitor?.stop();visibility?.destroy();
   try{tray?.destroy();}catch{}
-  void store?.flush().catch(()=>{}).finally(()=>{store?.saveSync();app.quit();});
+  void diagnostics?.record('shutdown').catch(()=>{}).finally(()=>store?.flush().catch(()=>{}).finally(()=>{store?.saveSync();app.quit();}));
 });

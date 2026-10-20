@@ -1,6 +1,7 @@
 import {Assets} from './assets';
 import {CORE_ACTIONS,EXT_ACTIONS,OUTFITS,PERFORMANCES,DEFAULTS,type ActionDef,type ClawdBridge,type Environment,type HostCommand,type Manifest,type Outfit,type Point,type TaskEvent} from '../shared/types';
-import {frameAt,durationOf,lookIndex,ClickArbiter} from '../shared/animation';
+import {frameAt,durationOf,stableLookIndex,ClickArbiter} from '../shared/animation';
+import {autonomousActions,autonomyDelayMs,doubleClickIntent,mayAutonomouslyRoam} from '../shared/behaviour';
 import {integrate,recover,chooseArea,throwVelocity,type Body,clamp} from '../shared/physics';
 declare global{interface Window{clawd:ClawdBridge;clawdDebug?:{snapshot:()=>unknown;action:(name:string)=>void;performance:(name:string)=>void;time:(ms:number)=>void;outfit:(name:Outfit)=>void;hitPoints:()=>{opaque:Point|null;transparent:Point};};}}
 const isStudio=new URLSearchParams(location.search).get('mode')==='studio';
@@ -57,7 +58,11 @@ class Runtime {
   private width=isStudio?640:240;
   private height=isStudio?420:280;
   private dpr=1;
-  private clicks=new ClickArbiter(()=>this.startAction(this.sleeping?'wake':'waving'),()=>this.startPerformance('agreement'));
+  private clicks=new ClickArbiter(()=>this.startAction(this.sleeping?'wake':'waving'),()=>{
+    const intent=doubleClickIntent(this.env.settings.doubleClickAction);
+    if(intent?.type==='performance')this.startPerformance(intent.value,true);
+    else if(intent?.type==='action')this.startAction(intent.value,true);
+  });
   private marks=new Map<string,HTMLImageElement>();
   constructor(env:Environment,assets:Assets){
     this.env=env;this.assets=assets;this.windowOrigin={x:env.windowBounds.x,y:env.windowBounds.y};
@@ -119,14 +124,24 @@ class Runtime {
     text('#scene-name',PERFORMANCES.find(p=>p[0]===name)?.[1]??name);if(isStudio)this.paused=false;
   }
   private stopPerformance(){this.performance=null;}
+  private scheduleAutonomy():void{
+    this.nextAutonomy=this.clock+autonomyDelayMs(this.env.settings.autonomyFrequency,this.env.settings.quietMode);
+  }
   private command(command:HostCommand){
     switch(command.type){
       case'action':this.startAction(String(command.value));break;
       case'performance':this.startPerformance(String(command.value));break;
       case'outfit':this.changeOutfit(command.value as Outfit);break;
-      case'setting':{Object.assign(this.env.settings,command.value);if(this.reduced()||this.env.settings.paused){this.stopPerformance();this.finishDrag(true);this.action='idle';this.body.velocity={x:0,y:0};}break;}
+      case'setting':{
+        const previousQuiet=this.env.settings.quietMode,previousFrequency=this.env.settings.autonomyFrequency;
+        Object.assign(this.env.settings,command.value);
+        if(this.reduced()||this.env.settings.paused){this.stopPerformance();this.finishDrag(true);this.action='idle';this.body.velocity={x:0,y:0};}
+        if(this.env.settings.quietMode){this.roamUntil=0;if(['running','running-left','running-right','skate','skate-jump'].includes(this.action)){this.action='idle';this.actionSince=this.clock;}}
+        if(previousQuiet!==this.env.settings.quietMode||previousFrequency!==this.env.settings.autonomyFrequency)this.scheduleAutonomy();
+        break;
+      }
       case'environment':{
-        const env=command.value as Environment;this.env.displays=env.displays;this.env.systemReducedMotion=env.systemReducedMotion;this.env.idleSeconds=env.idleSeconds;this.env.workArea=chooseArea(this.body.position,env.displays)??env.workArea;
+        const env=command.value as Environment;this.env.displays=env.displays;this.env.displayMetrics=env.displayMetrics;this.env.systemReducedMotion=env.systemReducedMotion;this.env.idleSeconds=env.idleSeconds;this.env.workArea=chooseArea(this.body.position,env.displays)??env.workArea;
         if(!this.body.airborne&&!this.drag){const area=this.env.workArea;this.body.position.x=clamp(this.body.position.x,area.x+this.body.halfWidth,area.x+area.width-this.body.halfWidth);this.body.position.y=area.y+area.height;}
         break;
       }
@@ -160,7 +175,7 @@ class Runtime {
   private applyTask(event:TaskEvent|null){
     if(this.drag||this.body.airborne){this.pendingTask=event;return;}
     this.task=event;this.stopPerformance();this.finishDrag(true);this.body.velocity={x:0,y:0};
-    if(!event){this.action='idle';this.actionSince=this.clock;this.nextAutonomy=this.clock+20000;return;}
+    if(!event){this.action='idle';this.actionSince=this.clock;this.scheduleAutonomy();return;}
     const key=`${event.eventId}:${event.state}`;
     if((event.state==='done'||event.state==='failed')&&this.handledEvents.has(key))return;
     if(event.state==='done'||event.state==='failed'){this.handledEvents.add(key);if(this.handledEvents.size>100)this.handledEvents.delete(this.handledEvents.values().next().value!);}
@@ -195,7 +210,7 @@ class Runtime {
         if(this.body.position.x<=this.env.workArea.x+this.body.halfWidth||this.body.position.x>=this.env.workArea.x+this.env.workArea.width-this.body.halfWidth){this.wanderDirection*=-1;this.action=this.wanderDirection>0?'running-right':'running-left';}
       }
     }
-    if(this.performance){const p=PERFORMANCES.find(p=>p[0]===this.performance)!;if(this.clock-this.performanceSince>(this.reduced()?1200:p[2])){this.stopPerformance();this.action='idle';this.actionSince=this.clock;this.nextAutonomy=this.clock+20000;}return;}
+    if(this.performance){const p=PERFORMANCES.find(p=>p[0]===this.performance)!;if(this.clock-this.performanceSince>(this.reduced()?1200:p[2])){this.stopPerformance();this.action='idle';this.actionSince=this.clock;this.scheduleAutonomy();}return;}
     if(this.drag)return;
     if(this.task){
       if((this.task.state==='done'||this.task.state==='failed')&&this.action!=='idle'&&this.animationTime>=durationOf(this.definition())){this.action='idle';this.actionSince=this.clock;}
@@ -205,10 +220,11 @@ class Runtime {
     if(this.sleeping){if(this.env.idleSeconds<3&&!this.manualSleep){this.sleeping=false;this.sleepNotBefore=this.clock+5000;this.action=this.exists('wake')?'wake':'waving';this.actionSince=this.clock;}return;}
     if(this.env.idleSeconds>napTime&&this.clock>=this.sleepNotBefore&&!this.reduced()){this.sleeping=true;this.action='sleep';this.actionSince=this.clock;return;}
     if(this.reduced()||this.action!=='idle'||this.clock<this.nextAutonomy)return;
-    this.nextAutonomy=this.clock+20000+Math.random()*15000;
+    this.scheduleAutonomy();
     const candidates=['waving','sway','peek-left','peek-right','headphone-groove','cowboy-tip'].filter(a=>this.exists(a)&&!this.autonomousHistory.slice(-2).includes(a));
-    if(this.env.settings.roam&&Math.random()<.5){this.roamUntil=this.clock+4000+Math.random()*4000;this.action=this.wanderDirection>0?'running-right':'running-left';this.actionSince=this.clock;}
-    else{const name=candidates[Math.floor(Math.random()*candidates.length)]??'idle';this.autonomousHistory.push(name);this.startAction(name);}
+    const mayRoam=mayAutonomouslyRoam(this.env.settings.roam,this.env.settings.quietMode);
+    if(mayRoam&&Math.random()<.5){this.roamUntil=this.clock+4000+Math.random()*4000;this.action=this.wanderDirection>0?'running-right':'running-left';this.actionSince=this.clock;}
+    else{const eligible=autonomousActions(candidates,this.env.settings.quietMode);const name=eligible[Math.floor(Math.random()*eligible.length)]??'idle';this.autonomousHistory.push(name);this.startAction(name);}
   }
   private drawActor(target:CanvasRenderingContext2D,x:number,y:number,scale:number,action=this.action,outfit=this.env.settings.outfit,phase=this.animationTime,look:number|null=this.direction){
     const actionOutfits:Record<string,Outfit>={'headphone-groove':'headphones',skate:'skateboard','skate-jump':'skateboard','wizard-charge':'wizard','wizard-cast':'wizard','hardhat-work':'hardhat','detective-inspect':'detective','chef-prepare':'chef','cowboy-tip':'cowboy',football:'football'};
@@ -291,7 +307,11 @@ class Runtime {
     if(!isStudio&&(!Number.isFinite(this.local.x)||Math.abs(this.local.x)>this.width*2))this.local={x:this.width/2,y:210};
     const {x,y}=this.local;
     const blink=frameAt(this.assets.manifest.animations.idle!,this.animationTime)===2;
-    this.direction=this.assets.manifest.look?(this.manualDirection?this.forcedDirection:(!isStudio&&!blink&&!this.reduced()&&this.action==='idle'&&!this.sleeping&&!this.drag&&!this.performance?lookIndex(this.pointing.x-this.body.position.x,this.pointing.y-(this.body.position.y-75)):null)):null;
+    if(!this.assets.manifest.look)this.direction=null;
+    else if(this.manualDirection)this.direction=this.forcedDirection;
+    else if(!isStudio&&this.action==='idle'&&!this.sleeping&&!this.drag&&!this.performance&&!this.reduced()){
+      if(!blink)this.direction=stableLookIndex(this.pointing.x-this.body.position.x,this.pointing.y-(this.body.position.y-75),this.direction);
+    }else this.direction=null;
     if(this.performance)this.renderPerformance(x,y,scale);
     else{this.drawActor(ctx,x,y,scale);this.drawActor(maskCtx,x,y,scale);}
     if(this.task?.detail){ctx.fillStyle='#faf9f5';const tw=Math.min(260,ctx.measureText(this.task.detail).width+24);ctx.fillRect(Math.round(x-tw/2),Math.round(y-174),Math.round(tw),28);ctx.fillStyle='#141413';ctx.font='12px Microsoft YaHei';ctx.textAlign='center';ctx.fillText(this.task.detail,x,y-155);}

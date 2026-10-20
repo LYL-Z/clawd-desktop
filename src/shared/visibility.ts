@@ -1,7 +1,7 @@
 import type {AppRule,SceneKind,Settings,VisibilityReason,VisibilitySnapshot} from './types';
 import type {ForegroundSample} from './probe';
 
-const AUTOMATIC_REASONS:VisibilityReason[]=['game','fullscreen'];
+const AUTOMATIC_REASONS:VisibilityReason[]=['game','focus','fullscreen'];
 
 function normalizedName(value:string|undefined):string{
   return value?.trim().split(/[\\/]/).pop()?.toLocaleLowerCase('en-US')??'';
@@ -23,15 +23,18 @@ export function classifyScene(settings:Settings,sample:ForegroundSample):{scene:
   const exception=settings.appRules.some(rule=>rule.kind==='exception'&&ruleMatches(rule,foregroundPath,foregroundName));
   const reasons=new Set<VisibilityReason>();
   const games=settings.appRules.filter(rule=>rule.kind==='game'&&rule.enabled);
+  const focusApps=settings.appRules.filter(rule=>rule.kind==='focus'&&rule.enabled);
   const foregroundGame=games.some(rule=>ruleMatches(rule,foregroundPath,foregroundName));
+  const foregroundFocus=focusApps.some(rule=>ruleMatches(rule,foregroundPath,foregroundName));
   const runningGame=games.some(rule=>sample.runningRuleIds.includes(rule.id));
-  const scene:SceneKind=foregroundGame||runningGame?'game':sample.fullscreen?'fullscreen':'desktop';
+  const scene:SceneKind=foregroundGame||runningGame?'game':foregroundFocus?'focus':sample.fullscreen?'fullscreen':'desktop';
   if(settings.autoHideMode==='manual')return{scene,automaticReasons:reasons};
   if(settings.autoHideMode==='game-running'){
     const running=new Set(sample.runningRuleIds);
     if(games.some(rule=>running.has(rule.id)))reasons.add('game');
   }else if(!exception){
     if(foregroundGame)reasons.add('game');
+    if(foregroundFocus)reasons.add('focus');
     if(settings.hideFullscreen&&sample.fullscreen)reasons.add('fullscreen');
   }
   return{scene,automaticReasons:reasons};
@@ -61,7 +64,7 @@ export class VisibilityController{
     this.userHidden=hidden;this.reconcile();
   }
 
-  setSystemBlocked(reason:'lock'|'suspend',blocked:boolean):void{
+  setSystemBlocked(reason:'lock'|'suspend'|'renderer',blocked:boolean):void{
     if(blocked)this.systemReasons.add(reason);else this.systemReasons.delete(reason);
     this.reconcile();
   }
@@ -95,7 +98,7 @@ export class VisibilityController{
     const reasons=new Set<VisibilityReason>(this.systemReasons);
     for(const reason of this.automaticReasons)reasons.add(reason);
     if(this.userHidden)reasons.add('user');
-    const ordered=(['lock','suspend','user','game','fullscreen'] as const).filter(reason=>reasons.has(reason));
+    const ordered=(['lock','suspend','renderer','user','game','focus','fullscreen'] as const).filter(reason=>reasons.has(reason));
     this.commit({...this.current,visible:ordered.length===0,reasons:ordered});
   }
 

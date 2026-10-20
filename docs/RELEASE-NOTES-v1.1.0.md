@@ -1,30 +1,48 @@
-# Clawd 1.1.0
+# Clawd Desktop 1.1.0
 
-本版本在 1.0.1 基础上增量完善 Windows 场景识别、设置体验和可复现交付；保留现有陶土像素角色、图集、造型、动作、演出、物理和本地任务状态桥。
+Clawd 1.1.0 在 1.0.1 基础上增量完善 Windows 场景管理、设置体验、诊断隐私与手动更新。项目仍使用既有 Canvas 像素图集和原生探针；没有重写角色身份、接入云端 AI、采集屏幕/键盘内容或修改其他项目的服务配置。
 
 ## 主要变化
 
-- 以原因集合统一游戏、全屏、手动隐藏、Windows 锁屏与系统挂起的可见性仲裁。
-- 原生探针输出版本化 JSON，支持用户显式添加 EXE 的完整路径/文件名规则、进程运行状态、心跳监测和退避重启。
-- 新增桌面设置中心、衣柜画布预览、场景模式、游戏/例外规则编辑和托盘状态提示。
-- 旧设置文件可迁移；配置损坏时先备份，保存采用串行队列和临时文件替换。
-- 宠物隐藏时停止动画帧与鼠标命中更新；设置预览在窗口隐藏时暂停。
-- 设置页增加手动版本检查和可选下载：优先使用 Clawd 独立更新入口，失败时回退 GitHub；支持 Range 断点续传、取消后保留进度和完整文件 SHA-256 校验。不会后台轮询、自动下载、执行、安装或替换正在运行的便携版。
-- 新增隔离的 Cloudflare Worker `clawd-updates` 与专用子域 `clawd-updates.chronokalamos.com` 配置；GitHub Release 保持唯一发布源，不使用 R2，不修改其他 Worker、DNS 记录或路由。普通全球边缘网络不承诺中国大陆全运营商可达。
-- 修复 QA 脚本的个人目录依赖和缺失证据清单，新增 Windows GitHub Actions 构建/测试工作流。
+- 以可见性原因集合协调用户隐藏、游戏、专注应用、全屏、锁屏、挂起与 Renderer 故障；前台 EXE 规则由用户显式配置，不对所有游戏作识别承诺。
+- 设置中心提供游戏/专注/例外规则、衣柜预览、安静模式、自主行为频率、双击动作和显示恢复等设置；旧设置迁移到 schema v2。
+- 隐藏时暂停 Renderer 动画与命中测试；注视方向加入迟滞；保留原有动作、服饰、物理、四场演出及任务状态桥。
+- 本地诊断采用有界轮转；导出前显示脱敏预览，用户确认后再选择保存位置。
+- 更新检查需用户手动触发。发现版本后可选择下载；支持 HTTP Range 续传、GitHub 回退、文件长度与 SHA-256 校验。更新不会自动执行、安装或替换正在运行的便携版。
+- 提供独立 Clawd Cloudflare Worker 源码和子域配置，但 Worker **尚未部署**；当前可用版本信息和更新文件均来自 GitHub Releases。没有启用可能产生费用的 Cloudflare 服务，也没有修改九霄或其他项目的域名、Worker 或路由。
 
-## 验证
+## 验证结果
 
-- `npm run check`：通过。
-- `npm test`：34 项通过。
-- `python -m unittest discover -s tests`：4 项通过。
-- `npm run build`：本机 Windows 构建与 C# 探针编译通过。
-- `Clawd-1.1.0-windows-x64.exe`：本地 Windows x64 portable 构建为 99,961,650 bytes（约 95.3 MiB）；SHA-256：`6259cba20101cc2b7b7c98fd72e28c73e36f051ea8f16e73d4e3c693ef8bcbb4`。
-- 本地 `SHA256SUMS.txt` 同时覆盖 Windows EXE、Codex V2 宠物包和浅/深两张 4K 壁纸；发布资产和远端哈希须在 GitHub Release 创建后复核。
-- 更新后的 portable 实际启动冒烟：通过；加载五张图集、原生探针可用，应用和便携启动器均正常退出。证据范围与限制见 `docs/architecture-audit.md`。
-- Windows GitHub Actions Hosted Runner：在最终源码提交合并前必须通过；结果以 [PR #1 checks](https://github.com/LYL-Z/clawd-desktop/pull/1/checks) 为准。
-- 真实游戏、多显示器、DPI、锁屏与长时间运行：本版本尚未完成目标设备验收。
+| 检查 | 结果 |
+| --- | --- |
+| `npm run check` | 通过 |
+| `npm test` | 40 项通过 |
+| `python -m unittest discover -s tests` | 4 项通过 |
+| `npm run build` | Windows 本地构建通过，包含原生窗口探针 |
+| `npm run qa:probe` | 4 个 JSON 样本通过，精确路径规则匹配，stderr 为空 |
+| `node scripts/qa-layout.mjs` | 软件 DPR 1.00、1.25、1.50、1.75、2.00、2.50 共 4,608 组布局断言通过 |
+| 设置与状态恢复 | 设置页 6 项检查、最终打包版状态恢复 10 项检查通过 |
+| 打包动作剧场 | 28 个动作各采样 3 个阶段、16 向注视、8 个衣柜状态、4 场演出及离线重载通过 |
+| Windows portable 冒烟 | 5 张图集已加载，探针可用，应用和启动器均正常退出 |
+| 隐藏状态采样 | 302.9 秒：全机归一化 CPU 平均 0.056%，进程树私有内存平均 241.3 MiB、峰值 246.3 MiB；无 Renderer 页面错误。此有限隐藏态样本不是 30 分钟一般使用或长稳证明 |
+| OS 鼠标输入 | 透明区域点击曾到达下层隔离测试窗；因高 DPI 指针坐标保护中止后续实体点击/拖拽测试，未据此给出通过结论 |
 
-## 发布范围
+以上为本机与本地脚本证据，不代表所有 Windows 版本、游戏、显示器或用户环境。真实游戏进出/Alt+Tab、锁屏/休眠、多显示器热插拔/混合 DPI、实体点击/拖拽、故障注入、30 分钟一般使用及 4 小时长稳仍需目标设备验收。5 分钟采样不足以证明长时间稳定性。
 
-Windows x64 portable EXE、Codex V2 宠物图集、浅/深 4K 静态壁纸、版本化 Release notes 与 SHA-256 清单。便携程序未签名；不建议为运行程序关闭 Windows 安全保护。更新只在用户主动操作后发起，SHA-256 校验只证明与发布清单的字节一致，不等于发布者签名。发布后的 tag 和资产以 [GitHub v1.1.0 Release](https://github.com/LYL-Z/clawd-desktop/releases/tag/v1.1.0) 为准。
+## Windows x64 便携包
+
+- 文件：`Clawd-1.1.0-windows-x64.exe`（portable，自解压启动器，不是 MSI/NSIS 安装向导）
+- 大小：99,970,228 bytes
+- SHA-256：`854f89dd543e3e112d2db9f49d333977446f7d590acb1460a2a5178b633ed5fd`
+- Codex 宠物包：`Clawd-Codex-V2.zip`（6,167 bytes；只含宿主所需描述文件、图集和安装说明，不含 QA 原始材料），SHA-256：`1fdea3cf9be79dc6303c96b009f617eed2dbb29b49e50ddce8290a60d737d704`
+- 浅色 4K 壁纸：SHA-256 `dcff77e0b376a2f75367010c64922deae9bde246b0670b6ae42ab2d733ea44b8`
+- 深色 4K 壁纸：SHA-256 `8480a99e45c8bc3389d43a98382402e836fac40513e0c14fb2d684fee8ddcfdc`
+- 全部文件的校验清单：`SHA256SUMS.txt`
+
+便携版未签名。SHA-256 用于确认文件和校验清单一致，不是发布者身份签名；请勿为了运行程序关闭 Windows 安全保护。项目标记为 `UNLICENSED`：公开可见不代表通用开源、再分发或商业使用许可。Claude、Anthropic、Clawd 与相关素材仍受各自权利边界约束，本项目为非官方粉丝作品。
+
+## 更新服务与地域范围
+
+目前更新器直接回退至 GitHub Releases。独立 Worker 尚未部署或进行公网验证，因此不能声称该边缘入口已上线。即使以后启用普通全球边缘网络，也不能据此保证中国大陆所有运营商和线路稳定可达；需要按运营商和地区实测。Cloudflare China Network 不在零新增费用范围内。
+
+本轮候选源码仍需本轮 Pull Request 的 Windows CI exact-SHA 通过后，才能把 CI 和正式 Release 状态补记为完成。GitHub CI 通过也不能替代上述目标设备验收。

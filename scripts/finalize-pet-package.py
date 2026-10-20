@@ -49,9 +49,32 @@ acceptance = {'recordedAt': datetime.now(timezone.utc).isoformat(), 'atlasSha256
               'reports': {name: {'path': str(path.relative_to(root)).replace('\\', '/'),
                          'sha256': hashlib.sha256(path.read_bytes()).hexdigest()} for name, path in paths.items()}}
 (package / 'acceptance.json').write_text(json.dumps(acceptance, indent=2) + '\n', encoding='utf-8')
-(package / 'README.txt').write_text('CLAWD / Codex V2 本地宠物包\n\n复制pet.json与spritesheet.webp到CODEX_HOME/pets/clawd（默认用户.codex/pets/clawd）。\n请先备份同名目录，再在Codex宠物设置手动选择。当前未自动安装或选中。\n最终图集已通过本地bundled结构、质量与三份隔离方向盲审；尚未在Codex实际加载。\n连续性原始扫描把外部腿缝也列作内部孔；保留原始失败记录，并以四足形状与向下外部连通性分类后重跑原质量脚本。没有改图、修改bundled脚本或放宽阈值。\n部分中间角度及离散眼位步进保留为视觉警告，未宣称匀速角度插值。\nGIF、MP4和完整源文件见项目exports/previews/codex-v2与assets/source。\n本地粉丝作品，非官方发布。\n', encoding='utf-8')
-with zipfile.ZipFile(root / 'dist/Clawd-Codex-V2.zip', 'w', zipfile.ZIP_DEFLATED) as archive:
-    for path in sorted(package.rglob('*')):
-        if path.is_file():
-            archive.write(path, str(Path('clawd') / path.relative_to(package)))
+(package / 'README.txt').write_text(
+    'CLAWD / Codex V2 本地宠物包\n\n'
+    '此压缩包只包含 Codex 宠物描述文件与透明 WebP 图集；互动、动作和显示由 Codex 宿主决定。\n\n'
+    '安装：将 clawd 目录复制到 CODEX_HOME/pets/clawd（默认位于用户目录下的 .codex/pets/clawd）。\n'
+    '如果同名目录已存在，请先备份，再复制文件；随后在 Codex 宠物设置中手动选择 Clawd。\n'
+    '此包不会自动安装、切换宠物或设置自启动。\n\n'
+    '这是基于用户提供参考制作的本地 Claude / Clawd 粉丝作品，不是 Anthropic 或 OpenAI 官方产品。\n'
+    '名称、标识及相关第三方权利仍归各自权利人所有；公开可见不代表获得再分发或商业使用授权。\n',
+    encoding='utf-8')
+
+# The QA reports above remain available in the local build tree for review, but
+# are intentionally excluded from the user-facing pet archive. Ship only the
+# files the host loader needs and a short installation/rights note.
+archive_path = root / 'dist/Clawd-Codex-V2.zip'
+release_files = {
+    'pet.json': package / 'pet.json',
+    'spritesheet.webp': atlas,
+    'README.txt': package / 'README.txt',
+}
+with zipfile.ZipFile(archive_path, 'w', zipfile.ZIP_DEFLATED) as archive:
+    for name, path in release_files.items():
+        archive.write(path, f'clawd/{name}')
+
+with zipfile.ZipFile(archive_path) as archive:
+    actual = set(archive.namelist())
+    expected = {f'clawd/{name}' for name in release_files}
+    if actual != expected:
+        raise SystemExit(f'Unexpected Codex archive members: {sorted(actual ^ expected)}')
 print(json.dumps(acceptance, indent=2))
