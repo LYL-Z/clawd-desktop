@@ -68,18 +68,27 @@ test('checksum mismatch and prerelease metadata fail closed',async()=>{
     console.error=originalError;
   }
   assert.equal(response.status,503);
-  assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'invalid_release',errorName:'Error'}]]);
+  assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'invalid_release',errorName:'Error',errorMessage:'invalid_release'}]]);
 });
 
-test('latest metadata failures log only a bounded diagnostic code',async()=>{
+test('latest metadata failures redact credential variants from logs and responses',async()=>{
   const originalError=console.error;
   const logs=[];
   console.error=(...args)=>logs.push(args);
   try{
-    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw new Error('private-sentinel');});
+    const errorMessage=String.raw`failed https://api.github.com/path?token=verysecret authorization: Bearer BEARER_SECRET api_token=API_SECRET client_secret=CLIENT_SECRET api_key=API_KEY_SECRET x-api-key: X_API_KEY_SECRET json={"api_key":"JSON_API_KEY","refresh_token":"JSON_REFRESH_TOKEN","authorization":"Bearer JSON_BEARER_TOKEN"} camel={"clientSecret":"CAMEL_CLIENT_SECRET","refreshToken":"CAMEL_REFRESH_TOKEN","apiKey":"CAMEL_API_KEY"} escaped={"password":"prefix\"ESCAPED_PASSWORD_SECRET"}`;
+    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw new Error(errorMessage);});
     assert.equal(response.status,503);
-    assert.equal((await response.text()).includes('private-sentinel'),false);
-    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'upstream_error',errorName:'Error'}]]);
+    const responseBody=await response.text();
+    assert.equal(responseBody.includes('BEARER_SECRET'),false);
+    assert.equal(responseBody.includes('API_SECRET'),false);
+    const expectedDiagnostic='failed [url] [redacted] [redacted] [redacted] [redacted] [redacted] json={[redacted],[redacted],[redacted]} camel={[redacted],[redacted],[redacted]} escaped={[redacted]}';
+    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'upstream_error',errorName:'Error',errorMessage:expectedDiagnostic.slice(0,160)}]]);
+    const escapedResponse=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw new Error(String.raw`{"password":"prefix\"ESCAPED_PASSWORD_SECRET"}`);});
+    assert.equal(escapedResponse.status,503);
+    assert.equal(logs[1][1].errorMessage,'{[redacted]}');
+    const serializedLogs=JSON.stringify(logs);
+    for(const secret of ['verysecret','BEARER_SECRET','API_SECRET','CLIENT_SECRET','API_KEY_SECRET','X_API_KEY_SECRET','JSON_API_KEY','JSON_REFRESH_TOKEN','JSON_BEARER_TOKEN','CAMEL_CLIENT_SECRET','CAMEL_REFRESH_TOKEN','CAMEL_API_KEY','ESCAPED_PASSWORD_SECRET']) assert.equal(serializedLogs.includes(secret),false);
   }finally{
     console.error=originalError;
   }
