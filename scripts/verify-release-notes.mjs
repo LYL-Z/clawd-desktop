@@ -51,34 +51,21 @@ if (!noteLines.some((line) => line.includes(`release-manifest-v${version}.json`)
 const assetStart = noteLines.indexOf('## 发布文件与校验') + 1;
 const nextHeading = noteLines.findIndex((line, index) => index >= assetStart && line.startsWith('## '));
 const assetSection = noteLines.slice(assetStart, nextHeading < 0 ? undefined : nextHeading);
-const assetRows = assetSection.flatMap((line) => {
-  const match = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([\d,]+)\s*\|\s*`?([a-f0-9]{64})`?\s*\|$/i);
-  return match ? [{
-    file: match[1].replaceAll('`', '').trim(),
-    type: match[2].trim(),
-    bytes: match[3].replaceAll(',', ''),
-    sha256: match[4].toLowerCase(),
-  }] : [];
-});
-if (assetRows.length === 0) {
-  throw new Error(`Release notes for ${version} must list each asset's file, type, byte size, and SHA-256`);
-}
-const executableName = `Clawd-${version}-windows-x64.exe`;
-if (!assetRows.some(({ file }) => file === executableName)) {
-  throw new Error(`Release asset table must include ${executableName}`);
-}
+const assetSectionText = assetSection.join('\n');
 for (const requiredAsset of [
+  `Clawd-${version}-windows-x64.exe`,
   'Clawd-Codex-V2.zip',
   'Clawd-dark-3840x2160.png',
   'Clawd-light-3840x2160.png',
+  `release-manifest-v${version}.json`,
   'SHA256SUMS.txt',
 ]) {
-  if (!assetRows.some(({ file }) => file === requiredAsset)) {
-    throw new Error(`Release asset table must include ${requiredAsset}`);
+  if (!assetSectionText.includes(requiredAsset)) {
+    throw new Error(`Release asset section must identify ${requiredAsset}`);
   }
 }
-if (new Set(assetRows.map(({ file }) => file)).size !== assetRows.length) {
-  throw new Error(`Release asset table for ${version} contains duplicate file names`);
+if (!/manifest|清单/i.test(assetSectionText) || !/SHA-?256/i.test(assetSectionText)) {
+  throw new Error('Release asset section must explain that generated manifest/checksum files are authoritative.');
 }
 
 const changelogHasVersion = changelog.replaceAll('\r\n', '\n').split('\n')

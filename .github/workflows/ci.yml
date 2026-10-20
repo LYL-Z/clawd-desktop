@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -47,6 +49,9 @@ jobs:
       - name: Run image and asset tests
         run: python -m unittest discover -s tests
 
+      - name: Lock release source commit
+        run: node scripts/create-release-manifest.mjs --preflight release/ci
+
       - name: Build application and native probe
         run: npm run build
 
@@ -58,6 +63,12 @@ jobs:
 
       - name: Package portable Windows x64 build
         run: npx electron-builder --win portable --x64 --publish never --config.directories.output=release/ci
+
+      - name: Stage Codex pet and wallpaper assets
+        run: node scripts/stage-release-assets.mjs release/ci
+
+      - name: Write build provenance manifest
+        run: node scripts/create-release-manifest.mjs release/ci
 
       - name: Write SHA-256 manifest
         run: node scripts/create-checksums.mjs release/ci
