@@ -9,7 +9,7 @@ import {loadElectronDriver} from './qa-support.mjs';
 const exec=promisify(execFile);
 const _electron=loadElectronDriver(),root=process.cwd(),out=path.join(root,'qa/runtime'),userData=path.join(out,'user-data','idle-benchmark');
 const sampleSeconds=Number(process.env.CLAWD_QA_SECONDS??20),label=sampleSeconds>20?'stability-qa':'idle-benchmark';
-if(!Number.isInteger(sampleSeconds)||sampleSeconds<20||sampleSeconds>600)throw new Error('Sample duration must be an integer from 20 to 600 seconds');
+if(!Number.isInteger(sampleSeconds)||sampleSeconds<20||sampleSeconds>14400)throw new Error('Sample duration must be an integer from 20 to 14400 seconds');
 await mkdir(userData,{recursive:true});await writeFile(path.join(userData,'settings.json'),JSON.stringify({welcomeSeen:true,outfit:'none',roam:false,paused:false,reducedMotion:false}));
 const env={...process.env,CLAWD_TEST_USER_DATA:userData,CLAWD_AUTOTEST:'1'};delete env.ELECTRON_RUN_AS_NODE;
 const app=await _electron.launch({executablePath:process.env.CLAWD_QA_EXE??path.join(root,'node_modules/electron/dist/electron.exe'),args:process.env.CLAWD_QA_EXE?[]:[root],cwd:root,env});
