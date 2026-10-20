@@ -5,18 +5,16 @@ import worker, {handleUpdateRequest, releaseMetadata} from '../cloudflare-update
 
 const digest='a'.repeat(64);
 const tag='v1.2.3';
-const assetName='Clawd-1.2.3-windows-x64.exe';
-const release={
-  tag_name:tag,
-  name:'Clawd 1.2.3',
-  body:'Release notes',
-  published_at:'2026-10-19T00:00:00Z',
-  draft:false,
-  prerelease:false,
-  assets:[
-    {name:assetName,size:42,browser_download_url:`https://github.com/LYL-Z/clawd-desktop/releases/download/${tag}/${assetName}`,digest:`sha256:${digest}`},
-    {name:'SHA256SUMS.txt',size:100,browser_download_url:`https://github.com/LYL-Z/clawd-desktop/releases/download/${tag}/SHA256SUMS.txt`},
-  ],
+const version='1.2.3';
+const assetName=`Clawd-${version}-windows-x64.exe`;
+const manifest={
+  schemaVersion:1,
+  product:'Clawd Desktop',
+  version,
+  platform:'Windows x64',
+  sourceCommit:'b'.repeat(40),
+  generatedAt:'2026-10-19T00:00:00.000Z',
+  artifacts:[{file:assetName,bytes:42,sha256:digest}],
 };
 
 test('deployment config binds only the isolated Clawd update hostname and worker',async()=>{
@@ -29,13 +27,15 @@ test('deployment config binds only the isolated Clawd update hostname and worker
   assert.match(source,/clawd-updates\.chronokalamos\.com/);
 });
 
-function mockFetch({rangeResponse}={}){
+function mockFetch({rangeResponse,latestLocation=`https://github.com/LYL-Z/clawd-desktop/releases/tag/${tag}`,manifestValue=manifest,sumsText=`${digest}  ${assetName}\n`,notesText='## Changes\nRelease notes'}={}){
   const calls=[];
   const fetcher=async(input,init={})=>{
     const url=String(input);calls.push({url,init});
-    if(url.endsWith('/releases/latest')||url.endsWith(`/releases/tags/${tag}`))return new Response(JSON.stringify(release),{status:200,headers:{'content-type':'application/json'}});
-    if(url.endsWith('/SHA256SUMS.txt'))return new Response(`${digest}  ${assetName}\n`,{status:200});
+    if(url==='https://github.com/LYL-Z/clawd-desktop/releases/latest')return new Response(null,{status:302,headers:{location:latestLocation}});
+    if(url.endsWith(`/release-manifest-${tag}.json`))return new Response(JSON.stringify(manifestValue),{status:200,headers:{'content-type':'application/json'}});
+    if(url.endsWith(`/SHA256SUMS.txt`))return new Response(sumsText,{status:200});
     if(url.endsWith(assetName))return rangeResponse??new Response('download bytes',{status:206,headers:{'content-range':'bytes 10-21/42','content-length':'12'}});
+    if(url===`https://raw.githubusercontent.com/LYL-Z/clawd-desktop/${tag}/docs/RELEASE-NOTES-v${version}.md`)return new Response(notesText,{status:200});
     throw new Error(`unexpected URL ${url}`);
   };
   return{fetcher,calls};
@@ -54,67 +54,103 @@ test('module worker entrypoint uses platform fetch instead of treating runtime e
   }
 });
 
-test('latest metadata is bounded to the matching official Windows release and checksum',async()=>{
-  const {fetcher}=mockFetch();
-  const metadata=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),fetcher);
-  assert.equal(metadata.status,200);
-  const body=await metadata.json();
+test('latest metadata is resolved from the fixed release redirect and verified manifest',async()=>{
+  const {fetcher,calls}=mockFetch();
+  const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),fetcher);
+  assert.equal(response.status,200);
+  const body=await response.json();
   assert.equal(body.tag_name,tag);
   assert.equal(body.artifact.name,assetName);
   assert.equal(body.artifact.size,42);
   assert.equal(body.artifact.sha256,digest);
   assert.equal(body.artifact.download_url,`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`);
-  assert.equal(body.artifact.fallback_url,release.assets[0].browser_download_url);
+  assert.equal(body.artifact.fallback_url,`https://github.com/LYL-Z/clawd-desktop/releases/download/${tag}/${assetName}`);
+  assert.equal(body.body,'## Changes\nRelease notes');
+  assert.equal(body.source_commit,'b'.repeat(40));
+  assert.equal(body.generated_at,manifest.generatedAt);
+  assert.equal(calls.some(call=>call.url.includes('api.github.com')),false);
 });
 
-test('checksum mismatch and prerelease metadata fail closed',async()=>{
-  const {fetcher}=mockFetch();
-  const wrongDigest='b'.repeat(64);
-  await assert.rejects(()=>releaseMetadata({...release,assets:release.assets.map(asset=>asset.name===assetName?{...asset,digest:`sha256:${wrongDigest}`}:asset)},fetcher),/checksum_mismatch/);
+test('latest redirect is restricted to this repository and a stable semantic version',async()=>{
   const originalError=console.error;
   const logs=[];
-  let response;
   console.error=(...args)=>logs.push(args);
   try{
-    response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>new Response(JSON.stringify({...release,prerelease:true}),{status:200}));
+  const badHost=mockFetch({latestLocation:'https://attacker.example/LYL-Z/clawd-desktop/releases/tag/v1.2.3'});
+  const denied=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),badHost.fetcher);
+  assert.equal(denied.status,503);
+  assert.equal(badHost.calls.length,1);
+
+  const prerelease=mockFetch({latestLocation:'https://github.com/LYL-Z/clawd-desktop/releases/tag/v1.2.3-rc.1'});
+  const rejected=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),prerelease.fetcher);
+  assert.equal(rejected.status,503);
+  assert.equal(prerelease.calls.length,1);
+  assert.equal(logs.length,2);
   }finally{
     console.error=originalError;
   }
-  assert.equal(response.status,503);
-  assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'invalid_release',errorName:'Error',errorMessage:'invalid_release'}]]);
 });
 
-test('latest metadata failures redact credential variants from logs and responses',async()=>{
+test('manifest and executable redirects cannot escape trusted GitHub hosts',async()=>{
+  const manifestSource=mockFetch();
+  const manifestFetcher=async(input,init={})=>{
+    if(String(input).endsWith(`/release-manifest-${tag}.json`))return new Response(null,{status:302,headers:{location:'https://127.0.0.1/secret'}});
+    return manifestSource.fetcher(input,init);
+  };
+  await assert.rejects(()=>releaseMetadata(tag,manifestFetcher),/manifest_unavailable/);
+  assert.equal(manifestSource.calls.some(call=>call.url.includes('127.0.0.1')),false);
+
+  const downloadSource=mockFetch();
+  const downloadFetcher=async(input,init={})=>{
+    if(String(input).endsWith(assetName))return new Response(null,{status:302,headers:{location:'http://127.0.0.1/secret'}});
+    return downloadSource.fetcher(input,init);
+  };
+  const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`),downloadFetcher);
+  assert.equal(response.status,502);
+  assert.equal(downloadSource.calls.some(call=>call.url.includes('127.0.0.1')),false);
+});
+
+test('manifest and checksum disagreement fail closed',async()=>{
+  const wrongDigest='c'.repeat(64);
+  const {fetcher}=mockFetch({manifestValue:{...manifest,artifacts:[{...manifest.artifacts[0],sha256:wrongDigest}]}});
+  await assert.rejects(()=>releaseMetadata(tag,fetcher),/checksum_mismatch/);
+  const duplicate=mockFetch({sumsText:`${digest}  ${assetName}\n${digest}  ${assetName}\n`});
+  await assert.rejects(()=>releaseMetadata(tag,duplicate.fetcher),/checksum_invalid/);
+});
+
+test('metadata failures never log raw exception messages or credentials',async()=>{
   const originalError=console.error;
   const logs=[];
   console.error=(...args)=>logs.push(args);
   try{
-    const errorMessage=String.raw`failed https://api.github.com/path?token=verysecret authorization: Bearer BEARER_SECRET api_token=API_SECRET client_secret=CLIENT_SECRET api_key=API_KEY_SECRET x-api-key: X_API_KEY_SECRET json={"api_key":"JSON_API_KEY","refresh_token":"JSON_REFRESH_TOKEN","authorization":"Bearer JSON_BEARER_TOKEN"} camel={"clientSecret":"CAMEL_CLIENT_SECRET","refreshToken":"CAMEL_REFRESH_TOKEN","apiKey":"CAMEL_API_KEY"} escaped={"password":"prefix\"ESCAPED_PASSWORD_SECRET"}`;
-    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw new Error(errorMessage);});
+    const unsafeMessage=String.raw`failed Authorization: Bearer BEARER_SECRET api_token=API_SECRET client_secret=CLIENT_SECRET api_key=API_KEY_SECRET`;
+    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw Object.assign(new Error(unsafeMessage),{cause:{code:'ECONNRESET'}});});
     assert.equal(response.status,503);
     const responseBody=await response.text();
-    assert.equal(responseBody.includes('BEARER_SECRET'),false);
-    assert.equal(responseBody.includes('API_SECRET'),false);
-    const expectedDiagnostic='failed [url] [redacted] [redacted] [redacted] [redacted] [redacted] json={[redacted],[redacted],[redacted]} camel={[redacted],[redacted],[redacted]} escaped={[redacted]}';
-    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'upstream_error',errorName:'Error',errorMessage:expectedDiagnostic.slice(0,160)}]]);
-    const escapedResponse=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw new Error(String.raw`{"password":"prefix\"ESCAPED_PASSWORD_SECRET"}`);});
-    assert.equal(escapedResponse.status,503);
-    assert.equal(logs[1][1].errorMessage,'{[redacted]}');
-    const serializedLogs=JSON.stringify(logs);
-    for(const secret of ['verysecret','BEARER_SECRET','API_SECRET','CLIENT_SECRET','API_KEY_SECRET','X_API_KEY_SECRET','JSON_API_KEY','JSON_REFRESH_TOKEN','JSON_BEARER_TOKEN','CAMEL_CLIENT_SECRET','CAMEL_REFRESH_TOKEN','CAMEL_API_KEY','ESCAPED_PASSWORD_SECRET']) assert.equal(serializedLogs.includes(secret),false);
+    for(const secret of ['BEARER_SECRET','API_SECRET','CLIENT_SECRET','API_KEY_SECRET'])assert.equal(responseBody.includes(secret),false);
+    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'release_unavailable',errorName:'Error'}]]);
+    assert.equal(JSON.stringify(logs).includes(unsafeMessage),false);
   }finally{
     console.error=originalError;
   }
 });
 
-test('range downloads are forwarded to the exact versioned GitHub asset',async()=>{
+test('range downloads are forwarded to the exact manifest-verified versioned asset',async()=>{
   const {fetcher,calls}=mockFetch();
   const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`,{headers:{range:'bytes=10-21','if-range':'"stable-etag"'}}),fetcher);
   assert.equal(response.status,206);
   assert.equal(response.headers.get('content-range'),'bytes 10-21/42');
   assert.equal(response.headers.get('content-disposition'),`attachment; filename="${assetName}"`);
+  assert.equal(calls.at(-1).url,`https://github.com/LYL-Z/clawd-desktop/releases/download/${tag}/${assetName}`);
   assert.equal(calls.at(-1).init.headers.get('range'),'bytes=10-21');
   assert.equal(calls.at(-1).init.headers.get('if-range'),'"stable-etag"');
+});
+
+test('HEAD uses the verified metadata without returning a body',async()=>{
+  const {fetcher}=mockFetch();
+  const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json',{method:'HEAD'}),fetcher);
+  assert.equal(response.status,200);
+  assert.equal(await response.text(),'');
 });
 
 test('unknown paths, asset names, and methods are rejected',async()=>{
