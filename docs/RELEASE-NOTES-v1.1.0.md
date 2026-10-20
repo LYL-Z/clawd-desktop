@@ -2,9 +2,9 @@
 
 Clawd 1.1.0 在 1.0.1 基础上增量完善 Windows 场景管理、设置体验、诊断隐私与手动更新。项目仍使用既有 Canvas 像素图集和原生探针；没有重写角色身份、接入云端 AI、采集屏幕/键盘内容或修改其他项目的服务配置。
 
-状态：候选版本，GitHub Release 尚未创建
+发布日期：2026-10-20
 基线版本：1.0.1
-候选源码：见当前分支的精确 Git SHA 与对应 Windows CI
+精确构建源码、构建时间及发行附件摘要以随版本发布的 `release-manifest-v1.1.0.json` 和 `SHA256SUMS.txt` 为准。
 
 任务书称为“Clawd 2.0”的是本轮升级方案名称；任务书第十八章明确版本应依据实际变更与项目版本约定，不能只因方案名称强制改为 2.0.0。1.1.0 是兼容性增量版本，不是临时过渡包。
 
@@ -14,7 +14,7 @@ Clawd 1.1.0 在 1.0.1 基础上增量完善 Windows 场景管理、设置体验�
 - 设置中心提供游戏/专注/例外规则、衣柜预览、安静模式、自主行为频率、双击动作和显示恢复等设置；旧设置迁移到 schema v2。
 - 本地诊断采用有界轮转；导出前显示脱敏预览，用户确认后再选择保存位置。
 - 更新检查需用户手动触发。发现版本后可选择下载；支持 HTTP Range 续传、GitHub 回退、文件长度与 SHA-256 校验。更新不会自动执行、安装或替换正在运行的便携版。
-- 提供独立 Clawd Cloudflare Worker 源码和子域配置，但 Worker **尚未部署**；当前可用版本信息和更新文件均来自 GitHub Releases。没有启用可能产生费用的 Cloudflare 服务，也没有修改九霄或其他项目的域名、Worker 或路由。
+- 提供独立 Clawd Cloudflare Worker 源码与专用子域配置。Worker 仅代理 Clawd 官方 GitHub Release 元数据与安装文件，不存储安装包、不依赖 R2，也不修改其他项目的域名、Worker 或路由；部署与公网验收状态记录在项目任务书中。
 
 ## 调整
 
@@ -69,14 +69,14 @@ Clawd 1.1.0 在 1.0.1 基础上增量完善 Windows 场景管理、设置体验�
 
 ## 构建溯源
 
-正式打包命令先要求 Git 工作区干净，再锁定 40 位源码 commit；构建后生成 `release-manifest-v1.1.0.json`，其中包含 Windows x64 目标平台、源码 commit、资产文件、字节数与 SHA-256。该 manifest 随正式包上传。当前候选尚未从最终提交重新构建，因此这里不把候选二进制伪称为已锁定最终源码的正式资产。
+正式打包命令要求 Git 工作区干净，并在构建前锁定 40 位源码 commit；构建后生成 `release-manifest-v1.1.0.json`，其中包含 Windows x64 目标平台、源码 commit、构建时间、每个发行资产的文件名、字节数与 SHA-256。manifest 随版本一并发布，`SHA256SUMS.txt` 同时校验 manifest 和交付附件。该清单是具体二进制溯源信息的权威记录。
 
 ## 发布文件与校验
 
-本机候选输出位于忽略目录 `release/`，不代表已发布的正式 Release。可下载文件为：`Clawd-1.1.0-windows-x64.exe`（Windows x64 portable）、`Clawd-Codex-V2.zip`（Codex 宠物包）、`Clawd-dark-3840x2160.png` 与 `Clawd-light-3840x2160.png`（4K 壁纸）。正式构建会同时生成 `release-manifest-v1.1.0.json` 与 `SHA256SUMS.txt`。实际源码提交、文件字节数和 SHA-256 以同一构建产生的 manifest 与校验清单为准，避免在版本说明中维护易过期的重复副本；manifest 自身由 `SHA256SUMS.txt` 校验，不在自身内部自引用。
+发行附件包括：`Clawd-1.1.0-windows-x64.exe`（Windows x64 portable）、`Clawd-Codex-V2.zip`（Codex 宠物包）、`Clawd-dark-3840x2160.png` 与 `Clawd-light-3840x2160.png`（4K 壁纸）、`release-manifest-v1.1.0.json` 与 `SHA256SUMS.txt`。逐项文件大小和 SHA-256 以发布附件中的 manifest 与校验清单为准；manifest 自身由 `SHA256SUMS.txt` 校验，不作递归自引用。
 
 ## 分发与地域范围
 
-独立 Clawd Worker 源码和配置已准备，但发布时尚未部署或进行公网验证；当前更新器可经 GitHub Releases 查询和下载。普通全球边缘网络若后续启用，可能增加一个与 GitHub 独立的访问入口，但不能保证中国大陆所有运营商和线路稳定可达，需要按运营商和地区实测。Cloudflare China Network 是另一项 Enterprise 服务，不属于本次零新增费用方案。
+更新元数据与文件以 Clawd 专用 Worker 和 GitHub Release 为入口，其中 GitHub 是唯一正式版本与文件来源。Worker 使用普通 Cloudflare 全球网络和 Free 额度；额度耗尽时服务可能限流，GitHub 仍为备用源。不能保证中国大陆所有运营商和线路稳定可达，需要按运营商和地区实测。Cloudflare China Network 是另一项 Enterprise 服务，不包含在本版本范围内。
 
-PR #3 当前为草稿；仓库已确认为公开可见。提交 `6e15f741ef25d88f37ed7ec5e71e376131e25678` 的两次 Windows CI 均成功（run `39411510761`、`39411520253`）；本版本说明随后新增的验收记录仍需随新提交重新通过精确 SHA CI。正式 GitHub Release 尚未创建；发布包须先通过当前 head 的 CI、审核与候选包门禁，发布后再下载远端副本复核。30 分钟普通模式测试通过；4 小时观察仅运行 3,481 秒后按用户要求停止，未达到四小时门槛。
+版本 CI、发布记录与实际包体的关系以公开仓库工作流和 `release-manifest-v1.1.0.json` 为准。30 分钟普通模式测试通过；该项对应较早候选包，最新正式构建仍单独执行便携包冒烟。4 小时观察仅运行 3,481 秒后按用户要求停止，未达到四小时门槛，不能记为通过。
