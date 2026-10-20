@@ -24,14 +24,15 @@ test('deployment config binds only the isolated Clawd update hostname and worker
   const config=JSON.parse(await readFile(new URL('../cloudflare-updates/wrangler.jsonc',import.meta.url),'utf8'));
   const source=await readFile(new URL('../cloudflare-updates/worker.mjs',import.meta.url),'utf8');
   assert.equal(config.name,'clawd-updates');
-  assert.equal(config.workers_dev,false);
+  assert.equal(config.workers_dev,true);
+  assert.equal(config.preview_urls,false);
   assert.deepEqual(config.routes,[{pattern:'clawd-updates.chronokalamos.com',custom_domain:true}]);
   assert.equal(config.bindings,undefined);
   assert.equal(config.observability.enabled,true);
   assert.equal(config.observability.redact_query_string,true);
   assert.equal(config.observability.logs.invocation_logs,false);
   assert.equal(config.observability.logs.head_sampling_rate,1);
-  assert.match(source,/clawd-updates\.chronokalamos\.com/);
+  assert.match(source,/clawd-updates\.3507103376\.workers\.dev/);
 });
 
 function releaseDescriptor({manifestValue=manifest,releaseTag=tag,draft=false,prerelease=false,executableDigest=`sha256:${digest}`,executableSize=42,body='## Changes\nRelease notes'}={}){
@@ -84,7 +85,7 @@ test('latest metadata uses the fixed GitHub release API and verifies its asset d
   assert.equal(body.artifact.name,assetName);
   assert.equal(body.artifact.size,42);
   assert.equal(body.artifact.sha256,digest);
-  assert.equal(body.artifact.download_url,`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`);
+  assert.equal(body.artifact.download_url,`https://clawd-updates.3507103376.workers.dev/v1/download/${tag}/${assetName}`);
   assert.equal(body.artifact.fallback_url,`https://github.com/LYL-Z/clawd-desktop/releases/download/${tag}/${assetName}`);
   assert.equal(body.body,'## Changes\nRelease notes');
   assert.equal(body.source_commit,'b'.repeat(40));

@@ -4,7 +4,9 @@
 
 ## 当前部署状态
 
-独立 Worker `clawd-updates` 已部署到 `clawd-updates.chronokalamos.com`。当前线上部署在健康检查上返回 200，但旧元数据实现访问 `github.com/releases/latest` 时收到上游 HTTP 525，导致 `/v1/latest.json` 返回 503。仓库候选已改用 GitHub 官方 Releases API 和 asset API；尚需合并、部署并在该 Worker 上重新验证元数据、Range 和完整包 SHA-256，不能把本机探测当成线上验收。
+独立 Worker `clawd-updates` 已部署到 `clawd-updates.chronokalamos.com`。PR #11 将上游改为 GitHub 官方 Releases API 和 asset API、加入日志脱敏后已合并并部署；但该自定义域名的 `/v1/latest.json` 仍返回 503，Range 返回 502，线上验收未通过。Cloudflare API 只读检查确认 `chronokalamos.com` 的区域级 Origin Post-Quantum Encryption 当前为 `supported`；[Cloudflare 官方文档](https://developers.cloudflare.com/ssl/origin-configuration/automatic-key-exchange/)说明此区域设置也影响 Worker 的 `fetch()` 请求。Cloudflare 的 [workerd issue #7042](https://github.com/cloudflare/workerd/issues/7042) 记录了自定义域名 Worker 访问 GitHub 出现 525、而 workers.dev 访问成功的相同症状。为免影响同一区域的其他项目，不修改此设置。
+
+1.1.1 候选在 Clawd Worker 配置中开启专属生产地址 `clawd-updates.3507103376.workers.dev`，让桌面客户端直接访问该主机；原有自定义域名保留，版本预览 URL 显式关闭。候选尚未合并或部署验证，不能将其写成已恢复服务。须在合并后实测 `workers.dev` 元数据、Range、完整安装包大小与 SHA-256，再更新本段结论。
 
 用户报告 Cloudflare Workers 为 Free。Wrangler OAuth 有 Worker 脚本写权限和 Zone 读取权限，但没有 Billing Read 权限，故无法独立核对实际账单、套餐余量或账户历史。当前 Worker 没有 R2、Pages、数据库或其他付费绑定；本轮不会升级套餐或创建额外 Cloudflare 资源。
 
@@ -13,7 +15,7 @@
 ```text
 用户点击“检查新版本”
         │
-        ├─ GET https://clawd-updates.chronokalamos.com/v1/latest.json
+        ├─ GET https://clawd-updates.3507103376.workers.dev/v1/latest.json (1.1.1 候选)
         │       └─ 通过 GitHub Releases API 查询固定仓库的最新正式版本
         │           以发行 manifest 与 GitHub asset digest/大小交叉核对
         │
@@ -22,7 +24,7 @@
 
 用户选择“下载更新”
         │
-        ├─ 首选 clawd-updates.chronokalamos.com 的固定版本下载路由
+        ├─ 首选 clawd-updates.3507103376.workers.dev 的固定版本下载路由 (1.1.1 候选)
         │   Worker 经 GitHub asset API 请求版本化文件，并校验重定向主机
         ├─ HTTP Range 分块续传至本地 updates/<version>/*.part
         ├─ 边缘源不可用时使用 GitHub Release 备用 URL
@@ -34,7 +36,7 @@
 
 ## 边缘入口隔离
 
-Worker 名称为 `clawd-updates`，Wrangler 配置只绑定 `clawd-updates.chronokalamos.com`。它只接受健康检查、版本元数据和固定仓库 Windows x64 正式 Release 文件的 GET/HEAD 请求，并传递 Range/If-Range。约 95 MiB 的 Windows 程序不上传到 Cloudflare 静态资产、不拆成另一套镜像；Worker 按请求从 GitHub release asset API 流式转发，保持 GitHub Release 为唯一文件源。服务没有上传、认证、用户识别、设置同步、远程命令或任意 URL 代理接口，也不依赖 R2。
+Worker 名称为 `clawd-updates`，保留 `clawd-updates.chronokalamos.com` 自定义域名，并为该 Worker 单独启用 `clawd-updates.3507103376.workers.dev`。1.1.1 客户端候选仅将后者作为首选更新主机，版本预览 URL 显式关闭。服务只接受健康检查、版本元数据和固定仓库 Windows x64 正式 Release 文件的 GET/HEAD 请求，并传递 Range/If-Range。约 95 MiB 的 Windows 程序不上传到 Cloudflare 静态资产、不拆成另一套镜像；Worker 按请求从 GitHub release asset API 流式转发，保持 GitHub Release 为唯一文件源。服务没有上传、认证、用户识别、设置同步、远程命令或任意 URL 代理接口，也不依赖 R2。
 
 所有 query string 都在任何上游访问或应用错误日志之前拒绝。Worker Logs 关闭普通 invocation logs，并开启 Cloudflare query-string 脱敏；只保留元数据失败时的结构化诊断，记录固定错误类别、白名单错误名称/网络错误码及 HTTP 状态，不记录异常原文、请求头或响应正文。Cloudflare 的自定义日志事件仍可能带有固定 Worker 的 URL/path 上下文。
 

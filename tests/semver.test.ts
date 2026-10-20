@@ -5,7 +5,7 @@ import {UpdateChecker} from '../src/electron/services/UpdateChecker';
 
 const artifact={
   name:'Clawd-1.2.0-windows-x64.exe',size:99_000_000,sha256:'a'.repeat(64),
-  download_url:'https://clawd-updates.chronokalamos.com/v1/download/v1.2.0/Clawd-1.2.0-windows-x64.exe',
+  download_url:'https://clawd-updates.3507103376.workers.dev/v1/download/v1.2.0/Clawd-1.2.0-windows-x64.exe',
   fallback_url:'https://github.com/LYL-Z/clawd-desktop/releases/download/v1.2.0/Clawd-1.2.0-windows-x64.exe',
 };
 
@@ -32,7 +32,7 @@ test('update check rejects prereleases, invalid tags and excessive release notes
   assert.equal(prerelease.status,'unavailable');
   const malformed=await new UpdateChecker(async()=>({tag_name:'latest'})).check('1.1.0');
   assert.equal(malformed.status,'unavailable');
-  const long=await new UpdateChecker(async()=>({tag_name:'v2.0.0',body:'x'.repeat(20000),artifact:{...artifact,name:'Clawd-2.0.0-windows-x64.exe',download_url:'https://clawd-updates.chronokalamos.com/v1/download/v2.0.0/Clawd-2.0.0-windows-x64.exe',fallback_url:'https://github.com/LYL-Z/clawd-desktop/releases/download/v2.0.0/Clawd-2.0.0-windows-x64.exe'}})).check('1.1.0');
+  const long=await new UpdateChecker(async()=>({tag_name:'v2.0.0',body:'x'.repeat(20000),artifact:{...artifact,name:'Clawd-2.0.0-windows-x64.exe',download_url:'https://clawd-updates.3507103376.workers.dev/v1/download/v2.0.0/Clawd-2.0.0-windows-x64.exe',fallback_url:'https://github.com/LYL-Z/clawd-desktop/releases/download/v2.0.0/Clawd-2.0.0-windows-x64.exe'}})).check('1.1.0');
   assert.equal(long.status,'available');if(long.status==='available')assert.equal(long.releaseNotes.length,12000);
 });
 

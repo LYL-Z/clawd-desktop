@@ -2,7 +2,8 @@
   "name": "clawd-updates",
   "main": "worker.mjs",
   "compatibility_date": "2026-10-19",
-  "workers_dev": false,
+  "workers_dev": true,
+  "preview_urls": false,
   "routes": [
     {
       "pattern": "clawd-updates.chronokalamos.com",
