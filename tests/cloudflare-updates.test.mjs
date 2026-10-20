@@ -27,11 +27,14 @@ test('deployment config binds only the isolated Clawd update hostname and worker
   assert.match(source,/clawd-updates\.chronokalamos\.com/);
 });
 
-function mockFetch({rangeResponse,latestLocation=`https://github.com/LYL-Z/clawd-desktop/releases/tag/${tag}`,manifestValue=manifest,sumsText=`${digest}  ${assetName}\n`,notesText='## Changes\nRelease notes'}={}){
+function mockFetch({rangeResponse,latestLocation=`https://github.com/LYL-Z/clawd-desktop/releases/tag/${tag}`,latestStatus=302,latestUrl,manifestValue=manifest,sumsText=`${digest}  ${assetName}\n`,notesText='## Changes\nRelease notes'}={}){
   const calls=[];
   const fetcher=async(input,init={})=>{
     const url=String(input);calls.push({url,init});
-    if(url==='https://github.com/LYL-Z/clawd-desktop/releases/latest')return new Response(null,{status:302,headers:{location:latestLocation}});
+    if(url==='https://github.com/LYL-Z/clawd-desktop/releases/latest'){
+      if(latestStatus===200){const response=new Response('release page',{status:200});Object.defineProperty(response,'url',{value:latestUrl??latestLocation});return response;}
+      return new Response(null,{status:latestStatus,headers:latestStatus>=300&&latestStatus<400?{location:latestLocation}:undefined});
+    }
     if(url.endsWith(`/release-manifest-${tag}.json`))return new Response(JSON.stringify(manifestValue),{status:200,headers:{'content-type':'application/json'}});
     if(url.endsWith(`/SHA256SUMS.txt`))return new Response(sumsText,{status:200});
     if(url.endsWith(assetName))return rangeResponse??new Response('download bytes',{status:206,headers:{'content-range':'bytes 10-21/42','content-length':'12'}});
@@ -69,6 +72,13 @@ test('latest metadata is resolved from the fixed release redirect and verified m
   assert.equal(body.source_commit,'b'.repeat(40));
   assert.equal(body.generated_at,manifest.generatedAt);
   assert.equal(calls.some(call=>call.url.includes('api.github.com')),false);
+});
+
+test('latest lookup accepts a fetch runtime that returns the final stable tag URL',async()=>{
+  const {fetcher}=mockFetch({latestStatus:200,latestUrl:`https://github.com/LYL-Z/clawd-desktop/releases/tag/${tag}`});
+  const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),fetcher);
+  assert.equal(response.status,200);
+  assert.equal((await response.json()).tag_name,tag);
 });
 
 test('latest redirect is restricted to this repository and a stable semantic version',async()=>{
@@ -130,6 +140,20 @@ test('metadata failures never log raw exception messages or credentials',async()
     for(const secret of ['BEARER_SECRET','API_SECRET','CLIENT_SECRET','API_KEY_SECRET'])assert.equal(responseBody.includes(secret),false);
     assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'release_unavailable',errorName:'Error'}]]);
     assert.equal(JSON.stringify(logs).includes(unsafeMessage),false);
+  }finally{
+    console.error=originalError;
+  }
+});
+
+test('upstream HTTP status is logged without recording response content',async()=>{
+  const originalError=console.error;
+  const logs=[];
+  console.error=(...args)=>logs.push(args);
+  try{
+    const {fetcher}=mockFetch({latestStatus:429});
+    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),fetcher);
+    assert.equal(response.status,503);
+    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'release_unavailable',errorName:'Error',upstreamStatus:429}]]);
   }finally{
     console.error=originalError;
   }

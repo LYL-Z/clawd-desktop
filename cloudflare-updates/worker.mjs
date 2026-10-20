@@ -33,8 +33,11 @@ function metadataErrorDetails(error) {
   const causeCode = error && typeof error.cause?.code === "string" && /^[A-Z0-9_-]{1,32}$/.test(error.cause.code)
     ? error.cause.code
     : null;
+  const upstreamStatus = Number.isSafeInteger(error?.upstreamStatus) && error.upstreamStatus >= 100 && error.upstreamStatus <= 599
+    ? error.upstreamStatus
+    : null;
   // Exception messages may contain request headers or credentials. Never put them in Worker logs.
-  return { errorName: name, ...(causeCode ? { causeCode } : {}) };
+  return { errorName: name, ...(causeCode ? { causeCode } : {}), ...(upstreamStatus ? { upstreamStatus } : {}) };
 }
 
 function json(data, status = 200, extra = {}) {
@@ -140,23 +143,30 @@ async function resolveLatestTag(request = fetch) {
     throw new Error("release_unavailable");
   }
 
-  if (![301, 302, 303, 307, 308].includes(response.status)) {
-    throw new Error(response.status === 404 ? "release_not_found" : "release_unavailable");
-  }
-
-  const location = response.headers.get("location");
-  if (!location) throw new Error("release_redirect_rejected");
   let target;
-  try {
-    target = new URL(location, `${GITHUB_BASE}/releases/latest`);
-  } catch {
-    throw new Error("release_redirect_rejected");
+  if ([301, 302, 303, 307, 308].includes(response.status)) {
+    const location = response.headers.get("location");
+    if (!location) throw new Error("release_redirect_rejected");
+    try {
+      target = new URL(location, `${GITHUB_BASE}/releases/latest`);
+    } catch {
+      throw new Error("release_redirect_rejected");
+    }
+  } else if (response.status === 200 && typeof response.url === "string") {
+    // Some fetch runtimes expose the final URL even when a redirect was followed.
+    try { target = new URL(response.url); }
+    catch { target = null; }
+  } else {
+    const error = new Error(response.status === 404 ? "release_not_found" : "release_unavailable");
+    error.upstreamStatus = response.status;
+    throw error;
   }
 
-  const match = /^\/LYL-Z\/clawd-desktop\/releases\/tag\/(v?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$/.exec(target.pathname);
-  if (target.protocol !== "https:" || target.hostname !== "github.com" || target.search || target.hash || !match) {
+  if (!target || target.protocol !== "https:" || target.hostname !== "github.com" || target.username || target.password || target.port || target.search || target.hash) {
     throw new Error("release_redirect_rejected");
   }
+  const match = /^\/LYL-Z\/clawd-desktop\/releases\/tag\/(v?(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*))$/.exec(target.pathname);
+  if (!match) throw new Error("release_redirect_rejected");
   return canonicalTag(match[1]);
 }
 
