@@ -10,6 +10,10 @@
     }
   ],
   "observability": {
-    "enabled": false
+    "enabled": true,
+    "logs": {
+      "invocation_logs": false,
+      "head_sampling_rate": 1
+    }
   }
 }

@@ -24,6 +24,9 @@ test('deployment config binds only the isolated Clawd update hostname and worker
   assert.equal(config.workers_dev,false);
   assert.deepEqual(config.routes,[{pattern:'clawd-updates.chronokalamos.com',custom_domain:true}]);
   assert.equal(config.bindings,undefined);
+  assert.equal(config.observability.enabled,true);
+  assert.equal(config.observability.logs.invocation_logs,false);
+  assert.equal(config.observability.logs.head_sampling_rate,1);
   assert.match(source,/clawd-updates\.chronokalamos\.com/);
 });
 
