@@ -223,4 +223,4 @@ LICENSE.md 当前标记为 UNLICENSED：程序与编排文件仅供本次委托�
 
 ---
 
-**资源：**[Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) · [1.1.0 变更说明](docs/RELEASE-NOTES-v1.1.0.md) · [动作目录](docs/action-catalog.md) · [场景架构审计](docs/architecture-audit.md) · [来源记录](docs/element-provenance.md) · 历史 1.0.1/1.0.0 包校验清单：`SHA256SUMS.txt`
+**资源：**[Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) · [更新日志](CHANGELOG.md) · [1.1.0 版本说明](docs/RELEASE-NOTES-v1.1.0.md) · [逐版本发布清单](docs/RELEASE-CHECKLIST.md) · [动作目录](docs/action-catalog.md) · [场景架构审计](docs/architecture-audit.md) · [来源记录](docs/element-provenance.md) · 历史 1.0.1/1.0.0 包校验清单：`SHA256SUMS.txt`
