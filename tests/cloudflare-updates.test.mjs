@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {handleUpdateRequest, releaseMetadata} from '../cloudflare-updates/worker.mjs';
+import worker, {handleUpdateRequest, releaseMetadata} from '../cloudflare-updates/worker.mjs';
 
 const digest='a'.repeat(64);
 const tag='v1.2.3';
@@ -40,6 +40,19 @@ function mockFetch({rangeResponse}={}){
   };
   return{fetcher,calls};
 }
+
+test('module worker entrypoint uses platform fetch instead of treating runtime env as a fetcher',async()=>{
+  const {fetcher}=mockFetch();
+  const originalFetch=globalThis.fetch;
+  globalThis.fetch=fetcher;
+  try{
+    const response=await worker.fetch(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),{runtimeEnv:'not a fetch function'},{});
+    assert.equal(response.status,200);
+    assert.equal((await response.json()).tag_name,tag);
+  }finally{
+    globalThis.fetch=originalFetch;
+  }
+});
 
 test('latest metadata is bounded to the matching official Windows release and checksum',async()=>{
   const {fetcher}=mockFetch();

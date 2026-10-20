@@ -213,4 +213,12 @@ export async function handleUpdateRequest(request, fetcher = fetch) {
   return json({ code: "not_found" }, 404);
 }
 
-export default { fetch: handleUpdateRequest };
+function platformFetch(input, init) {
+  return globalThis.fetch(input, init);
+}
+
+export default {
+  fetch(request) {
+    return handleUpdateRequest(request, platformFetch);
+  },
+};
