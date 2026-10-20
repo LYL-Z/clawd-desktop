@@ -30,7 +30,19 @@ function metadataErrorDetails(error) {
   const causeCode = error && typeof error.cause?.code === "string" && /^[A-Z0-9_-]{1,32}$/.test(error.cause.code)
     ? error.cause.code
     : null;
-  return causeCode ? { errorName: name, causeCode } : { errorName: name };
+  const rawMessage = error instanceof Error ? error.message : "";
+  const message = rawMessage
+    .replace(/https?:\/\/[^\s"'<>]+/gi, "[url]")
+    .replace(/\b(?:authorization|bearer|token|secret|password)\s*[:=]?\s*\S+/gi, "[redacted]")
+    .replace(/\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b/g, "[email]")
+    .replace(/\b[a-f0-9]{32,}\b/gi, "[redacted]")
+    .replace(/[\r\n\t]+/g, " ")
+    .slice(0, 160);
+  return {
+    errorName: name,
+    ...(causeCode ? { causeCode } : {}),
+    errorMessage: message || "unknown",
+  };
 }
 
 function json(data, status = 200, extra = {}) {
