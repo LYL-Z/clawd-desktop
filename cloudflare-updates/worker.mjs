@@ -24,6 +24,15 @@ function metadataErrorCode(error) {
   return METADATA_ERROR_CODES.has(code) ? code : "upstream_error";
 }
 
+function metadataErrorDetails(error) {
+  const allowedNames = new Set(["TypeError", "Error", "RangeError", "SyntaxError", "URIError"]);
+  const name = error instanceof Error && allowedNames.has(error.name) ? error.name : "OtherError";
+  const causeCode = error && typeof error.cause?.code === "string" && /^[A-Z0-9_-]{1,32}$/.test(error.cause.code)
+    ? error.cause.code
+    : null;
+  return causeCode ? { errorName: name, causeCode } : { errorName: name };
+}
+
 function json(data, status = 200, extra = {}) {
   const headers = new Headers({
     "access-control-allow-origin": "*",
@@ -158,7 +167,7 @@ export async function handleUpdateRequest(request, fetcher = fetch) {
       const response = json(result);
       return request.method === "HEAD" ? new Response(null, { status: response.status, headers: response.headers }) : response;
     } catch (error) {
-      console.error("clawd_update_metadata_failed", { stage, code: metadataErrorCode(error) });
+      console.error("clawd_update_metadata_failed", { stage, code: metadataErrorCode(error), ...metadataErrorDetails(error) });
       return json({ code: "release_metadata_unavailable" }, 503, { "retry-after": "60" });
     }
   }
