@@ -84,7 +84,7 @@
 
 | 交付项 | 结果 |
 | --- | --- |
-| 完整源码与 PR | `codex/taskbook-completion` 分支；PR、合并 SHA 与 exact-SHA CI 在完成后补入 |
+| 完整源码与 PR | `codex/taskbook-completion` 分支；[Draft PR #2](https://github.com/LYL-Z/clawd-desktop/pull/2) 已打开。GitHub Actions 状态以该 PR 最新 head SHA 的检查结果为准；合并 SHA 尚不存在 |
 | Windows x64 运行版 | Windows x64 portable 候选已构建并通过启动/退出 QA；最终发布资产的大小和 SHA-256 在发布后记录 |
 | 架构、场景与配置文档 | `docs/architecture-audit.md`、`docs/visibility-and-scenes.md`、本文及 `docs/visual-system.md` |
 | README 与 Windows 说明 | 更新游戏/专注规则、安静模式、双击配置、诊断导出、更新限制与排障 |
@@ -112,7 +112,7 @@
 
 ## 本轮验证记录
 
-最终提交与候选包 SHA、CI 运行地址、Windows 版本和硬件信息须在发布前依据实际新结果填写；不得沿用 1.0.1 或早期 1.1.0 旧包数据。自动化报告应记录日期、命令、结果文件和明确范围。
+本轮源代码已提交并推送至 Draft PR #2。GitHub Actions 检查结果应在发布前按该 PR 的最新 head SHA 核对，不能沿用旧提交结果；合并 SHA 仅在未来实际合并后记录。候选包哈希见上表。目标 Windows 版本和硬件信息须在真实设备验收时按实际结果补记，不得沿用 1.0.1 或早期 1.1.0 旧包数据。
 
 ### 目标设备人工验收清单
 
