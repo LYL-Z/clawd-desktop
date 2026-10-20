@@ -11,7 +11,7 @@ const CHUNK_BYTES=8*1024*1024;
 const REQUEST_TIMEOUT_MS=60_000;
 const EDGE_TIMEOUT_MS=25_000;
 const MAX_SIZE=250*1024*1024;
-const EDGE_HOST='clawd-updates.chronokalamos.com';
+const EDGE_HOST='clawd-updates.3507103376.workers.dev';
 
 type RangeResponse={response:IncomingMessage;cancel:()=>void};
 type RangeReader=(source:UpdateSource,start:number,end:number,signal?:AbortSignal)=>Promise<RangeResponse>;

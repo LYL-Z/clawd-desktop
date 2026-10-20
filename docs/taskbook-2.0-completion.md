@@ -1,10 +1,10 @@
 # Clawd 2.0 增量升级任务书完成度与验收记录
 
-更新日期：2026-10-20。对应用户提供的 `CLAWD 2.0 — Windows 桌面像素伙伴全方位优化与增量开发任务书`。任务书中的“2.0”是工作方案名称，不强制改变语义版本；本轮按实际变更继续使用 `1.1.0`。
+更新日期：2026-10-20。对应用户提供的 `CLAWD 2.0 — Windows 桌面像素伙伴全方位优化与增量开发任务书`。任务书中的“2.0”是工作方案名称，不强制改变语义版本；正式基础版为 `1.1.0`，本次更新分发修复按补丁级变更准备 `1.1.1`。
 
 ### 版本决策
 
-任务书第十八章明确要求“版本号必须按照实际变更与项目版本约定确定”，并说明不得仅因任务书称为 Clawd 2.0 就强制把 `package.json` 改为 2.0.0。本轮从公开的 1.0.1 基线增量开发，保留旧设置迁移与原有功能兼容，因此按 SemVer 次版本递增为正式版本 **1.1.0**。该版本已于 2026-10-20 发布；“Clawd 2.0”是任务书/升级方案名称，不代表已发布 2.0.0。
+任务书第十八章明确要求“版本号必须按照实际变更与项目版本约定确定”，并说明不得仅因任务书称为 Clawd 2.0 就强制把 `package.json` 改为 2.0.0。1.1.0 已于 2026-10-20 正式发布；本次只修正更新边缘入口与客户端首选地址，不改变桌宠功能、设置 schema 或素材，按 SemVer 补丁递增为 **1.1.1**。它不是临时过渡包；“Clawd 2.0”仍是升级方案名称，不代表已发布 2.0.0。
 
 ## 结论与证据口径
 
@@ -12,7 +12,7 @@
 
 GitHub 仓库 [LYL-Z/clawd-desktop](https://github.com/LYL-Z/clawd-desktop) 为公开仓库。PR #3「Clawd 1.1.0：验收证据与逐版本发布门禁」已合并，合并提交 `8b15542d53224cb6800b415909d5d921a92efe48`；PR head `fb8db6a593a5882dbdafe02b112b488fe6e0b0fa` 的两项 Windows CI 均通过。正式 [v1.1.0 Release](https://github.com/LYL-Z/clawd-desktop/releases/tag/v1.1.0) 已发布，包含 Windows x64 portable、Clawd Codex V2 宠物包、深色/浅色壁纸、manifest 与 SHA256SUMS。安装包为 99,967,264 字节，GitHub asset digest 与本机发布副本 SHA-256 均为 `e8b095cd95225fb7379783d0f9a7549cd3be71e6b19d67421a1c23735544daac`；本机包和远端 digest 一致。
 
-本次跟进只修复更新 Worker 的上游读取路径与错误日志脱敏：旧线上 `/v1/healthz` 为 200，但 `/v1/latest.json` 因旧 `github.com/releases/latest` 上游路径返回 HTTP 525 而为 503；候选改为固定仓库的 GitHub Releases/asset REST API，并交叉核验 Release manifest、GitHub asset digest 和大小。13 项 Worker 定向测试、48 项完整 Node 测试、类型/发布说明检查、Worker dry-run、本机真实 Release API 与单字节 Range 探测均通过；Security Review 没有可执行发现。该修复仍需 PR 精确 SHA CI、合并、部署及线上验证。用户报告的 15 项目标 Windows 场景通过仍按用户报告记录，未收到逐项设备日志。
+PR #11 已将 GitHub Releases/asset REST API 和日志脱敏修复合并到 `main`（合并 SHA `c243f833200f30bcde0addd9fde7a2ad66a48e5a`），两条 Windows CI 对精确 head `7c9c8bf8cdc7236227f08b7096eb459e1f5cdb5d` 均通过。该版本的 Worker 已部署（版本 ID `89ac0c49-fbe6-4fa5-9053-5c7933391b40`），但线上 `/v1/latest.json` 仍因上游 525 返回 503，Range 返回 502，故这次部署**未通过上线验收**。只读 Cloudflare API 确认 `chronokalamos.com` 的 `origin_post_quantum_encryption` 当前为 `supported`；Cloudflare 官方说明该区域设置也作用于 Worker `fetch()`。为遵守不影响九霄/GlassDesk 的约束，不修改区域设置；1.1.1 候选改为 Clawd 专属 `workers.dev` 入口，并同步更新客户端的精确主机白名单。候选当前本地 `npm test` 48/48、`npm run check`、`npm run build` 与 Wrangler dry-run 通过，尚待新 PR 精确 SHA CI、合并、workers.dev 实机边缘验证和完整包校验。用户报告的 15 项目标 Windows 场景通过仍按用户报告记录，未收到逐项设备日志。
 
 长稳证据仍有限：历史 302.9 秒隐藏态采样；较早候选 30 分钟普通模式采样通过（1,800 秒/61 次）；4 小时观察运行 3,481 秒/59 次采样后按用户要求停止，未达到四小时门槛；可选 24 小时未执行。故不能把所有稳定性目标写成已通过。中国境内不同运营商实测也尚未取得。用户报告 Workers Free；OAuth 没有 Billing Read 权限，因此套餐/账单余量没有独立核实。
 

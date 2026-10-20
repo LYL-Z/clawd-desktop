@@ -11,7 +11,7 @@ const bytes=Buffer.from('Clawd update payload with enough bytes to verify safe c
 const sha256=createHash('sha256').update(bytes).digest('hex');
 const fileName='Clawd-1.2.3-windows-x64.exe';
 const artifact={fileName,size:bytes.length,sha256,sources:[
-  {kind:'edge',url:`https://clawd-updates.chronokalamos.com/v1/download/v1.2.3/${fileName}`},
+  {kind:'edge',url:`https://clawd-updates.3507103376.workers.dev/v1/download/v1.2.3/${fileName}`},
   {kind:'github',url:`https://github.com/LYL-Z/clawd-desktop/releases/download/v1.2.3/${fileName}`},
 ]};
 

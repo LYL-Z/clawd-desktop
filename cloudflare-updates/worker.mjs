@@ -1,7 +1,7 @@
 const REPOSITORY = "LYL-Z/clawd-desktop";
 const GITHUB_BASE = `https://github.com/${REPOSITORY}`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
-const PUBLIC_BASE = "https://clawd-updates.chronokalamos.com/v1";
+const PUBLIC_BASE = "https://clawd-updates.3507103376.workers.dev/v1";
 const MAX_RELEASE_BYTES = 250 * 1024 * 1024;
 const MAX_RELEASE_METADATA_BYTES = 1024 * 1024;
 const MAX_MANIFEST_BYTES = 128 * 1024;

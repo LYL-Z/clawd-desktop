@@ -3,14 +3,14 @@ import type {IncomingHttpHeaders,IncomingMessage} from 'node:http';
 import {compareSemVer} from '../../shared/semver';
 import type {UpdateArtifact,UpdateCheckResult,UpdateSource} from '../../shared/types';
 
-const EDGE_URL='https://clawd-updates.chronokalamos.com/v1/latest.json';
+const EDGE_URL='https://clawd-updates.3507103376.workers.dev/v1/latest.json';
 const API_URL='https://api.github.com/repos/LYL-Z/clawd-desktop/releases/latest';
 const MAX_RESPONSE_BYTES=256*1024;
 const MAX_CHECKSUM_BYTES=64*1024;
 const REQUEST_TIMEOUT_MS=12_000;
 const MAX_REDIRECTS=4;
 const MAX_ARTIFACT_BYTES=250*1024*1024;
-const ALLOWED_HOSTS=new Set(['clawd-updates.chronokalamos.com','api.github.com','github.com']);
+const ALLOWED_HOSTS=new Set(['clawd-updates.chronokalamos.com','clawd-updates.3507103376.workers.dev','api.github.com','github.com']);
 
 type ReleaseAsset={name?:unknown;size?:unknown;browser_download_url?:unknown;digest?:unknown};
 type ReleasePayload={tag_name?:unknown;name?:unknown;body?:unknown;published_at?:unknown;draft?:unknown;prerelease?:unknown;assets?:unknown;artifact?:unknown};
@@ -128,7 +128,7 @@ async function artifactFromGitHub(release:ReleasePayload,tag:string):Promise<Upd
     size:Number(executable.size),
     sha256,
     sources:[
-      {kind:'edge',url:`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${encodeURIComponent(name)}`},
+      {kind:'edge',url:`https://clawd-updates.3507103376.workers.dev/v1/download/${tag}/${encodeURIComponent(name)}`},
       {kind:'github',url:githubUrl},
     ],
   };
@@ -139,7 +139,7 @@ function artifactFromEdge(release:ReleasePayload,tag:string):UpdateArtifact{
   const asset=release.artifact as Record<string,unknown>;
   const name=safeArtifactName(tag);
   if(asset.name!==name||!Number.isSafeInteger(asset.size)||Number(asset.size)<1||Number(asset.size)>MAX_ARTIFACT_BYTES||typeof asset.sha256!=='string'||!/^[a-f0-9]{64}$/i.test(asset.sha256))throw new Error('invalid-response');
-  const edgeUrl=`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${encodeURIComponent(name)}`;
+  const edgeUrl=`https://clawd-updates.3507103376.workers.dev/v1/download/${tag}/${encodeURIComponent(name)}`;
   if(asset.download_url!==edgeUrl)throw new Error('invalid-response');
   const fallback=safeGithubAssetUrl(asset.fallback_url,tag,name);
   return{fileName:name,size:Number(asset.size),sha256:asset.sha256.toLowerCase(),sources:[{kind:'edge',url:edgeUrl},{kind:'github',url:fallback}]};
@@ -205,7 +205,7 @@ export class UpdateChecker{
         const artifact=release.artifact&&typeof release.artifact==='object'?release.artifact as Record<string,unknown>:null;
         const validName=safeArtifactName(tag);
         if(!artifact||artifact.name!==validName||!Number.isSafeInteger(artifact.size)||Number(artifact.size)<1||Number(artifact.size)>MAX_ARTIFACT_BYTES||typeof artifact.sha256!=='string'||!/^[a-f0-9]{64}$/i.test(artifact.sha256)||typeof artifact.download_url!=='string'||typeof artifact.fallback_url!=='string')throw new Error('artifact-missing');
-        const edgeUrl=`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${encodeURIComponent(validName)}`;
+        const edgeUrl=`https://clawd-updates.3507103376.workers.dev/v1/download/${tag}/${encodeURIComponent(validName)}`;
         const download=safeGithubAssetUrl(artifact.fallback_url,tag,validName);
         if(artifact.download_url!==edgeUrl)throw new Error('invalid-response');
         const updateArtifact:UpdateArtifact={fileName:validName,size:Number(artifact.size),sha256:artifact.sha256.toLowerCase(),sources:[{kind:'edge',url:edgeUrl},{kind:'github',url:download}]};

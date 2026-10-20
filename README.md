@@ -142,7 +142,7 @@ npm start 会先构建再运行；npm run studio 打开动作剧场。首次安�
 
 本项目当前提供**便携 EXE，不是 MSI/NSIS 安装向导**。设置中心“隐私与关于”可手动查询最新正式 Release；发现更新后可以选择在 Clawd 中下载，也可以打开 GitHub 备用页。下载支持 HTTP Range 断点续传，完整文件通过 SHA-256 校验后才会显示在文件夹中。程序不会自动安装或替换自身：请先关闭 Clawd，再手动运行新便携版。程序未签名，Windows 可能提示未知发布者；核对项目 Release 中的哈希后再运行，不要为此关闭系统保护。版本和发布资产以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) 为准。
 
-更新器代码先尝试独立子域 `clawd-updates.chronokalamos.com`，失败后回退到 GitHub；GitHub Release 是唯一正式版本和安装文件来源。**截至 2026-10-20，Clawd Worker 尚未部署或公网验收，当前可用更新路径以 GitHub 源为准。**Worker 配置仅针对 Clawd 独立服务和子域，未改动其他项目；Cloudflare 账户费用状态没有验证，故没有启用服务。普通全球边缘入口即使部署，也不能保证中国大陆所有运营商和网络时段始终可达；China Network 不属于已获零费用批准的范围。详见[更新分发设计](docs/update-delivery.md)。
+1.1.0 发布版先尝试 Clawd 自定义子域，失败后回退到 GitHub；GitHub Release 始终是唯一正式版本和安装文件来源。1.1.1 候选将更新入口切换到 Clawd 专属 `workers.dev` 域名，避免更改 `chronokalamos.com` 的区域级 TLS 设置；该候选尚待合并、边缘验收与发布。没有修改区域级 TLS/DNS/路由，也未改动九霄或 GlassDesk。Cloudflare Workers 为用户报告的 Free，但账户账单与余量没有通过 Billing API 独立核实。普通全球边缘入口不能保证中国大陆所有运营商和网络时段始终可达；China Network 不属于本版本范围。详见[更新分发设计](docs/update-delivery.md)。
 
 Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，也可在 Windows 运行本地复制脚本：
 
