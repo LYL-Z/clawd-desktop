@@ -58,8 +58,31 @@ test('checksum mismatch and prerelease metadata fail closed',async()=>{
   const {fetcher}=mockFetch();
   const wrongDigest='b'.repeat(64);
   await assert.rejects(()=>releaseMetadata({...release,assets:release.assets.map(asset=>asset.name===assetName?{...asset,digest:`sha256:${wrongDigest}`}:asset)},fetcher),/checksum_mismatch/);
-  const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>new Response(JSON.stringify({...release,prerelease:true}),{status:200}));
+  const originalError=console.error;
+  const logs=[];
+  let response;
+  console.error=(...args)=>logs.push(args);
+  try{
+    response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>new Response(JSON.stringify({...release,prerelease:true}),{status:200}));
+  }finally{
+    console.error=originalError;
+  }
   assert.equal(response.status,503);
+  assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'invalid_release'}]]);
+});
+
+test('latest metadata failures log only a bounded diagnostic code',async()=>{
+  const originalError=console.error;
+  const logs=[];
+  console.error=(...args)=>logs.push(args);
+  try{
+    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw new Error('private-sentinel');});
+    assert.equal(response.status,503);
+    assert.equal((await response.text()).includes('private-sentinel'),false);
+    assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'upstream_error'}]]);
+  }finally{
+    console.error=originalError;
+  }
 });
 
 test('range downloads are forwarded to the exact versioned GitHub asset',async()=>{
