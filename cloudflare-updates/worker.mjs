@@ -3,6 +3,8 @@ const GITHUB_BASE = `https://github.com/${REPOSITORY}`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
 const RELEASE_ASSET_HOST = "release-assets.githubusercontent.com";
 const PUBLIC_BASE = "https://clawd-updates.3507103376.workers.dev/v1";
+const PUBLIC_ORIGIN = new URL(PUBLIC_BASE).origin;
+const LEGACY_CUSTOM_HOST = "clawd-updates.chronokalamos.com";
 const MAX_RELEASE_BYTES = 250 * 1024 * 1024;
 const MAX_RELEASE_METADATA_BYTES = 1024 * 1024;
 const MAX_MANIFEST_BYTES = 128 * 1024;
@@ -362,6 +364,22 @@ function safeDownloadRequest(request) {
   return { tag: match[1], name };
 }
 
+function redirectLegacyCustomHost(request, url) {
+  if (url.hostname !== LEGACY_CUSTOM_HOST) return null;
+  if (url.pathname !== "/v1/latest.json" && !safeDownloadRequest(request)) return null;
+  return new Response(null, {
+    status: 307,
+    headers: {
+      location: `${PUBLIC_ORIGIN}${url.pathname}`,
+      "cache-control": "no-store",
+      "access-control-allow-origin": "*",
+      "access-control-allow-methods": "GET, HEAD, OPTIONS",
+      "access-control-allow-headers": "Range, If-Range",
+      "x-content-type-options": "nosniff",
+    },
+  });
+}
+
 function downloadHeaders(source, name) {
   const headers = new Headers(source.headers);
   for (const key of ["connection", "keep-alive", "proxy-authenticate", "proxy-authorization", "te", "trailer", "transfer-encoding", "upgrade", "set-cookie"]) headers.delete(key);
@@ -385,6 +403,8 @@ export async function handleUpdateRequest(request, fetcher = fetch) {
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: { "access-control-allow-origin": "*", "access-control-allow-methods": "GET, HEAD, OPTIONS", "access-control-allow-headers": "Range, If-Range" } });
   if (request.method !== "GET" && request.method !== "HEAD") return json({ code: "method_not_allowed" }, 405, { allow: "GET, HEAD, OPTIONS" });
   if (url.pathname === "/v1/healthz") return json({ service: "clawd-updates", status: "ok" }, 200, { "cache-control": "no-store" });
+  const legacyRedirect = redirectLegacyCustomHost(request, url);
+  if (legacyRedirect) return legacyRedirect;
 
   if (url.pathname === "/v1/latest.json") {
     let stage = "release_lookup";
