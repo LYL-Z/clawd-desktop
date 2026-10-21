@@ -42,7 +42,7 @@ Clawd 1.1.1 is a focused update-delivery patch for the 1.1.0 release. It directs
 | 安全复审 | 复核固定重定向与 CDN 限制、日志脱敏、Range/If-Range、multipart、304/416 和 alias 路由；未发现实质性安全问题。 |
 | 正式包冒烟 | `Clawd-1.1.1-windows-x64.exe` 启动、五张图集加载、28 个动作条目、原生探针及正常关闭检查通过。资产大小 99,969,008 字节；SHA-256 为 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`。 |
 | Windows 稳定性 | 用户于 2026-10-21 将完整 4 小时门槛改为沿用先前约 1 小时观察。原记录实际为 3,481.287 秒（58 分 1 秒）、59 次样本，来自 1.1.0 候选 SHA `9aff3f54b09f9b93be0706a06b29ecb24d7c305971441a0d0eaaeaa8b523e39f`，不是精确 60 分钟或 1.1.1 包。最终 1.1.1 包另有 6,482 秒、109 个采样检查点的普通模式中断观察；最后记录健康，但脚本未写出完整报告或 `passed` 结论。两份观察均不记作 4 小时通过。详情见[1.1.1 稳定性记录](qa/2026-10-21-v1.1.1-windows-stability.md)。 |
-| Worker 公网 | 发布前已确认两个入口的 healthz 为 200；workers.dev metadata 为 200，返回当时最新的 v1.1.0；自定义域名按设计返回 307 至固定 workers.dev origin。1.1.1 发布后的 metadata 与完整文件下载核验记录见[更新分发说明](update-delivery.md)。 |
+| Worker 公网 | v1.1.1 发布后，metadata 返回 v1.1.1、99,969,008 字节及预期 SHA-256；Worker 完整下载返回 HTTP 200，下载后的 SHA-256 与本地 EXE 及 GitHub asset digest 相同。单字节 Range 为 206，越界 Range 为 416，HEAD 为 200；自定义域名 Range 请求先 307 至固定 workers.dev origin，再返回 206；带 query 为 400，未知路径为 404。 |
 
 长稳测试范围为单台 Windows 11 主机、一个活动显示器、250% 缩放的普通桌面观察；没有在这次观察中运行游戏、锁屏、休眠、显示器热插拔或崩溃注入。任务书列出的 15 个目标设备场景由用户报告通过，未收到逐项日志或截图，因此仍标为用户报告。24 小时观察和中国境内多运营商下载测试没有执行。
 
