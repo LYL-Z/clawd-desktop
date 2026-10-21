@@ -19,6 +19,12 @@ const manifest={
 const apiBase='https://api.github.com/repos/LYL-Z/clawd-desktop';
 const executableAssetId=101;
 const manifestAssetId=202;
+const manifestAssetName=`release-manifest-${tag}.json`;
+const releaseAssetUrl=name=>`https://github.com/LYL-Z/clawd-desktop/releases/download/${tag}/${name}`;
+const manifestDownloadUrl=releaseAssetUrl(manifestAssetName);
+const executableDownloadUrl=releaseAssetUrl(assetName);
+const manifestCdnUrl='https://release-assets.githubusercontent.com/clawd-test/manifest?token=fixture-signature';
+const executableCdnUrl='https://release-assets.githubusercontent.com/clawd-test/executable?token=fixture-signature';
 
 test('deployment config binds only the isolated Clawd update hostname and worker',async()=>{
   const config=JSON.parse(await readFile(new URL('../cloudflare-updates/wrangler.jsonc',import.meta.url),'utf8'));
@@ -35,7 +41,7 @@ test('deployment config binds only the isolated Clawd update hostname and worker
   assert.match(source,/clawd-updates\.3507103376\.workers\.dev/);
 });
 
-function releaseDescriptor({manifestValue=manifest,releaseTag=tag,draft=false,prerelease=false,executableDigest=`sha256:${digest}`,executableSize=42,body='## Changes\nRelease notes'}={}){
+function releaseDescriptor({manifestValue=manifest,releaseTag=tag,draft=false,prerelease=false,executableDigest=`sha256:${digest}`,executableSize=42,manifestUrl=manifestDownloadUrl,executableUrl=executableDownloadUrl,body='## Changes\nRelease notes'}={}){
   const manifestText=JSON.stringify(manifestValue);
   return {
     tag_name:releaseTag,
@@ -44,8 +50,8 @@ function releaseDescriptor({manifestValue=manifest,releaseTag=tag,draft=false,pr
     draft,
     prerelease,
     assets:[
-      {id:executableAssetId,name:assetName,state:'uploaded',size:executableSize,digest:executableDigest},
-      {id:manifestAssetId,name:`release-manifest-${tag}.json`,state:'uploaded',size:Buffer.byteLength(manifestText),digest:`sha256:${'c'.repeat(64)}`},
+      {id:executableAssetId,name:assetName,state:'uploaded',size:executableSize,digest:executableDigest,browser_download_url:executableUrl},
+      {id:manifestAssetId,name:manifestAssetName,state:'uploaded',size:Buffer.byteLength(manifestText),digest:`sha256:${'c'.repeat(64)}`,browser_download_url:manifestUrl},
     ],
   };
 }
@@ -56,8 +62,10 @@ function mockFetch({rangeResponse,latestStatus=200,releaseStatus=200,latestRelea
     const url=String(input);calls.push({url,init});
     if(url===`${apiBase}/releases/latest`)return new Response(JSON.stringify(latestRelease),{status:latestStatus,headers:{'content-type':'application/json'}});
     if(url===`${apiBase}/releases/tags/${tag}`)return new Response(JSON.stringify(release),{status:releaseStatus,headers:{'content-type':'application/json'}});
-    if(url===`${apiBase}/releases/assets/${manifestAssetId}`)return new Response(JSON.stringify(manifestValue),{status:manifestStatus,headers:{'content-type':'application/octet-stream'}});
-    if(url===`${apiBase}/releases/assets/${executableAssetId}`)return executableResponse??rangeResponse??new Response('download bytes',{status:206,headers:{'content-range':'bytes 10-21/42','content-length':'12'}});
+    if(url===manifestDownloadUrl)return new Response(null,{status:302,headers:{location:manifestCdnUrl}});
+    if(url===manifestCdnUrl)return new Response(JSON.stringify(manifestValue),{status:manifestStatus,headers:{'content-type':'application/octet-stream'}});
+    if(url===executableDownloadUrl)return new Response(null,{status:302,headers:{location:executableCdnUrl}});
+    if(url===executableCdnUrl)return executableResponse??rangeResponse??new Response('download bytes',{status:206,headers:{'content-range':'bytes 10-21/42','content-length':'12'}});
     throw new Error(`unexpected URL ${url}`);
   };
   return{fetcher,calls};
@@ -93,6 +101,7 @@ test('latest metadata uses the fixed GitHub release API and verifies its asset d
   assert.equal(body.published_at,'2026-10-20T13:26:02Z');
   assert.equal(calls.some(call=>call.url===`${apiBase}/releases/latest`),true);
   assert.equal(calls.some(call=>call.url.includes('github.com/LYL-Z/clawd-desktop/releases/latest')),false);
+  assert.equal(calls.some(call=>call.url.includes('/releases/assets/')),false);
 });
 
 test('latest lookup accepts a stable release returned by the fixed GitHub API endpoint',async()=>{
@@ -125,7 +134,7 @@ test('latest release rejects prereleases and non-semver tags',async()=>{
 test('manifest and executable redirects cannot escape trusted GitHub hosts',async()=>{
   const manifestSource=mockFetch();
   const manifestFetcher=async(input,init={})=>{
-    if(String(input)===`${apiBase}/releases/assets/${manifestAssetId}`)return new Response(null,{status:302,headers:{location:'https://127.0.0.1/secret'}});
+    if(String(input)===manifestDownloadUrl)return new Response(null,{status:302,headers:{location:'https://127.0.0.1/secret'}});
     return manifestSource.fetcher(input,init);
   };
   await assert.rejects(()=>releaseMetadata(tag,manifestFetcher),/manifest_unavailable/);
@@ -133,12 +142,42 @@ test('manifest and executable redirects cannot escape trusted GitHub hosts',asyn
 
   const downloadSource=mockFetch();
   const downloadFetcher=async(input,init={})=>{
-    if(String(input)===`${apiBase}/releases/assets/${executableAssetId}`)return new Response(null,{status:302,headers:{location:'http://127.0.0.1/secret'}});
+    if(String(input)===executableDownloadUrl)return new Response(null,{status:302,headers:{location:'http://127.0.0.1/secret'}});
     return downloadSource.fetcher(input,init);
   };
   const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`),downloadFetcher);
   assert.equal(response.status,502);
   assert.equal(downloadSource.calls.some(call=>call.url.includes('127.0.0.1')),false);
+});
+
+test('release metadata redirects cannot leave the fixed GitHub API host and repository path',async()=>{
+  const source=mockFetch();
+  const fetcher=async(input,init={})=>{
+    if(String(input)===`${apiBase}/releases/latest`)return new Response(null,{status:302,headers:{location:'https://github.com/LYL-Z/clawd-desktop/releases/latest'}});
+    return source.fetcher(input,init);
+  };
+  const originalError=console.error;console.error=()=>{};
+  try{
+    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),fetcher);
+    assert.equal(response.status,503);
+    assert.equal(source.calls.some(call=>call.url.includes('github.com/LYL-Z')),false);
+  }finally{console.error=originalError;}
+});
+
+test('release asset browser URLs must exactly match the fixed repository, tag, and asset name',async()=>{
+  const hostileUrls=[
+    'https://attacker.example/Clawd-1.2.3-windows-x64.exe',
+    'https://github.com/attacker/clawd-desktop/releases/download/v1.2.3/Clawd-1.2.3-windows-x64.exe',
+    'https://github.com/LYL-Z/clawd-desktop/releases/download/v9.9.9/Clawd-1.2.3-windows-x64.exe',
+  ];
+  for(const executableUrl of hostileUrls){
+    const {fetcher,calls}=mockFetch({release:releaseDescriptor({executableUrl})});
+    await assert.rejects(()=>releaseMetadata(tag,fetcher),/upstream_redirect_rejected/);
+    assert.equal(calls.some(call=>call.url===executableUrl),false);
+  }
+  const {fetcher,calls}=mockFetch({release:releaseDescriptor({manifestUrl:'https://github.com/LYL-Z/clawd-desktop/releases/download/v1.2.3/wrong.json'})});
+  await assert.rejects(()=>releaseMetadata(tag,fetcher),/upstream_redirect_rejected/);
+  assert.equal(calls.some(call=>call.url.includes('/wrong.json')),false);
 });
 
 test('manifest and GitHub asset digest disagreement fails closed',async()=>{
@@ -149,21 +188,24 @@ test('manifest and GitHub asset digest disagreement fails closed',async()=>{
   await assert.rejects(()=>releaseMetadata(tag,malformedAsset.fetcher),/manifest_invalid/);
 });
 
-test('metadata failures never log raw exception messages or credentials',async()=>{
+test('metadata failures never log bearer-token tails, API tokens, or raw exception messages',async()=>{
   const originalError=console.error;
   const logs=[];
   console.error=(...args)=>logs.push(args);
   try{
     const bearerTail='ABCDEFGHIJKLMNOPQRSTUVWXYZ123456';
-    const unsafeMessage=String.raw`failed Authorization: Bearer ${bearerTail} api_token=API_SECRET client_secret=CLIENT_SECRET api_key=API_KEY_SECRET`;
-    const response=await handleUpdateRequest(new Request('https://clawd-updates.chronokalamos.com/v1/latest.json'),async()=>{throw Object.assign(new Error(unsafeMessage),{cause:{code:bearerTail}});});
+    const apiToken='api-token-value-that-must-not-appear';
+    const unsafeMessage=String.raw`failed Authorization: Bearer ${bearerTail} api_token=${apiToken} client_secret=CLIENT_SECRET api_key=API_KEY_SECRET`;
+    const request=new Request('https://clawd-updates.chronokalamos.com/v1/latest.json',{headers:{authorization:`Bearer ${bearerTail}`}});
+    const response=await handleUpdateRequest(request,async()=>{throw Object.assign(new Error(unsafeMessage),{cause:{code:bearerTail}});});
     assert.equal(response.status,503);
     const responseBody=await response.text();
-    for(const secret of ['BEARER_SECRET','API_SECRET','CLIENT_SECRET','API_KEY_SECRET'])assert.equal(responseBody.includes(secret),false);
+    for(const secret of [bearerTail,apiToken,'CLIENT_SECRET','API_KEY_SECRET'])assert.equal(responseBody.includes(secret),false);
     assert.deepEqual(logs,[['clawd_update_metadata_failed',{stage:'release_lookup',code:'release_unavailable',errorName:'Error'}]]);
     assert.equal(JSON.stringify(logs).includes(unsafeMessage),false);
     assert.equal(JSON.stringify(logs).includes(bearerTail),false);
-    assert.equal(JSON.stringify(logs).includes('API_SECRET'),false);
+    assert.equal(JSON.stringify(logs).includes(apiToken),false);
+    assert.equal(JSON.stringify(logs).includes('Authorization'),false);
   }finally{
     console.error=originalError;
   }
@@ -189,10 +231,38 @@ test('range downloads are forwarded to the exact manifest-verified versioned ass
   assert.equal(response.status,206);
   assert.equal(response.headers.get('content-range'),'bytes 10-21/42');
   assert.equal(response.headers.get('content-disposition'),`attachment; filename="${assetName}"`);
-  assert.equal(calls.at(-1).url,`${apiBase}/releases/assets/${executableAssetId}`);
+  assert.equal(response.headers.get('content-type'),'application/octet-stream');
+  assert.equal(calls.at(-1).url,executableCdnUrl);
   assert.equal(calls.at(-1).init.headers.get('range'),'bytes=10-21');
   assert.equal(calls.at(-1).init.headers.get('if-range'),'"stable-etag"');
   assert.equal(calls.at(-1).init.headers.get('accept'),'application/octet-stream');
+  assert.equal(calls.some(call=>call.url.includes('/releases/assets/')),false);
+});
+
+test('multipart range responses preserve their content type and boundary',async()=>{
+  const body='--clawd-boundary\r\nContent-Range: bytes 0-0/42\r\n\r\na\r\n--clawd-boundary--';
+  const {fetcher}=mockFetch({executableResponse:new Response(body,{status:206,headers:{'content-type':'multipart/byteranges; boundary=clawd-boundary'}})});
+  const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`,{headers:{range:'bytes=0-0,2-2'}}),fetcher);
+  assert.equal(response.status,206);
+  assert.equal(response.headers.get('content-type'),'multipart/byteranges; boundary=clawd-boundary');
+  assert.equal(await response.text(),body);
+});
+
+test('unsatisfiable ranges return 416 with the manifest-verified asset length',async()=>{
+  const {fetcher}=mockFetch({executableResponse:new Response(null,{status:416,headers:{'content-range':'bytes */999'}})});
+  const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`,{headers:{range:'bytes=999-'}}),fetcher);
+  assert.equal(response.status,416);
+  assert.equal(response.headers.get('content-range'),'bytes */42');
+  assert.deepEqual(await response.json(),{code:'range_not_satisfiable'});
+});
+
+test('conditional asset requests preserve a safe 304 response and validator',async()=>{
+  const {fetcher,calls}=mockFetch({executableResponse:new Response(null,{status:304,headers:{etag:'"asset-validator"'}})});
+  const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/download/${tag}/${assetName}`,{headers:{'if-none-match':'"asset-validator"'}}),fetcher);
+  assert.equal(response.status,304);
+  assert.equal(response.headers.get('etag'),'"asset-validator"');
+  assert.equal(await response.text(),'');
+  assert.equal(calls.at(-1).init.headers.get('if-none-match'),'"asset-validator"');
 });
 
 test('HEAD uses the verified metadata without returning a body',async()=>{
@@ -217,13 +287,14 @@ test('query parameters are rejected before upstream access or credential-bearing
   try{
     const {fetcher,calls}=mockFetch();
     for(const method of ['GET','OPTIONS']){
-      const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/latest.json?api_token=QUERY_SECRET`,{method}),fetcher);
+      const response=await handleUpdateRequest(new Request(`https://clawd-updates.chronokalamos.com/v1/latest.json?api_token=QUERY_SECRET`,{method,headers:{authorization:'Bearer QUERY_HEADER_SECRET'}}),fetcher);
       assert.equal(response.status,400);
       assert.deepEqual(await response.json(),{code:'query_not_supported'});
     }
     assert.equal(calls.length,0);
     assert.deepEqual(logs,[]);
     assert.equal(JSON.stringify(logs).includes('QUERY_SECRET'),false);
+    assert.equal(JSON.stringify(logs).includes('QUERY_HEADER_SECRET'),false);
   }finally{
     console.error=originalError;
   }

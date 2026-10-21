@@ -1,12 +1,20 @@
 # Clawd 2.0 增量升级任务书完成度与验收记录
 
-更新日期：2026-10-20。对应用户提供的 `CLAWD 2.0 — Windows 桌面像素伙伴全方位优化与增量开发任务书`。任务书中的“2.0”是工作方案名称，不强制改变语义版本；正式基础版为 `1.1.0`，本次更新分发修复按补丁级变更准备 `1.1.1`。
+更新日期：2026-10-21。对应用户提供的 `CLAWD 2.0 — Windows 桌面像素伙伴全方位优化与增量开发任务书`。任务书中的“2.0”是工作方案名称，不强制改变语义版本；正式基础版为 `1.1.0`，更新分发修复按补丁级变更准备 `1.1.1`。
 
 ### 版本决策
 
 任务书第十八章明确要求“版本号必须按照实际变更与项目版本约定确定”，并说明不得仅因任务书称为 Clawd 2.0 就强制把 `package.json` 改为 2.0.0。1.1.0 已于 2026-10-20 正式发布；本次只修正更新边缘入口与客户端首选地址，不改变桌宠功能、设置 schema 或素材，按 SemVer 补丁递增为 **1.1.1**。它不是临时过渡包；“Clawd 2.0”仍是升级方案名称，不代表已发布 2.0.0。
 
 ## 结论与证据口径
+
+### 最新状态补记（2026-10-21）
+
+恢复时确认本地分支 `codex/clawd-github-asset-download` 与 `origin/main` 基线 `22ec7a7550d2c52b03c6f79c5b2756d7f5dcfef5` 一致。当前候选将 Worker 下载切换为：Release API 仍提供固定版本、manifest、文件大小与 SHA-256 核验；`browser_download_url` 必须精确匹配仓库、tag 和文件名；资产按 HTTPS 手动重定向到固定 GitHub Release CDN 并流式转发。Bearer token、`api_token` 与异常消息不写入 Worker 应用日志；多段 Range 的 multipart MIME 边界由 Worker 保留。
+
+本地验证为 `npm test` 53/53（其中更新 Worker 18 项）、Python 4/4、`npm run check`、`npm run build`、`npm run qa:probe` 和 Wrangler 4.151.2 dry-run 全部通过。本机以真实 v1.1.0 Release 核对 manifest/API 摘要一致；单字节 Range 为 206、越界 Range 为 416、HEAD 为 200 且无正文。安全复审确认 multipart 修复有效，未发现新的实质性代码问题。2026-10-21 部署前复查中，workers.dev 与自定义域名的健康检查均为 200，但两个 `/v1/latest.json` 均为 503。
+
+截至本补记，公开版本仍为 v1.1.0；1.1.1 尚未提交、通过精确 SHA Windows CI、部署或发布。合并前 PR 与 CI、部署后公网 metadata/Range/完整文件 SHA-256、发行包和 GitHub Release 均待执行。本补记不改变旧记录：15 项 Windows 真实场景仍按用户报告记载；4 小时观察在 3,481 秒/59 次样本后停止，未通过时长门槛；24 小时观察和中国境内多运营商下载测试未执行。实际安装包更新、用户桌面同步与真实设备复测也不由源码测试代替。
 
 ### 最新状态补记（2026-10-20）
 
@@ -110,7 +118,7 @@ PR #11 已将 GitHub Releases/asset REST API 和日志脱敏修复合并到 `mai
 
 ## 更新分发与地域范围
 
-桌面更新器支持用户主动查询、选择下载、HTTP Range 续传、双来源回退和长度/SHA-256 校验。GitHub Release 是版本与安装包唯一发布源。独立 Worker `clawd-updates` 已部署至 `clawd-updates.chronokalamos.com`；线上 `/v1/healthz` 返回 200，但旧 `/v1/latest.json` 因访问 GitHub 网页发布入口时上游 HTTP 525 返回 503。当前候选修复改走固定仓库 Releases/asset API，已通过本地测试与 dry-run，仍需 PR 精确 SHA CI、合并、部署及线上验证。部署授权仅针对 Clawd Worker，不修改 GlassDesk、九霄、DNS、zone routes 或其他 Worker。用户报告 Workers Free；OAuth 缺少 Billing Read 权限，不能独立核对账单或余量。本轮不升级计划、不创建 R2/付费资源。
+桌面更新器支持用户主动查询、选择下载、HTTP Range 续传、双来源回退和长度/SHA-256 校验。GitHub Release 是版本与安装包唯一发布源。独立 Worker `clawd-updates` 已部署至 `clawd-updates.chronokalamos.com`，并启用专属 `workers.dev` 入口；2026-10-21 两处 `/v1/healthz` 均为 200，但两个 `/v1/latest.json` 均为 503。1.1.1 候选保留固定仓库 Releases API 的版本/manifest/大小/SHA-256 核验，改用严格校验的 `browser_download_url` 获取资产，并限制 HTTPS 重定向到 GitHub Release CDN。候选本地测试与 dry-run 通过；当前仍待 PR 精确 SHA CI、合并、仅部署 Clawd Worker、线上 Range 与完整文件摘要验证。部署授权仅针对 Clawd Worker，不修改 GlassDesk、九霄、DNS、zone routes 或其他 Worker。用户报告 Workers Free；OAuth 缺少 Billing Read 权限，不能独立核对账单或余量。本轮不升级计划、不创建 R2/付费资源。
 
 普通全球边缘网络可尝试改善对 GitHub 的访问，但不能承诺中国大陆所有网络都能下载。Cloudflare 官方说明 China Network 属 Enterprise 计划下的单独订阅，且需 ICP 与内容审核；这不符合本项目未经重新授权不得产生新增费用的约束。中国境内下载须另外进行多运营商实测，不能仅由源码、CI 或海外请求通过推断。
 

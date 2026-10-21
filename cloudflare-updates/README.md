@@ -2,9 +2,9 @@
 
 这是 Clawd 独立的 Cloudflare Worker。当前生产部署保留 `clawd-updates.chronokalamos.com` 自定义域名；1.1.1 候选配置会启用同一 Worker 的专属 `workers.dev` 域名 `clawd-updates.3507103376.workers.dev`，作为桌面更新器的首选入口。这样可避免自定义域名上下文继承 `chronokalamos.com` 的区域级出站 TLS 设置；配置不会改动该设置。候选只开放固定的生产 `workers.dev` 入口，并显式关闭版本预览 URL。部署不新增 DNS 记录或 zone routes，不复用其他项目的更新入口，也不依赖 R2。
 
-GitHub Releases 是正式版本和文件的唯一发布源。Worker 通过固定仓库的 GitHub Releases REST API 读取最新正式版本；它要求正式 SemVer tag、非草稿/预发布版本，并以随版本发布的 manifest 与 GitHub asset API 的 SHA-256 digest、文件大小互相核对。Worker 不把安装包另存到 Cloudflare。
+GitHub Releases 是正式版本和文件的唯一发布源。Worker 通过固定仓库的 GitHub Releases REST API 读取最新正式版本；它要求正式 SemVer tag、非草稿/预发布版本，并以随版本发布的 manifest 与 release API 元数据中的 SHA-256 digest、文件大小互相核对。二进制资产通过 API 返回的 `browser_download_url` 获取，不调用偶发返回 403 的资产二进制 API。
 
-文件路由只接受 GET/HEAD、正式版本标签和与版本匹配的 Clawd Windows x64 安装文件名。Worker 用 GitHub release asset API 的二进制响应，并手动验证重定向目标后流式转发；Range/If-Range 会继续传递到文件源。客户端下载完成后仍按版本元数据中的 SHA-256 与字节数验证，校验通过才向用户显示文件。
+文件路由只接受 GET/HEAD、正式版本标签和与版本匹配的 Clawd Windows x64 安装文件名。Worker 要求 `browser_download_url` 与固定仓库、tag、文件名组合出的 HTTPS URL 完全相同；随后手动验证重定向，只允许到 `release-assets.githubusercontent.com`，再流式转发。Range、If-Range 和条件请求会传递到资产源，416 响应使用已核验的 manifest 文件长度。客户端下载完成后仍按版本元数据中的 SHA-256 与字节数验证，校验通过才向用户显示文件。
 
 ## 路径
 

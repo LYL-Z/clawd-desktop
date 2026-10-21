@@ -2,8 +2,8 @@
 
 Clawd 1.1.1 is a focused update-delivery hotfix for the 1.1.0 release. It directs edge checks and downloads through Clawd's isolated `workers.dev` hostname, avoiding a zone-wide TLS setting change that could affect unrelated services.
 
-状态：1.1.1 未发布候选；最终上线结果会在发布前补录。
-拟发布日期：2026-10-20
+状态：1.1.1 未发布候选；源码合并、精确 SHA CI、部署和发行包校验尚未完成。
+发布日期：未发布
 基线版本：1.1.0
 
 ## 新增
@@ -20,7 +20,9 @@ Clawd 1.1.1 is a focused update-delivery hotfix for the 1.1.0 release. It direct
 ## 修复与回归保护
 
 - 针对 1.1.0 更新入口通过 Clawd 自定义域名上下文访问 GitHub Releases API 时遇到上游 HTTP 525、导致版本检查返回 503 与边缘下载失败的问题，候选改走独立 `workers.dev` 主机；是否彻底消除故障以部署后的公网验证为准。
-- 保留 Release manifest、GitHub asset 大小与 SHA-256 摘要的交叉验证，以及 Range 续传、可信重定向和下载完成后的本地校验。
+- 保留 Release manifest、GitHub Releases API 中的资产大小与 SHA-256 摘要交叉验证；资产字节通过精确校验后的 `browser_download_url` 获取，并只允许 HTTPS 跳转到 GitHub Release CDN。
+- 保留 Range/If-Range 续传和本地完整下载校验；补齐条件请求的 304 响应与 manifest 文件长度支持的 416 响应。
+- 日志只记录固定错误码与白名单元数据，并以回归测试覆盖 Bearer token 尾段、`api_token` 值、Authorization 请求头和异常文本。
 - Worker 拒绝所有 query string，Cloudflare Logs 开启 query-string 脱敏并关闭普通 invocation logs；只记录白名单结构化错误字段。
 
 ## 安全与隐私
@@ -36,8 +38,11 @@ Clawd 1.1.1 is a focused update-delivery hotfix for the 1.1.0 release. It direct
 
 ## 验证范围
 
-- 当前候选已通过 `npm test`（48/48）、`npm run check`、`npm run build` 和固定版本 Wrangler dry-run；Security Review 未发现可报告问题。
-- 精确 SHA Windows CI、公网元数据、Range 与安装包完整哈希将在公开发布前完成并记录；部署后 Cloudflare 资源对照也会核实只有 Clawd Worker 有预期变化。
+- 本地已通过 `npm run check`、`npm test`（53/53，其中 Worker 18/18）、`python -m unittest discover -s tests`（4/4）、`npm run build`、`npm run qa:probe` 和 Wrangler 4.151.2 dry-run。
+- 本机用真实 GitHub v1.1.0 Release 验证了 metadata 与 manifest/API 摘要一致；本地 Worker 单字节 Range 返回 206、越界 Range 返回 416、HEAD 返回 200 且无正文。这是本机 Worker 模块的外部网络验证，不等于公网 Worker 已部署修复。
+- 代码安全复审确认多段 Range 的 MIME 边界修复有效，未发现新的实质性代码问题；复审指出的验证计数与旧状态记录已更正。
+- 2026-10-21 复查时，workers.dev 与自定义域名的 `/v1/healthz` 都返回 200，但两个 `/v1/latest.json` 都返回 503。修复部署后的公网 metadata、Range 与完整包 SHA-256，以及部署前后 Cloudflare 资源对照仍待完成。
+- 精确 SHA Windows CI、部署和发行附件构建/校验仍待完成。
 - 中国大陆运营商实测需要目标地区真实网络，海外公网验证不能替代该项。
 
 ## 已知限制
