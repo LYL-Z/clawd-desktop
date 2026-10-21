@@ -1,6 +1,6 @@
 # Clawd 更新边缘入口
 
-这是 Clawd 独立的 Cloudflare Worker。当前生产部署保留 `clawd-updates.chronokalamos.com` 自定义域名；1.1.1 候选配置会启用同一 Worker 的专属 `workers.dev` 域名 `clawd-updates.3507103376.workers.dev`，作为桌面更新器的首选入口。这样可避免自定义域名上下文继承 `chronokalamos.com` 的区域级出站 TLS 设置；配置不会改动该设置。候选只开放固定的生产 `workers.dev` 入口，并显式关闭版本预览 URL。部署不新增 DNS 记录或 zone routes，不复用其他项目的更新入口，也不依赖 R2。
+这是 Clawd 独立的 Cloudflare Worker。生产部署保留 `clawd-updates.chronokalamos.com` 自定义域名，并启用同一 Worker 的专属 `workers.dev` 域名 `clawd-updates.3507103376.workers.dev`，作为桌面更新器的首选入口。线上观察到自定义域名访问 GitHub API 时上游 TLS 握手返回 525，而 `workers.dev` 可正常访问；因此有效 metadata 与下载请求会从自定义域名以不缓存的 307 响应转至 `workers.dev`，健康检查仍由原 Worker 直接返回。此方案不改动 `chronokalamos.com` 的区域级 TLS 设置。生产只开放固定的 `workers.dev` 入口，并显式关闭版本预览 URL。部署不新增 DNS 记录或 zone routes，不复用其他项目的更新入口，也不依赖 R2。
 
 GitHub Releases 是正式版本和文件的唯一发布源。Worker 通过固定仓库的 GitHub Releases REST API 读取最新正式版本；它要求正式 SemVer tag、非草稿/预发布版本，并以随版本发布的 manifest 与 release API 元数据中的 SHA-256 digest、文件大小互相核对。二进制资产通过 API 返回的 `browser_download_url` 获取，不调用偶发返回 403 的资产二进制 API。
 
@@ -20,7 +20,7 @@ GitHub Releases 是正式版本和文件的唯一发布源。Worker 通过固定
 npm run deploy:updates
 ```
 
-部署使用仓库锁定的 Wrangler 版本和当前已存在的 Clawd Custom Domain。Worker 另启用专属 `workers.dev` endpoint；部署不得修改 `chronokalamos.com` 区域级 TLS 设置、现有 DNS、zone routes 或其他 Worker。每次变更后应分别检查两个主机上的健康检查，并在 `workers.dev` 主机验证最新元数据、完整文件下载、Range 续传与 SHA-256。
+部署使用仓库锁定的 Wrangler 版本和当前已存在的 Clawd Custom Domain。Worker 另启用专属 `workers.dev` endpoint；部署不得修改 `chronokalamos.com` 区域级 TLS 设置、现有 DNS、zone routes 或其他 Worker。每次变更后应检查两个主机上的健康检查、自定义域名 metadata/下载重定向，以及 `workers.dev` 的最新元数据、完整文件下载、Range 续传与 SHA-256。
 
 ## 网络与费用边界
 
