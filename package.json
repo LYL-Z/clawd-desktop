@@ -16,7 +16,7 @@
     "start": "npm run build && electron .",
     "studio": "npm run build && electron . --studio",
     "pack": "npm run verify:release-notes && npm run build && python scripts/make-icon.py && electron-builder --win dir --x64 --publish never",
-    "release": "npm run verify:release-notes && node scripts/create-release-manifest.mjs --preflight release && npm run build && python scripts/make-icon.py && electron-builder --win portable --x64 --publish never && node scripts/stage-release-assets.mjs release && node scripts/create-release-manifest.mjs release && node scripts/create-checksums.mjs release",
+    "release": "npm run verify:release-notes && node scripts/create-release-manifest.mjs --preflight release && npm run build && python scripts/make-icon.py && electron-builder --win portable --x64 --publish never && electron-builder --win nsis --x64 --publish never && node scripts/stage-release-assets.mjs release && node scripts/create-release-manifest.mjs release && node scripts/create-checksums.mjs release",
     "deploy:updates": "npx --yes wrangler@4.151.2 deploy --config cloudflare-updates/wrangler.jsonc"
   },
   "build": {
@@ -35,6 +35,12 @@
       ],
       "icon": "app/icon.ico",
       "signExecutable": false
+    },
+    "nsis": {
+      "artifactName": "Clawd-${version}-Setup-windows-x64.exe",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false
     },
     "portable": {
       "artifactName": "Clawd-${version}-windows-x64.exe"

@@ -57,6 +57,7 @@ if (currentCommit !== sourceCommit || changesDuringBuild) {
 
 const expectedNames = [
   `Clawd-${version}-windows-x64.exe`,
+  `Clawd-${version}-Setup-windows-x64.exe`,
   'Clawd-Codex-V2.zip',
   'Clawd-dark-3840x2160.png',
   'Clawd-light-3840x2160.png',
@@ -65,6 +66,9 @@ const entries = await readdir(outputDirectory, { withFileTypes: true });
 const artifactNames = expectedNames.filter((name) => entries.some((entry) => entry.isFile() && entry.name === name));
 if (!artifactNames.includes(`Clawd-${version}-windows-x64.exe`)) {
   throw new Error(`Windows portable asset not found in ${outputDirectory}.`);
+}
+if (!artifactNames.includes(`Clawd-${version}-Setup-windows-x64.exe`)) {
+  throw new Error(`Windows per-user NSIS installer not found in ${outputDirectory}.`);
 }
 
 const artifacts = [];
