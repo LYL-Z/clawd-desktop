@@ -1,6 +1,6 @@
 # Clawd 2.0 增量升级任务书完成度与验收记录
 
-更新日期：2026-10-21。对应用户提供的 `CLAWD 2.0 — Windows 桌面像素伙伴全方位优化与增量开发任务书`。任务书中的“2.0”是工作方案名称，不强制改变语义版本；正式基础版为 `1.1.0`，更新分发修复按补丁级变更准备 `1.1.1`。
+更新日期：2026-10-21。对应用户提供的 `CLAWD 2.0 — Windows 桌面像素伙伴全方位优化与增量开发任务书`。任务书中的“2.0”是工作方案名称，不强制改变语义版本；正式基础版为 `1.1.0`，更新分发修复按补丁级变更为 `1.1.1`。
 
 ### 版本决策
 
@@ -10,11 +10,13 @@
 
 ### 最新状态补记（2026-10-21）
 
-恢复时确认本地分支 `codex/clawd-github-asset-download` 与 `origin/main` 基线 `22ec7a7550d2c52b03c6f79c5b2756d7f5dcfef5` 一致。当前候选将 Worker 下载切换为：Release API 仍提供固定版本、manifest、文件大小与 SHA-256 核验；`browser_download_url` 必须精确匹配仓库、tag 和文件名；资产按 HTTPS 手动重定向到固定 GitHub Release CDN 并流式转发。Bearer token、`api_token` 与异常消息不写入 Worker 应用日志；多段 Range 的 multipart MIME 边界由 Worker 保留。
+从已合并的 `main` `f93060ba8039951e10a77264d79fa3fa8abeacf4` 继续收尾。PR #12–#16 已合并；PR #16 精确 head 的 Windows CI 和合并 SHA `f93060…` 的 main push CI 均通过。该源码包括固定 GitHub Release 下载路径与重定向校验、Bearer/API token 日志脱敏及回归测试、多段 Range 处理，以及 Windows 使用说明修正。安全复审检查了重定向、CDN 限制、日志脱敏、Range/If-Range、multipart、304/416 与 alias 路由，未发现实质性问题。
 
-本地验证为 `npm test` 53/53（其中更新 Worker 18 项）、Python 4/4、`npm run check`、`npm run build`、`npm run qa:probe` 和 Wrangler 4.151.2 dry-run 全部通过。本机以真实 v1.1.0 Release 核对 manifest/API 摘要一致；单字节 Range 为 206、越界 Range 为 416、HEAD 为 200 且无正文。安全复审确认 multipart 修复有效，未发现新的实质性代码问题。2026-10-21 部署前复查中，workers.dev 与自定义域名的健康检查均为 200，但两个 `/v1/latest.json` 均为 503。
+最终 v1.1.1 包以 `f93060ba8039951e10a77264d79fa3fa8abeacf4` 构建。EXE 为 99,969,008 字节，SHA-256 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`。精确包冒烟检查通过：启动、五张图集、28 个动作条目、原生探针和正常关闭。GitHub 草稿 Release 已上传六个附件，远端 API digest 与本地摘要相符，Release 仍待公开发布。
 
-截至本补记，公开版本仍为 v1.1.0；1.1.1 尚未提交、通过精确 SHA Windows CI、部署或发布。合并前 PR 与 CI、部署后公网 metadata/Range/完整文件 SHA-256、发行包和 GitHub Release 均待执行。本补记不改变旧记录：15 项 Windows 真实场景仍按用户报告记载；4 小时观察在 3,481 秒/59 次样本后停止，未通过时长门槛；24 小时观察和中国境内多运营商下载测试未执行。实际安装包更新、用户桌面同步与真实设备复测也不由源码测试代替。
+用户于 2026-10-21 明确废除完整 4 小时的发布门槛，并要求沿用先前约 1 小时的观察。先前记录实际为 3,481.287 秒（约 58 分 1 秒）、59 次样本，来自 1.1.0 候选，不是精确 60 分钟或 1.1.1 包。最终 1.1.1 包还有一轮普通模式进度记录：6,482 秒、109 个采样检查点；最后保存样本显示窗口响应、可见、探针在线。该轮按用户指示中断，只保存进度文件，没有完整结束报告或 `passed` 结论。详细边界见[1.1.1 稳定性记录](qa/2026-10-21-v1.1.1-windows-stability.md)。这两项都不记作 4 小时通过。
+
+恢复期间 workers.dev 与自定义域名 healthz 均为 200；workers.dev `/v1/latest.json` 为 200，返回当时最新的公开版本 v1.1.0；自定义域名 healthz 直返、metadata 按设计 307 至固定 workers.dev origin。v1.1.1 发布后的 latest metadata、Range 和完整文件摘要仍需用新公开版本复验。15 项目标设备场景继续按用户报告记载通过，没有逐项日志；24 小时观察、中国境内多运营商下载测试未执行。Workers Free 为用户报告，账单与额度余量无法独立核实。
 
 ### 最新状态补记（2026-10-20）
 
