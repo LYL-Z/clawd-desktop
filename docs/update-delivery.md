@@ -4,9 +4,11 @@
 
 ## 当前部署状态
 
-独立 Worker `clawd-updates` 已部署到 `clawd-updates.chronokalamos.com`，并通过 PR #12 启用了专属 `workers.dev` 入口。当前部署版本为 `63720f52-5ccf-40f4-916c-49f3a4c4ad0f`。2026-10-21 实测两个主机的 `/v1/healthz` 都为 200；workers.dev 的 `/v1/latest.json` 为 200 并返回 v1.1.0，自定义域名同一路径仍为 503。实时 Worker 日志显示后者的 GitHub release lookup 收到上游 525。Cloudflare API 只读检查确认 `chronokalamos.com` 的区域级 Origin Post-Quantum Encryption 当前为 `supported`；[Cloudflare 官方文档](https://developers.cloudflare.com/ssl/origin-configuration/automatic-key-exchange/)说明此区域设置也影响 Worker 的 `fetch()` 请求。Cloudflare 的 [workerd issue #7042](https://github.com/cloudflare/workerd/issues/7042) 记录了自定义域名 Worker 访问 GitHub 出现 525、而 workers.dev 访问成功的相同症状。为免影响同一区域的其他项目，不修改此设置。
+独立 Worker `clawd-updates` 已部署到 `clawd-updates.chronokalamos.com`，并启用专属 `workers.dev` 入口。PR #13 将资产传输切换到经验证的 GitHub Release 下载路径；PR #14 增加自定义域名兼容重定向。PR #14 head `e41f782b9940de7d5fc7ae017e4b25cf9795b7cb` 的 push 与 PR Windows CI 均通过，合并提交为 `fdda659d419a882d36532c702415f0b2b6981bb2`。部署版本为 `77e92a01-7b3f-488e-83f3-1b540ff4b91c`。
 
-1.1.1 候选将 `clawd-updates.3507103376.workers.dev` 作为桌面客户端首选地址，并把自定义域名作为兼容入口：对合法的 `/v1/latest.json` 与版本化下载 GET/HEAD 请求返回 `307` 到固定 `workers.dev` origin；不携带 query string，不改变方法或 Range 语义；healthz 直接返回。版本预览 URL 显式关闭。候选保留 Releases API 的 tag、manifest、大小和 SHA-256 核验，对 `browser_download_url` 执行精确仓库/tag/文件名校验，再从固定下载路径手动跳转至 `release-assets.githubusercontent.com`。当前重定向代码仍待 PR CI、合并、部署和线上验证。
+2026-10-21 公网复验：两个主机的 `/v1/healthz` 都为 200；workers.dev 的 `/v1/latest.json` 为 200；自定义域名的 metadata 与下载请求返回 `307` 到固定 workers.dev origin，自动跟随后 metadata 为 200、Range 为 206。单字节 Range 收到 `Content-Range: bytes 0-0/99967264`；无效 Range 为 416，带 query 的请求为 400，未知路径为 404。完整安装包端到端 SHA-256 尚未核验。此前自定义域名到 GitHub 的 525 由固定重定向路径绕开；没有修改区域 TLS/PQ、DNS、zone routes 或其他项目资源。
+
+客户端将 `clawd-updates.3507103376.workers.dev` 作为首选地址，自定义域名作为兼容入口：对合法的 `/v1/latest.json` 与版本化下载 GET/HEAD 请求返回不缓存的 `307` 到固定 `workers.dev` origin；不携带 query string，healthz 直接返回。版本预览 URL 显式关闭。Worker 保留 Releases API 的 tag、manifest、大小和 SHA-256 核验，对 `browser_download_url` 执行精确仓库/tag/文件名校验，再从固定下载路径手动跳转至 `release-assets.githubusercontent.com`。
 
 用户报告 Cloudflare Workers 为 Free。Wrangler OAuth 有 Worker 脚本写权限和 Zone 读取权限，但没有 Billing Read 权限，故无法独立核对实际账单、套餐余量或账户历史。当前 Worker 没有 R2、Pages、数据库或其他付费绑定；本轮不会升级套餐或创建额外 Cloudflare 资源。
 
@@ -64,4 +66,4 @@ npm run deploy:updates
 
 ## 验证记录
 
-本地 Worker 单元测试覆盖稳定版本筛选、发行 manifest 与 GitHub asset digest 一致性、可信重定向、Range/If-Range 透传、query 参数拒绝和错误日志脱敏；下载器测试覆盖续传、双来源回退、摘要校验及取消后保留进度。本机使用公开 Release 实测到 API 元数据 200，且 Worker 模块处理单字节 Range 返回 `206 bytes 0-0/99,967,264`；这是本机直接网络路径，不代表 Cloudflare 线上 Worker 已修复。公网健康检查虽为 200，旧版 `/v1/latest.json` 曾返回 503；新的 Worker 部署后须再次核验，并记录完整安装包大小和 SHA-256。中国网络线路尚未取得测试证据。
+本地 Worker 单元测试覆盖稳定版本筛选、发行 manifest 与 GitHub asset digest 一致性、可信重定向、Range/If-Range 透传、query 参数拒绝和错误日志脱敏；下载器测试覆盖续传、双来源回退、摘要校验及取消后保留进度。部署后的公网检查已确认健康检查、metadata、固定 307 alias、单字节 Range 206、无效 Range 416、query 拒绝和未知路径响应。安全复审未发现实质性问题。完整 99,967,264 字节 Worker 响应的 SHA-256、中国境内多运营商可达性仍无实测证据；不能由单字节 Range 或海外网络结果推断。
