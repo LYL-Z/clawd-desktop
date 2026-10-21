@@ -80,7 +80,7 @@
 
 更新器只由用户触发，支持 latest Release 检查、明确同意后选择下载、HTTP Range 续传、固定仓库 URL 限制、长度及 SHA-256 校验和失败后 GitHub 源回退。更新不会自动执行、安装或替换正在运行的 EXE。
 
-Clawd 更新 Worker `clawd-updates` 已部署，版本 ID `77e92a01-7b3f-488e-83f3-1b540ff4b91c`；自定义域名与 `clawd-updates.3507103376.workers.dev` healthz 均返回 200。2026-10-21 发布 v1.1.1 前复验中，workers.dev metadata 返回 200 和当时公开的 v1.1.0；自定义域名 metadata 依设计返回 307 至固定 workers.dev origin。没有改动区域级 TLS/PQ、九霄、GlassDesk、DNS 或其他 Worker。用户报告 Workers Free，但 OAuth 无 Billing Read，套餐及额度余量未独立核实；未新增付费资源。中国境内网络可达性仍未实测。
+Clawd 更新 Worker `clawd-updates` 已部署，版本 ID `77e92a01-7b3f-488e-83f3-1b540ff4b91c`。v1.1.1 发布后，workers.dev metadata 返回 tag、大小和预期摘要；healthz 为 200，Range 为 206，越界 Range 为 416，HEAD 为 200，自定义域名按设计 307 至固定 workers.dev origin。完整 99,969,008 字节 Worker 下载的 SHA-256 与公开 GitHub asset 及本地产物匹配。没有改动区域级 TLS/PQ、九霄、GlassDesk、DNS 或其他 Worker。用户报告 Workers Free，但 OAuth 无 Billing Read，套餐及额度余量未独立核实；未新增付费资源。中国境内网络可达性仍未实测。
 
 ## 尚未验收的硬性设备场景
 

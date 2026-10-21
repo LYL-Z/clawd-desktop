@@ -6,7 +6,7 @@
 
 独立 Worker `clawd-updates` 已部署到 `clawd-updates.chronokalamos.com`，并启用专属 `workers.dev` 入口。PR #13 将资产传输切换到经验证的 GitHub Release 下载路径；PR #14 增加自定义域名兼容重定向。PR #14 head `e41f782b9940de7d5fc7ae017e4b25cf9795b7cb` 的 push 与 PR Windows CI 均通过，合并提交为 `fdda659d419a882d36532c702415f0b2b6981bb2`。部署版本为 `77e92a01-7b3f-488e-83f3-1b540ff4b91c`。
 
-2026-10-21 公网复验：两个主机的 `/v1/healthz` 都为 200；workers.dev 的 `/v1/latest.json` 为 200；自定义域名的 metadata 与下载请求返回 `307` 到固定 workers.dev origin，自动跟随后 metadata 为 200、Range 为 206。单字节 Range 收到 `Content-Range: bytes 0-0/99967264`；无效 Range 为 416，带 query 的请求为 400，未知路径为 404。完整安装包端到端 SHA-256 尚未核验。此前自定义域名到 GitHub 的 525 由固定重定向路径绕开；没有修改区域 TLS/PQ、DNS、zone routes 或其他项目资源。
+2026-10-21 v1.1.1 发布后复验：workers.dev `/v1/latest.json` 返回 tag `v1.1.1`、资产大小 99,969,008 字节及 SHA-256 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`。通过 Worker 完整下载返回 HTTP 200，99,969,008 字节，耗时 129.568 秒；下载结果摘要与本地 EXE 和 GitHub Release asset digest 相同。单字节 Range 为 206 且 `Content-Range: bytes 0-0/99969008`；越界 Range 为 416 且 `Content-Range: bytes */99969008`；HEAD 返回 200 与正确长度。自定义域名 Range 请求按设计先返回 307 至固定 workers.dev origin，跟随后 Range 为 206。healthz 返回 200，带 query 的请求为 400，未知路径为 404。此前自定义域名到 GitHub 的 525 由固定重定向路径绕开；没有修改区域 TLS/PQ、DNS、zone routes 或其他项目资源。
 
 客户端将 `clawd-updates.3507103376.workers.dev` 作为首选地址，自定义域名作为兼容入口：对合法的 `/v1/latest.json` 与版本化下载 GET/HEAD 请求返回不缓存的 `307` 到固定 `workers.dev` origin；不携带 query string，healthz 直接返回。版本预览 URL 显式关闭。Worker 保留 Releases API 的 tag、manifest、大小和 SHA-256 核验，对 `browser_download_url` 执行精确仓库/tag/文件名校验，再从固定下载路径手动跳转至 `release-assets.githubusercontent.com`。
 
@@ -66,4 +66,4 @@ npm run deploy:updates
 
 ## 验证记录
 
-本地 Worker 单元测试覆盖稳定版本筛选、发行 manifest 与 GitHub asset digest 一致性、可信重定向、Range/If-Range 透传、query 参数拒绝和错误日志脱敏；下载器测试覆盖续传、双来源回退、摘要校验及取消后保留进度。部署后的公网检查已确认健康检查、metadata、固定 307 alias、单字节 Range 206、无效 Range 416、query 拒绝和未知路径响应。安全复审未发现实质性问题。完整 99,967,264 字节 Worker 响应的 SHA-256、中国境内多运营商可达性仍无实测证据；不能由单字节 Range 或海外网络结果推断。
+本地 Worker 单元测试覆盖稳定版本筛选、发行 manifest 与 GitHub asset digest 一致性、可信重定向、Range/If-Range 透传、query 参数拒绝和错误日志脱敏；下载器测试覆盖续传、双来源回退、摘要校验及取消后保留进度。部署后公网验证覆盖 healthz、metadata、固定 307 alias、单字节 Range 206、越界 Range 416、HEAD、query 拒绝、未知路径和完整 99,969,008 字节 Worker 响应 SHA-256；该完整响应与 v1.1.1 本地构建及 GitHub asset digest 一致。安全复审未发现实质性问题。中国境内多运营商可达性仍无实测证据；海外网络结果不能替代该项。
