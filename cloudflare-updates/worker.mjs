@@ -1,6 +1,7 @@
 const REPOSITORY = "LYL-Z/clawd-desktop";
 const GITHUB_BASE = `https://github.com/${REPOSITORY}`;
 const GITHUB_API_BASE = `https://api.github.com/repos/${REPOSITORY}`;
+const RELEASE_ASSET_HOST = "release-assets.githubusercontent.com";
 const PUBLIC_BASE = "https://clawd-updates.3507103376.workers.dev/v1";
 const MAX_RELEASE_BYTES = 250 * 1024 * 1024;
 const MAX_RELEASE_METADATA_BYTES = 1024 * 1024;
@@ -44,7 +45,7 @@ function metadataErrorDetails(error) {
   const upstreamStatus = Number.isSafeInteger(error?.upstreamStatus) && error.upstreamStatus >= 100 && error.upstreamStatus <= 599
     ? error.upstreamStatus
     : null;
-  // Exception messages may contain request headers or credentials. Never put them in Worker logs.
+  // Log only allowlisted metadata; exception messages, stacks, URLs, and headers may contain credentials.
   return { errorName: name, ...(causeCode ? { causeCode } : {}), ...(upstreamStatus ? { upstreamStatus } : {}) };
 }
 
@@ -80,6 +81,44 @@ function releaseAssetUrl(tag, name) {
   return `${GITHUB_BASE}/releases/download/${tag}/${encodeURIComponent(name)}`;
 }
 
+function trustedReleaseDownloadUrl(value, tag, name) {
+  const expected = releaseAssetUrl(tag, name);
+  if (typeof value !== "string" || value !== expected) throw new Error("upstream_redirect_rejected");
+  let url;
+  try { url = new URL(value); }
+  catch { throw new Error("upstream_redirect_rejected"); }
+  if (url.protocol !== "https:" || url.hostname !== "github.com" || url.username || url.password || url.port || url.search || url.hash) {
+    throw new Error("upstream_redirect_rejected");
+  }
+  return url;
+}
+
+function trustedReleaseRedirectUrl(value, current, expected) {
+  let url;
+  try { url = new URL(value, current); }
+  catch { throw new Error("upstream_redirect_rejected"); }
+  const safeCdnRedirect = url.protocol === "https:" && url.hostname === RELEASE_ASSET_HOST && !url.username && !url.password && !url.port && !url.hash;
+  if (!safeCdnRedirect && url.href !== expected) throw new Error("upstream_redirect_rejected");
+  return url;
+}
+
+async function fetchReleaseAsset(value, tag, name, init, request) {
+  const expected = releaseAssetUrl(tag, name);
+  let url = trustedReleaseDownloadUrl(value, tag, name);
+  for (let redirects = 0; redirects <= 5; redirects += 1) {
+    const response = await request(url, { ...init, redirect: "manual" });
+    if (![301, 302, 303, 307, 308].includes(response.status)) return response;
+    const location = response.headers.get("location");
+    if (!location || redirects === 5) {
+      await response.body?.cancel();
+      throw new Error("upstream_redirect_rejected");
+    }
+    await response.body?.cancel();
+    url = trustedReleaseRedirectUrl(location, url, expected);
+  }
+  throw new Error("upstream_redirect_rejected");
+}
+
 async function readBounded(response, maximumBytes, code) {
   const reader = response.body?.getReader();
   if (!reader) {
@@ -113,8 +152,10 @@ function trustedUpstreamUrl(value) {
   let url;
   try { url = value instanceof URL ? new URL(value.href) : new URL(value); }
   catch { throw new Error("upstream_redirect_rejected"); }
-  const trustedHost = url.hostname === "github.com" || url.hostname === "api.github.com" || url.hostname.endsWith(".githubusercontent.com");
-  if (url.protocol !== "https:" || !trustedHost || url.username || url.password || url.port) throw new Error("upstream_redirect_rejected");
+  const releaseApiPath = `/repos/${REPOSITORY}/releases/`;
+  if (url.protocol !== "https:" || url.hostname !== "api.github.com" || !url.pathname.startsWith(releaseApiPath) || url.username || url.password || url.port || url.search || url.hash) {
+    throw new Error("upstream_redirect_rejected");
+  }
   return url;
 }
 
@@ -124,7 +165,11 @@ async function fetchTrustedUpstream(value, init, request) {
     const response = await request(url, { ...init, redirect: "manual" });
     if (![301, 302, 303, 307, 308].includes(response.status)) return response;
     const location = response.headers.get("location");
-    if (!location || redirects === 5) throw new Error("upstream_redirect_rejected");
+    if (!location || redirects === 5) {
+      await response.body?.cancel();
+      throw new Error("upstream_redirect_rejected");
+    }
+    await response.body?.cancel();
     url = trustedUpstreamUrl(new URL(location, url));
   }
   throw new Error("upstream_redirect_rejected");
@@ -137,11 +182,6 @@ function safeUpstreamError(code, error) {
     : null;
   if (causeCode) wrapped.cause = { code: causeCode };
   return wrapped;
-}
-
-function apiAssetUrl(assetId) {
-  if (!Number.isSafeInteger(assetId) || assetId <= 0) throw new Error("manifest_invalid");
-  return `${GITHUB_API_BASE}/releases/assets/${assetId}`;
 }
 
 async function fetchReleaseDescriptor(url, request, errorCode, cacheTtl) {
@@ -196,11 +236,10 @@ async function resolveLatestRelease(request = fetch) {
 async function fetchReleaseAssetText(asset, request, maximumBytes, errorCode) {
   let response;
   try {
-    response = await fetchTrustedUpstream(apiAssetUrl(asset.id), {
+    response = await fetchReleaseAsset(asset.downloadUrl, asset.tag, asset.name, {
       headers: {
         "user-agent": "ClawdDesktop-UpdateDelivery",
         accept: "application/octet-stream",
-        "x-github-api-version": "2022-11-28",
       },
     }, request);
   } catch (error) {
@@ -215,12 +254,19 @@ async function fetchReleaseAssetText(asset, request, maximumBytes, errorCode) {
   return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
 }
 
-function findReleaseAsset(release, name) {
+function findReleaseAsset(release, tag, name) {
   const matches = release.assets.filter((asset) => asset?.name === name);
   if (matches.length !== 1) return null;
   const asset = matches[0];
   if (asset.state !== "uploaded" || !Number.isSafeInteger(asset.id) || asset.id <= 0 || !Number.isSafeInteger(asset.size) || asset.size < 0) return null;
-  return asset;
+  return {
+    id: asset.id,
+    name,
+    size: asset.size,
+    digest: asset.digest,
+    tag,
+    downloadUrl: trustedReleaseDownloadUrl(asset.browser_download_url, tag, name).href,
+  };
 }
 
 async function readRelease(tagOrDescriptor, request = fetch) {
@@ -234,8 +280,8 @@ async function readRelease(tagOrDescriptor, request = fetch) {
   const tag = validateReleaseDescriptor(descriptor, typeof tagOrDescriptor === "string" ? tagOrDescriptor : undefined);
   const version = versionOf(tag);
   const expectedName = expectedExecutable(tag);
-  const manifestAsset = findReleaseAsset(descriptor, `release-manifest-${tag}.json`);
-  const executableAsset = findReleaseAsset(descriptor, expectedName);
+  const manifestAsset = findReleaseAsset(descriptor, tag, `release-manifest-${tag}.json`);
+  const executableAsset = findReleaseAsset(descriptor, tag, expectedName);
   if (!manifestAsset || !executableAsset) throw new Error("windows_asset_missing");
   if (
     manifestAsset.size < 1 || manifestAsset.size > MAX_MANIFEST_BYTES ||
@@ -274,7 +320,7 @@ async function readRelease(tagOrDescriptor, request = fetch) {
     tag,
     manifest,
     artifact: { name: expectedName, size: artifact.bytes, sha256: checksum },
-    assetId: executableAsset.id,
+    assetDownloadUrl: executableAsset.downloadUrl,
     release: descriptor,
   };
 }
@@ -322,7 +368,12 @@ function downloadHeaders(source, name) {
   headers.set("accept-ranges", "bytes");
   headers.set("cache-control", "public, max-age=3600, s-maxage=86400, immutable");
   headers.set("content-disposition", `attachment; filename="${name}"`);
-  headers.set("content-type", "application/octet-stream");
+  const upstreamContentType = headers.get("content-type") ?? "";
+  if (source.status === 206 && /^multipart\/byteranges(?:\s*;|$)/i.test(upstreamContentType)) {
+    headers.set("content-type", upstreamContentType);
+  } else {
+    headers.set("content-type", "application/octet-stream");
+  }
   headers.set("x-content-type-options", "nosniff");
   headers.set("x-clawd-update-edge", "1");
   return headers;
@@ -360,10 +411,16 @@ export async function handleUpdateRequest(request, fetcher = fetch) {
         const value = request.headers.get(key);
         if (value) headers.set(key, value);
       }
-      const upstream = await fetchTrustedUpstream(apiAssetUrl(release.assetId), {
+      const upstream = await fetchReleaseAsset(release.assetDownloadUrl, release.tag, release.artifact.name, {
         method: request.method,
-        headers: new Headers({ ...Object.fromEntries(headers), accept: "application/octet-stream", "x-github-api-version": "2022-11-28" }),
+        headers: new Headers({ ...Object.fromEntries(headers), accept: "application/octet-stream" }),
       }, fetcher);
+      if (upstream.status === 304) {
+        return new Response(null, { status: upstream.status, statusText: upstream.statusText, headers: downloadHeaders(upstream, release.artifact.name) });
+      }
+      if (upstream.status === 416) {
+        return json({ code: "range_not_satisfiable" }, 416, { "accept-ranges": "bytes", "content-range": `bytes */${release.artifact.size}` });
+      }
       if (upstream.status < 200 || upstream.status > 299) return json({ code: "release_asset_unavailable" }, upstream.status === 404 ? 404 : 502, { "retry-after": "60" });
       return new Response(request.method === "HEAD" ? null : upstream.body, { status: upstream.status, statusText: upstream.statusText, headers: downloadHeaders(upstream, release.artifact.name) });
     } catch {
