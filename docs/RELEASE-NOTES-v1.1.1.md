@@ -43,7 +43,7 @@ Clawd 1.1.1 is a focused update-delivery hotfix for the 1.1.0 release. It direct
 - 当前源码分支已通过 `npm run check`、`npm test`（55/55，其中 Worker 20/20）和 Wrangler 4.151.2 dry-run。合并提交 `6e48c70872e3c2cfb06aea5736a473c6cea26367` 的基础版本此前通过 Python 4/4、`npm run build` 与 `npm run qa:probe`；此次 Worker 变更后的完整发行包需按最终合并 SHA 重新构建。
 - 本机用真实 GitHub v1.1.0 Release 验证了 metadata 与 manifest/API 摘要一致；本地 Worker 单字节 Range 返回 206、越界 Range 返回 416、HEAD 返回 200 且无正文。这是本机 Worker 模块的外部网络验证，不等于公网 Worker 已部署修复。
 - 上一轮代码安全复审确认多段 Range 的 MIME 边界修复有效，未发现新的实质性代码问题；复审指出的验证计数与旧状态记录已更正。本次 custom-host redirect 以固定 canonical origin 和 allowlisted 路径生成 Location，并由新增测试约束查询参数及未知路径。
-- PR #13 head `310d124ec175d9438338d00dad9852c181d09c7b` 的 push 与 PR Windows CI 均成功；PR 已合并至 `6e48c70872e3c2cfb06aea5736a473c6cea26367`。追加的 custom-host redirect 变更尚未提交。
+- PR #13 head `310d124ec175d9438338d00dad9852c181d09c7b` 的 push 与 PR Windows CI 均成功；PR 已合并至 `6e48c70872e3c2cfb06aea5736a473c6cea26367`。追加的 custom-host redirect 变更已提交到当前分支，尚未合并。
 - 已部署 Worker 版本 `63720f52-5ccf-40f4-916c-49f3a4c4ad0f`：workers.dev 与自定义域名 healthz 均为 200；workers.dev metadata 为 200 并返回 v1.1.0，自定义域名 metadata 仍为 503（日志显示上游 525）。代码修复部署、公网 Range 和完整文件 SHA-256 仍待完成。
 - 基于合并提交构建出的本机 v1.1.1 portable EXE 尚未按最终代码 SHA 重建；未发布 GitHub Release。
 - 中国大陆运营商实测需要目标地区真实网络，海外公网验证不能替代该项。
