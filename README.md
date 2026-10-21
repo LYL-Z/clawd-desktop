@@ -95,7 +95,7 @@ flowchart LR
 | 任务桥 | 本地 JSON 文件与 PowerShell 写入器 | 手动演示，不是 Codex/Claude 自动集成 |
 | 游戏与全屏场景 | 本地 Win32 探针、EXE 路径/文件名规则、可见性原因集合 | 智能、游戏运行期间、手动三种模式；未知场景不宣称已识别 |
 | 设置中心 | 造型预览、启动选项、游戏/专注隐藏/例外规则、安静模式、行为频率、双击动作及诊断预览/导出 | 规则留在本机，显式操作后即时保存；导出前可检查预览 |
-| 版本更新 | 用户点击后查询 Clawd 独立边缘入口，失败时回退 GitHub；可选分块断点下载 | 下载完整后校验 SHA-256；用户关闭旧程序并手动运行新文件，不自动替换 portable EXE |
+| 版本更新 | 用户点击后查询 Clawd 独立边缘入口，失败时回退 GitHub；可选分块断点下载 | 内置更新器下载 portable EXE 并校验 SHA-256，不自动安装；安装版请从 GitHub Release 获取 NSIS 安装向导 |
 | 壁纸 | 浅/深 4K PNG | 用户自行设置为静态壁纸 |
 
 状态桥示例：
@@ -113,7 +113,7 @@ flowchart LR
 | Electron | 44.7.2 | 透明窗口、托盘、系统事件；包体积是主要代价 |
 | Canvas 2D / HTML / CSS | 浏览器内置 | 简单像素绘制，不引入 3D 或远程 UI 框架 |
 | esbuild | 0.28.2 | 快速打包主进程、Preload 与 renderer |
-| electron-builder | 26.15.3 | Windows x64 便携 EXE |
+| electron-builder | 26.15.3 | Windows x64 便携 EXE 与当前用户 NSIS 安装向导 |
 | C# / .NET Framework v4 编译器 | Windows 构建机，自动探测常见编译器位置或通过 `CLAWD_CSC` 指定 | 窄范围 Win32 前台窗口和输入状态探针 |
 | Playwright Core | 1.64.1（开发测试依赖） | Electron 桌面 QA，不作为运行时依赖 |
 | Node test runner / Python unittest | 锁文件与系统运行时 | 共享逻辑与图像测量分类回归 |
@@ -140,9 +140,9 @@ npm start 会先构建再运行；npm run studio 打开动作剧场。首次安�
 
 ## 九、安装与更新
 
-本项目当前提供**便携 EXE，不是 MSI/NSIS 安装向导**。设置中心“隐私与关于”可手动查询最新正式 Release；发现更新后可以选择在 Clawd 中下载，也可以打开 GitHub 备用页。下载支持 HTTP Range 断点续传，完整文件通过 SHA-256 校验后才会显示在文件夹中。程序不会自动安装或替换自身：请先关闭 Clawd，再手动运行新便携版。程序未签名，Windows 可能提示未知发布者；核对项目 Release 中的哈希后再运行，不要为此关闭系统保护。版本和发布资产以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) 为准。
+本项目提供 Windows x64 **便携版 EXE** 和**当前用户 NSIS 安装向导**。安装向导会创建开始菜单快捷方式和 Windows 卸载项，不要求管理员权限，并沿用 `%APPDATA%\Clawd` 用户数据目录。设置中心“隐私与关于”可手动查询最新正式 Release；内置更新器提供的仍是便携版 EXE，下载通过 SHA-256 校验后由用户手动运行，不会自动安装或替换程序。若要保持安装版，请从 GitHub Release 下载对应的 NSIS 安装向导。程序和安装向导未签名，Windows 可能提示未知发布者；请核对 Release 中的哈希，不要为此关闭系统保护。版本和发布资产以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) 为准。
 
-1.1.0 发布版先尝试 Clawd 自定义子域，失败后回退到 GitHub；GitHub Release 始终是唯一正式版本和安装文件来源。1.1.1 候选将更新入口切换到 Clawd 专属 `workers.dev` 域名，避免更改 `chronokalamos.com` 的区域级 TLS 设置；该候选尚待合并、边缘验收与发布。没有修改区域级 TLS/DNS/路由，也未改动九霄或 GlassDesk。Cloudflare Workers 为用户报告的 Free，但账户账单与余量没有通过 Billing API 独立核实。普通全球边缘入口不能保证中国大陆所有运营商和网络时段始终可达；China Network 不属于本版本范围。详见[更新分发设计](docs/update-delivery.md)。
+1.1.0 使用 Clawd 自定义子域并以 GitHub 为备用源；1.1.1 已正式发布，更新入口切换到 Clawd 专属 `workers.dev` 域名，避免更改 `chronokalamos.com` 的区域级 TLS 设置。GitHub Release 始终是唯一正式版本和安装文件来源；1.1.1 同时提供便携 EXE 和当前用户 NSIS 安装向导，内置更新器仍只分发便携版。没有修改区域级 TLS/DNS/路由，也未改动九霄或 GlassDesk。Cloudflare Workers 为用户报告的 Free，但账户账单与余量没有通过 Billing API 独立核实。普通全球边缘入口不能保证中国大陆所有运营商和网络时段始终可达；China Network 不属于本版本范围。详见[更新分发设计](docs/update-delivery.md)。
 
 Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，也可在 Windows 运行本地复制脚本：
 
@@ -209,7 +209,7 @@ Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，
 | 任务状态 | 默认关闭的本地 JSON 文件协议 | 易校验且不依赖私有 API；需用户主动写入 |
 | 系统场景 | 进程元数据、用户规则与可见性原因仲裁 | 游戏识别透明且可配置；未列入规则的窗口化游戏不会被可靠识别 |
 | 版本更新 | 用户主动检查、选择分块续传；Clawd Worker 优先、GitHub 备用；SHA-256 校验后手动替换 | 平时保持离线；不自动安装；依赖免费边缘平台配额与 GitHub 源可用性，不能承诺中国网络全线可达 |
-| 发布形态 | 未签名 portable EXE | 免安装；缺少签名信任与集中卸载体验 |
+| 发布形态 | 未签名 portable EXE 与当前用户 NSIS 安装向导 | 安装向导支持标准卸载；签名信任仍未覆盖 |
 
 ## 十五、生态、案例与局限
 
@@ -223,4 +223,4 @@ LICENSE.md 当前标记为 UNLICENSED：程序与编排文件仅供本次委托�
 
 ---
 
-**资源：**[Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) · [更新日志](CHANGELOG.md) · [1.1.0 版本说明](docs/RELEASE-NOTES-v1.1.0.md) · [逐版本发布清单](docs/RELEASE-CHECKLIST.md) · [动作目录](docs/action-catalog.md) · [场景架构审计](docs/architecture-audit.md) · [来源记录](docs/element-provenance.md) · 历史 1.0.1/1.0.0 包校验清单：`SHA256SUMS.txt`
+**资源：**[Releases](https://github.com/LYL-Z/clawd-desktop/releases/latest) · [更新日志](CHANGELOG.md) · [1.1.1 版本说明](docs/RELEASE-NOTES-v1.1.1.md) · [1.1.0 版本说明](docs/RELEASE-NOTES-v1.1.0.md) · [1.0.1 版本说明](docs/RELEASE-NOTES-v1.0.1.md) · [1.0.0 历史二进制说明](docs/RELEASE-NOTES-v1.0.0.md) · [逐版本发布清单](docs/RELEASE-CHECKLIST.md) · [动作目录](docs/action-catalog.md) · [场景架构审计](docs/architecture-audit.md) · [来源记录](docs/element-provenance.md) · 历史包校验清单：`SHA256SUMS.txt`

@@ -12,7 +12,7 @@
 
 从已合并的 `main` `f93060ba8039951e10a77264d79fa3fa8abeacf4` 继续收尾。PR #12–#17 已合并；PR #16 精确 head 与其后的 package-source main SHA 的 Windows CI 均通过。PR #17 closeout head `c64fcec2df3f6b5ed5a2fdaca5f2c89cc3488ee7` 的两条 Windows CI 和合并后 main SHA `33d2b847a402c8b842a1881af81956bcfa506b69` 的 Windows CI 也通过。PR #17 合并后 `main` 包含验收证据更新。发行包源码提交仍为 `f93060ba8039951e10a77264d79fa3fa8abeacf4`。该源码包括固定 GitHub Release 下载路径与重定向校验、Bearer/API token 日志脱敏及回归测试、多段 Range 处理，以及 Windows 使用说明修正。安全复审检查了重定向、CDN 限制、日志脱敏、Range/If-Range、multipart、304/416 与 alias 路由，未发现实质性问题。
 
-最终 v1.1.1 包以 `f93060ba8039951e10a77264d79fa3fa8abeacf4` 构建。EXE 为 99,969,008 字节，SHA-256 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`。精确包冒烟检查通过：启动、五张图集、28 个动作条目、原生探针和正常关闭。公开 [v1.1.1 Release](https://github.com/LYL-Z/clawd-desktop/releases/tag/v1.1.1) 于 2026-10-21 发布，target commit 为上述 `f93060…`；六个发行附件的 GitHub size/digest 与本地逐项一致。
+最终 v1.1.1 portable 包以 `f93060ba8039951e10a77264d79fa3fa8abeacf4` 构建。EXE 为 99,969,008 字节，SHA-256 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`。精确包冒烟检查通过：启动、五张图集、28 个动作条目、原生探针和正常关闭。公开 [v1.1.1 Release](https://github.com/LYL-Z/clawd-desktop/releases/tag/v1.1.1) 于 2026-10-21 发布，target commit 为上述 `f93060…`。随后补充的当前用户 NSIS 安装向导为 111,249,422 字节，SHA-256 `3318d9dbb4a40219198472a8f629a55b9ef1589ba8e0fb4ded473089a5e6ad17`；安装验证确认卸载注册项、开始菜单快捷方式及可见运行窗口正常，安装包 `app.asar` 与正式 portable 包一致。补充上传后，Release 共含七个附件，manifest 与 SHA256SUMS 记录所有可执行文件和用户资产的摘要。
 
 用户于 2026-10-21 明确废除完整 4 小时的发布门槛，并要求沿用先前约 1 小时的观察。先前记录实际为 3,481.287 秒（约 58 分 1 秒）、59 次样本，来自 1.1.0 候选，不是精确 60 分钟或 1.1.1 包。最终 1.1.1 包还有一轮普通模式进度记录：6,482 秒、109 个采样检查点；最后保存样本显示窗口响应、可见、探针在线。该轮按用户指示中断，只保存进度文件，没有完整结束报告或 `passed` 结论。详细边界见[1.1.1 稳定性记录](qa/2026-10-21-v1.1.1-windows-stability.md)。这两项都不记作 4 小时通过。
 

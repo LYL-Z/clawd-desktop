@@ -54,6 +54,7 @@ const assetSection = noteLines.slice(assetStart, nextHeading < 0 ? undefined : n
 const assetSectionText = assetSection.join('\n');
 for (const requiredAsset of [
   `Clawd-${version}-windows-x64.exe`,
+  `Clawd-${version}-Setup-windows-x64.exe`,
   'Clawd-Codex-V2.zip',
   'Clawd-dark-3840x2160.png',
   'Clawd-light-3840x2160.png',

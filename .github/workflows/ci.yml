@@ -64,6 +64,9 @@ jobs:
       - name: Package portable Windows x64 build
         run: npx electron-builder --win portable --x64 --publish never --config.directories.output=release/ci
 
+      - name: Package per-user NSIS Windows x64 installer
+        run: npx electron-builder --win nsis --x64 --publish never --config.directories.output=release/ci
+
       - name: Stage Codex pet and wallpaper assets
         run: node scripts/stage-release-assets.mjs release/ci
 

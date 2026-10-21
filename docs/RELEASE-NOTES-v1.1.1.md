@@ -30,8 +30,9 @@ Clawd 1.1.1 is a focused update-delivery patch for the 1.1.0 release. It directs
 
 ## 兼容性与升级
 
-- 从 1.1.0 升级无需迁移设置，仍为 Windows x64 portable EXE。下载后由用户手动运行，不自动关闭、安装或替换正在运行的程序。
-- Windows EXE 未签名。SHA-256 用于核验文件完整性，不证明发布者身份。
+- 从 1.1.0 升级无需迁移设置。Windows x64 同时提供 portable EXE 与当前用户 NSIS 安装向导。安装向导创建开始菜单快捷方式和 Windows 卸载项，不要求管理员权限，并沿用 `%APPDATA%\Clawd` 用户数据目录。
+- 内置更新器仍只提供 portable EXE，下载后由用户手动运行；不会自动关闭、安装或替换正在运行的程序。安装版用户应从 GitHub Release 下载 NSIS 向导进行升级。
+- Windows EXE 与 NSIS 安装向导未签名。SHA-256 用于核验文件完整性，不证明发布者身份。
 
 ## 验证范围
 
@@ -41,6 +42,7 @@ Clawd 1.1.1 is a focused update-delivery patch for the 1.1.0 release. It directs
 | 本地检查 | `npm run check`、`npm test`（55/55，其中 Worker 20 项）、`python -m unittest discover -s tests`（4/4）、`npm run build`、`npm run qa:probe` 和 Wrangler 4.151.2 dry-run 通过。 |
 | 安全复审 | 复核固定重定向与 CDN 限制、日志脱敏、Range/If-Range、multipart、304/416 和 alias 路由；未发现实质性安全问题。 |
 | 正式包冒烟 | `Clawd-1.1.1-windows-x64.exe` 启动、五张图集加载、28 个动作条目、原生探针及正常关闭检查通过。资产大小 99,969,008 字节；SHA-256 为 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`。 |
+| NSIS 安装验证 | 当前用户静默安装返回 0；Windows 卸载注册项、开始菜单快捷方式和安装路径均已核对。已安装的 1.1.1 进程及可见窗口通过检查；安装包内 `app.asar` 与正式 portable 包一致。最终按仓库发布配置重建的安装向导为 111,249,422 字节，SHA-256 为 `3318d9dbb4a40219198472a8f629a55b9ef1589ba8e0fb4ded473089a5e6ad17`；其 `app.asar` 与已安装验证包及正式 portable 包一致。 |
 | Windows 稳定性 | 用户于 2026-10-21 将完整 4 小时门槛改为沿用先前约 1 小时观察。原记录实际为 3,481.287 秒（58 分 1 秒）、59 次样本，来自 1.1.0 候选 SHA `9aff3f54b09f9b93be0706a06b29ecb24d7c305971441a0d0eaaeaa8b523e39f`，不是精确 60 分钟或 1.1.1 包。最终 1.1.1 包另有 6,482 秒、109 个采样检查点的普通模式中断观察；最后记录健康，但脚本未写出完整报告或 `passed` 结论。两份观察均不记作 4 小时通过。详情见[1.1.1 稳定性记录](qa/2026-10-21-v1.1.1-windows-stability.md)。 |
 | Worker 公网 | v1.1.1 发布后，metadata 返回 v1.1.1、99,969,008 字节及预期 SHA-256；Worker 完整下载返回 HTTP 200，下载后的 SHA-256 与本地 EXE 及 GitHub asset digest 相同。单字节 Range 为 206，越界 Range 为 416，HEAD 为 200；自定义域名 Range 请求先 307 至固定 workers.dev origin，再返回 206；带 query 为 400，未知路径为 404。 |
 
@@ -54,7 +56,7 @@ Clawd 1.1.1 is a focused update-delivery patch for the 1.1.0 release. It directs
 
 ## 发布文件与校验
 
-发行附件包括 `Clawd-1.1.1-windows-x64.exe`、`Clawd-Codex-V2.zip`、`Clawd-dark-3840x2160.png`、`Clawd-light-3840x2160.png`、`release-manifest-v1.1.1.json` 和 `SHA256SUMS.txt`。逐项大小与摘要以 manifest 和校验清单为准；manifest 自身由校验清单验证，不作递归自引用。
+发行附件包括 `Clawd-1.1.1-windows-x64.exe`、`Clawd-1.1.1-Setup-windows-x64.exe`、`Clawd-Codex-V2.zip`、`Clawd-dark-3840x2160.png`、`Clawd-light-3840x2160.png`、`release-manifest-v1.1.1.json` 和 `SHA256SUMS.txt`。逐项大小与摘要以 manifest 和校验清单为准；manifest 自身由校验清单验证，不作递归自引用。Worker 仍只查询和分发便携 EXE；NSIS 安装向导只作为 GitHub Release 附件提供。
 
 ## 构建溯源
 

@@ -6,6 +6,10 @@
 
 这是 1.1.0 的更新分发热修复版本。客户端改为通过 Clawd 专属 `workers.dev` 入口检查版本和下载，规避自定义域名 Worker 访问 GitHub API 时遇到的 HTTP 525。Worker 保留 Releases API 的版本与摘要校验，并通过严格校验的 `browser_download_url` 获取文件；GitHub Release 仍是唯一正式版本与文件来源，用户仍需主动检查、选择下载并手动运行。
 
+### 分发补充
+
+- v1.1.1 GitHub Release 现同时提供 Windows x64 便携版和当前用户 NSIS 安装向导。内置更新器仍只下载便携版；安装版用户可从 Release 下载 NSIS 向导升级。
+
 ### 修复
 
 - 调整更新边缘入口，避免通过更改区域级 TLS/后量子设置影响九霄或 GlassDesk。
@@ -47,4 +51,18 @@
 ### 构建溯源
 
 实际构建源码提交、发行附件大小与 SHA-256 以随 `v1.1.0` 发布的 `release-manifest-v1.1.0.json` 和 `SHA256SUMS.txt` 为准。manifest 在锁定精确源码提交后由正式打包流程生成，避免手工填写造成不一致。
+
+## [1.0.1] — 2026-10-18
+
+这是公开仓库首次提供当前源码快照与重新构建的 Windows x64 portable 程序。随包还提供 Codex V2 宠物文件，以及一个仅作历史下载保留的 1.0.0 二进制。
+
+### 验证与限制
+
+- 发行说明记录了 `npm run check`、8 项 Node 测试和 4 项 Python 回归测试通过；Windows 包使用 Electron 44.7.2 与 electron-builder 26.15.3 构建。
+- 程序未签名；自动检查不代表跨设备或长时间稳定性验收。
+- 随包的 1.0.0 二进制没有可用的原始源码快照，不是从 1.0.1 源码构建，也没有独立的 `v1.0.0` 源码标签。详见[1.0.1 版本说明](docs/RELEASE-NOTES-v1.0.1.md)和[1.0.0 历史二进制说明](docs/RELEASE-NOTES-v1.0.0.md)。
+
+### [1.0.0] 历史附件说明
+
+`Clawd-1.0.0-windows-x64.exe` 仅作为历史文件随 v1.0.1 Release 提供，不是独立源码 Release。原始源码快照不可用，无法可靠列出它的功能变化、修复或构建环境；不要将 v1.0.1 的源码或验证结果归到该二进制。详见[1.0.0 历史二进制说明](docs/RELEASE-NOTES-v1.0.0.md)。
 

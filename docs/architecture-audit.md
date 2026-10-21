@@ -74,7 +74,7 @@
 | OS 鼠标 QA | 透明区域实际点击至少一次穿透到下层隔离测试窗 | 后续实体点移动触发指针坐标偏差安全保护；角色点击、拖拽、抛掷和焦点未取得结论 |
 | GitHub Actions | PR #3 head `6e15f741ef25d88f37ed7ec5e71e376131e25678` 的两次 Windows CI 均通过 | 文档更新后的新 head 需重跑；托管 Windows Runner 不等于实机多屏/游戏验收 |
 
-最终 v1.1.1 Windows x64 portable EXE 为 99,969,008 bytes，SHA-256 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`，源码提交 `f93060ba8039951e10a77264d79fa3fa8abeacf4`。Codex V2 ZIP 为 6,167 bytes，SHA-256 `1fdea3cf9be79dc6303c96b009f617eed2dbb29b49e50ddce8290a60d737d704`；ZIP 仅含 `pet.json`、透明 `spritesheet.webp` 和安装/权利说明，QA 原始记录不随用户包发布。发行附件和各自摘要见 GitHub Release manifest 与 `SHA256SUMS.txt`。程序未签名，SHA-256 只校验完整性，不证明发布者身份。
+最终 v1.1.1 Windows x64 portable EXE 为 99,969,008 bytes，SHA-256 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`，源码提交 `f93060ba8039951e10a77264d79fa3fa8abeacf4`。随后补充的当前用户 NSIS 安装向导为 111,249,422 bytes，SHA-256 `3318d9dbb4a40219198472a8f629a55b9ef1589ba8e0fb4ded473089a5e6ad17`；安装验证确认 Windows 卸载项、开始菜单快捷方式和可见运行窗口，包内 `app.asar` 与正式 portable 包相同。Codex V2 ZIP 为 6,167 bytes，SHA-256 `1fdea3cf9be79dc6303c96b009f617eed2dbb29b49e50ddce8290a60d737d704`；ZIP 仅含 `pet.json`、透明 `spritesheet.webp` 和安装/权利说明，QA 原始记录不随用户包发布。发行附件和各自摘要见 GitHub Release manifest 与 `SHA256SUMS.txt`。程序与安装向导未签名，SHA-256 只校验完整性，不证明发布者身份。
 
 ## 更新分发状态与隔离
 

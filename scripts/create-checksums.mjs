@@ -9,6 +9,7 @@ const version=pkg.version;
 const currentExecutable=`Clawd-${version}-windows-x64.exe`;
 const approved=new Set([
   currentExecutable,
+  `Clawd-${version}-Setup-windows-x64.exe`,
   'Clawd-Codex-V2.zip',
   'Clawd-dark-3840x2160.png',
   'Clawd-light-3840x2160.png',
