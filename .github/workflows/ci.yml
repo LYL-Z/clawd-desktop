@@ -5,6 +5,16 @@ on:
     branches: [main, "codex/**"]
   pull_request:
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: Publish the built installer to an existing stable release
+        required: true
+        default: false
+        type: boolean
+      release_tag:
+        description: Existing stable tag matching package.json (for example v1.1.1)
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -83,3 +93,85 @@ jobs:
           path: release/ci/
           if-no-files-found: error
           retention-days: 14
+
+  publish-release-installer:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_release == true && github.ref == 'refs/heads/main'
+    needs: windows-build
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Check out main source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download the exact-SHA Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: clawd-windows-${{ github.sha }}
+          path: release/ci
+
+      - name: Validate tag and existing release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          if ($env:GITHUB_REF -ne 'refs/heads/main') { throw 'Release publishing is allowed only from main.' }
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ($env:RELEASE_TAG -ne "v$version") { throw 'The requested release tag must match package.json.' }
+          $release = gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json tagName,isDraft,isPrerelease | ConvertFrom-Json
+          if ($release.tagName -ne $env:RELEASE_TAG -or $release.isDraft -or $release.isPrerelease) { throw 'The target must be an existing stable release.' }
+
+      - name: Download current release assets
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: gh release download $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --dir release/publish
+
+      - name: Add installer and regenerate provenance files
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $installer = "Clawd-$version-Setup-windows-x64.exe"
+          Copy-Item -LiteralPath "release/ci/$installer" -Destination "release/publish/$installer" -Force
+          node scripts/update-release-installer-manifest.mjs release/publish $env:GITHUB_SHA
+          node scripts/create-checksums.mjs release/publish
+
+      - name: Publish installer and updated provenance
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $installer = "release/publish/Clawd-$version-Setup-windows-x64.exe"
+          $manifest = "release/publish/release-manifest-v$version.json"
+          $checksums = 'release/publish/SHA256SUMS.txt'
+          gh release upload $env:RELEASE_TAG $installer $manifest $checksums --repo $env:GITHUB_REPOSITORY --clobber
+          gh release edit $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --notes-file "docs/RELEASE-NOTES-v$version.md"
+
+      - name: Verify published asset digests
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          $names = @("Clawd-$version-Setup-windows-x64.exe", "release-manifest-v$version.json", 'SHA256SUMS.txt')
+          $release = gh release view $env:RELEASE_TAG --repo $env:GITHUB_REPOSITORY --json assets | ConvertFrom-Json
+          foreach ($name in $names) {
+            $path = Join-Path 'release/publish' $name
+            $localHash = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+            $localSize = (Get-Item -LiteralPath $path).Length
+            $remote = @($release.assets | Where-Object name -eq $name)
+            if ($remote.Count -ne 1 -or $remote[0].size -ne $localSize -or $remote[0].digest -ne "sha256:$localHash") {
+              throw "Remote release asset did not match local size and SHA-256: $name"
+            }
+          }

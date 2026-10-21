@@ -8,7 +8,7 @@
   "main": "app/main.cjs",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "tsc --noEmit && node --check scripts/create-release-manifest.mjs && node --check scripts/stage-release-assets.mjs && node --check scripts/verify-release-notes.mjs && node --check scripts/create-checksums.mjs && npm run verify:release-notes",
+    "check": "tsc --noEmit && node --check scripts/create-release-manifest.mjs && node --check scripts/stage-release-assets.mjs && node --check scripts/verify-release-notes.mjs && node --check scripts/create-checksums.mjs && node --check scripts/update-release-installer-manifest.mjs && npm run verify:release-notes",
     "verify:release-notes": "node scripts/verify-release-notes.mjs",
     "test": "node --import tsx --test tests/*.test.ts tests/*.test.mjs",
     "qa:probe": "node --import tsx scripts/qa-probe.mjs",
