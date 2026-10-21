@@ -70,17 +70,17 @@
 | Electron 动作剧场 QA | 打包 `app.asar` 通过：28 动作×3 阶段、16 向、8 衣柜项、4 场演出及离线重载 | 直接用便携自解压 EXE 启动 Playwright 超时；改用同候选包 `win-unpacked\Clawd.exe` 运行，便携 wrapper 另以启动/退出冒烟通过 |
 | 便携 EXE QA | 通过，五张图集加载、探针可用、应用与启动器均正常退出 | 候选包 SHA-256 与包内启动路径记录在运行报告 |
 | 隐藏状态性能 QA | 302.9 秒：CPU 全机归一化平均 0.056%，进程树私有内存平均 241.3 MiB、峰值 246.3 MiB；无页面错误 | 通过 Clawd 可见性控制器设置 user-hidden；不等于 30 分钟一般使用或 4/24 小时稳定性 |
-| 普通模式长稳 QA | 2026-10-20 候选运行 1,800 秒/61 次采样通过；平均归一化 CPU 0.639%，进程树私有内存均值 259.3 MiB、峰值 264.8 MiB；无异常诊断 | 单台 Windows x64 主机；随后四小时观察于 3,481 秒/59 次样本按用户要求停止，未完成 |
+| 普通模式长稳 QA | 先前 1.1.0 候选记录为 3,481.287 秒/59 次样本；用户于 2026-10-21 将 4 小时门槛改为沿用这份约 1 小时观察。最终 1.1.1 包另有 6,482 秒/109 检查点进度记录，最后保存样本响应、可见且探针在线 | 最终包观察被中断且未生成完整结束报告，不记录为完整 QA pass；详情见 `docs/qa/2026-10-21-v1.1.1-windows-stability.md` |
 | OS 鼠标 QA | 透明区域实际点击至少一次穿透到下层隔离测试窗 | 后续实体点移动触发指针坐标偏差安全保护；角色点击、拖拽、抛掷和焦点未取得结论 |
 | GitHub Actions | PR #3 head `6e15f741ef25d88f37ed7ec5e71e376131e25678` 的两次 Windows CI 均通过 | 文档更新后的新 head 需重跑；托管 Windows Runner 不等于实机多屏/游戏验收 |
 
-当前本地候选资产（尚未提交到 Git）：Windows x64 portable EXE 99,966,917 bytes，SHA-256 `9aff3f54b09f9b93be0706a06b29ecb24d7c305971441a0d0eaaeaa8b523e39f`；Codex V2 ZIP 6,167 bytes，SHA-256 `1fdea3cf9be79dc6303c96b009f617eed2dbb29b49e50ddce8290a60d737d704`。Codex ZIP 仅含 `pet.json`、透明 `spritesheet.webp` 和安装/权利说明；QA 原始记录留在本机生成目录，不随用户包发布。另含浅色与深色壁纸，全部摘要见候选目录 `SHA256SUMS.txt`。程序未签名，SHA-256 只检查文件与清单一致，不是发布者签名。
+最终 v1.1.1 Windows x64 portable EXE 为 99,969,008 bytes，SHA-256 `b5ee0f56972a3759a6a709afcd8cc5b1d0b37cd84704e868a307a53cab811fa5`，源码提交 `f93060ba8039951e10a77264d79fa3fa8abeacf4`。Codex V2 ZIP 为 6,167 bytes，SHA-256 `1fdea3cf9be79dc6303c96b009f617eed2dbb29b49e50ddce8290a60d737d704`；ZIP 仅含 `pet.json`、透明 `spritesheet.webp` 和安装/权利说明，QA 原始记录不随用户包发布。发行附件和各自摘要见 GitHub Release manifest 与 `SHA256SUMS.txt`。程序未签名，SHA-256 只校验完整性，不证明发布者身份。
 
 ## 更新分发状态与隔离
 
 更新器只由用户触发，支持 latest Release 检查、明确同意后选择下载、HTTP Range 续传、固定仓库 URL 限制、长度及 SHA-256 校验和失败后 GitHub 源回退。更新不会自动执行、安装或替换正在运行的 EXE。
 
-Worker 源码与配置只指向独立服务 `clawd-updates` 和 `clawd-updates.chronokalamos.com`；没有修改其他项目的 DNS、Worker、路由或资源。此前只读检查未发现精确目标冲突，但未部署 Worker、未验证公网 DNS/HTTPS/大文件/中国运营商可达。账户计费状态无法读取，因此为遵守零新增费用边界保持未部署。Cloudflare China Network 要求 Enterprise 及单独订阅和 ICP 等手续，不在零费用承诺范围内。
+Clawd 更新 Worker `clawd-updates` 已部署，版本 ID `77e92a01-7b3f-488e-83f3-1b540ff4b91c`；自定义域名与 `clawd-updates.3507103376.workers.dev` healthz 均返回 200。2026-10-21 发布 v1.1.1 前复验中，workers.dev metadata 返回 200 和当时公开的 v1.1.0；自定义域名 metadata 依设计返回 307 至固定 workers.dev origin。没有改动区域级 TLS/PQ、九霄、GlassDesk、DNS 或其他 Worker。用户报告 Workers Free，但 OAuth 无 Billing Read，套餐及额度余量未独立核实；未新增付费资源。中国境内网络可达性仍未实测。
 
 ## 尚未验收的硬性设备场景
 
@@ -88,7 +88,7 @@ Worker 源码与配置只指向独立服务 `clawd-updates` 和 `clawd-updates.c
 2. 游戏切分辨率、主副屏不等高/上下排列/负坐标、混合 DPI 100/125/150/175/200%、副屏全屏、热插拔与休眠后显示器编号变化。
 3. 实际焦点不抢占、透明区鼠标穿透、托盘手动隐藏/恢复、Windows 锁屏/解锁/休眠。
 4. 注入 Renderer/原生探针异常并确认恢复、退出不留子进程。
-5. 当前候选已完成 30 分钟普通模式单机采样；4 小时观察运行 3,481 秒后按用户要求停止，不算通过。尚待完整 4 小时稳定性、故障注入及条件允许时 24 小时长测；旧版 182 秒数字不是本轮结果。
-6. 中国境内多运营商/线路的真实更新下载；公网 Worker 还未部署。
+5. 长稳门槛已按用户 2026-10-21 明确指示从 4 小时调整为沿用此前约 1 小时观察。先前记录为 3,481.287 秒；最终 1.1.1 包另有 6,482 秒中断观察，但未生成完整结束报告。故障注入与条件允许时的 24 小时观察仍未执行；见稳定性记录。
+6. 中国境内多运营商/线路的真实更新下载仍未实测；全球公网 Worker 已部署并完成海外公网 endpoint 检查。
 
 任务书第十四章 P2 明确要求在核心质量完成后再评估，故场景预设、天气主题、更多任务桥扩展和独立动作制作工具不阻塞本轮核心；任务书第六章中“建议”的全量主题、设置导入导出和 per-display 偏好也不应误写为已完成。十五项场景和具体设备记录见 [任务书完成度与验收记录](taskbook-2.0-completion.md)。

@@ -2,7 +2,7 @@
 
 **同一套 Claude / Clawd 衍生陶土像素身体，既是 Codex 本地宠物图集，也是拥有独立互动系统的 Windows 桌面小蟹。**
 
-![Version 1.1.0](https://img.shields.io/badge/version-1.1.0-d97757)
+![Version 1.1.1](https://img.shields.io/badge/version-1.1.1-d97757)
 ![Windows x64](https://img.shields.io/badge/platform-Windows%20x64-0078D4)
 ![Electron 44.7.2](https://img.shields.io/badge/Electron-44.7.2-47848F)
 ![TypeScript 7.0.2](https://img.shields.io/badge/TypeScript-7.0.2-3178C6)
@@ -13,7 +13,7 @@
 
 Clawd 是本地 Claude / Clawd 粉丝作品，非 Anthropic 或 OpenAI 官方产品，未获其背书。仓库按用户要求公开可见；公开可见不代表获得再分发或商用许可。请先阅读 [LICENSE.md](LICENSE.md) 与[元素来源记录](docs/element-provenance.md)。
 
-> **版本边界：**源码按 1.1.0 维护；公开版本、可下载资产和校验值以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases) 为准。本仓库从 1.0.1 开始记录 Git 历史，不会把新源码伪标为 1.0.0；更早的 1.0.0 便携包不代表当前源码。
+> **版本边界：**当前源码按 1.1.1 维护；公开版本、可下载资产和校验值以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases) 为准。本仓库从 1.0.1 开始记录 Git 历史，不会把新源码伪标为 1.0.0；更早的 1.0.0 便携包不代表当前源码。
 
 ## 一、项目概览
 
@@ -124,7 +124,7 @@ flowchart LR
 
 在一台 Windows x64 设备上约 182 秒空闲采样：平均 CPU 0.50%，进程树私有内存平均 239.2 MiB、峰值 244.9 MiB。该样本不是跨设备基准，不能证明小时级稳定或无内存泄漏；不同长度的旧采样不用于宣称性能提升比例。
 
-仓库内的验收记录见[任务书完成度与验收记录](docs/taskbook-2.0-completion.md)。当前代码新增专注应用隐藏规则、安静模式、可配置双击、自主行为频率、显示器/DPI 环境变化处理、脱敏诊断预览与导出。自动化验证包括 Node 逻辑/服务测试、Python 图像测试、TypeScript 类型检查、Windows Electron/C# 构建、探针启动、软件 DPR/角色尺寸/服饰/动作布局 QA 与便携包启动。实际数量和 exact-SHA CI 结果以发布记录为准。2026-10-20，1.1.0 候选在单台 Windows x64 主机完成 1,800 秒普通模式采样（61 次样本，脚本判定通过）；随后 4 小时观察按用户要求在 3,481 秒/59 次样本时停止，记录为未完成，不算 4 小时通过。真实游戏、物理多屏/混合 DPI/热插拔、焦点、锁屏/恢复及跨设备稳定性仍需目标环境验收。
+仓库内的验收记录见[任务书完成度与验收记录](docs/taskbook-2.0-completion.md)。当前代码新增专注应用隐藏规则、安静模式、可配置双击、自主行为频率、显示器/DPI 环境变化处理、脱敏诊断预览与导出。自动化验证包括 Node 逻辑/服务测试、Python 图像测试、TypeScript 类型检查、Windows Electron/C# 构建、探针启动、软件 DPR/角色尺寸/服饰/动作布局 QA 与便携包启动。实际数量和 exact-SHA CI 结果以发布记录为准。2026-10-20，1.1.0 候选在单台 Windows x64 主机完成 1,800 秒普通模式采样（61 次样本，脚本判定通过）；同日长测实际运行 3,481.287 秒（约 58 分 1 秒）。用户于 2026-10-21 将 4 小时门槛改为沿用此前约 1 小时观察。最终 1.1.1 包另有 6,482 秒中断观察，最后保存样本窗口响应、桌面可见、探针在线；没有完整报告或 `passed` 结论。见[稳定性记录](docs/qa/2026-10-21-v1.1.1-windows-stability.md)。真实游戏、物理多屏/混合 DPI/热插拔、焦点、锁屏/恢复及跨设备稳定性仍需目标环境验收。
 
 ## 八、快速开始
 
@@ -197,7 +197,7 @@ Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，
 
 ## 十三、治理与路线图
 
-当前为个人维护的公开可见项目，无外部贡献者等级、公开支持 SLA、社区会议或赞助渠道。PR #2 的精确 SHA Windows CI 已通过并合并。用户报告 15 项目标设备验收通过；本项目未独立收集逐项设备记录。本机 30 分钟普通模式采样已通过；4 小时测试在用户要求停止后记录为 58 分 1 秒的部分观察，不计为通过。1.1.0 正式 Release 尚待发布。仓库没有通用开源或再分发许可；GitHub 上查看与 fork 受 GitHub 服务条款约束，其他用途未获授权。
+当前为个人维护的公开可见项目，无外部贡献者等级、公开支持 SLA、社区会议或赞助渠道。PR #16 的精确 SHA Windows CI 和合并后 `main` CI 均通过。用户报告 15 项目标设备验收通过；本项目未独立收集逐项设备记录。1.1.0 已正式发布，1.1.1 发布状态与下载附件以 [GitHub Releases](https://github.com/LYL-Z/clawd-desktop/releases) 为准。仓库没有通用开源或再分发许可；GitHub 上查看与 fork 受 GitHub 服务条款约束，其他用途未获授权。
 
 ## 十四、架构决策记录（ADR）
 
@@ -213,7 +213,7 @@ Codex V2 包为 Clawd-Codex-V2.zip。可在 Codex 宠物设置中手动选择，
 
 ## 十五、生态、案例与局限
 
-只维护 Windows 桌宠、Codex 本地宠物包与静态壁纸；没有容器镜像、Helm、第三方插件或 SDK。仓库包含独立 Clawd 更新 Worker 源码；截至本版本文档生成时尚未部署，边缘入口需要完成发布后公网验收。用户报告目标设备 15 项场景验收通过，但没有逐项记录；本机 30 分钟普通模式采样已通过，4 小时稳定性测试只完成 58 分 1 秒/59 次采样，按用户要求停止，未达到完整门槛。尚无企业生产案例。Windows x64 开发机和一次 Codex Mini 使用体验不能代表所有设备或宿主版本。
+只维护 Windows 桌宠、Codex 本地宠物包与静态壁纸；没有容器镜像、Helm、第三方插件或 SDK。Clawd 更新 Worker 已部署到专属 `workers.dev` 与兼容域名；上线范围和公网证据见[更新分发说明](docs/update-delivery.md)。用户报告目标设备 15 项场景验收通过，但没有逐项记录；长稳观察按 2026-10-21 的用户指示采用先前约 1 小时记录，具体时长、版本和边界见[稳定性记录](docs/qa/2026-10-21-v1.1.1-windows-stability.md)。尚无企业生产案例。Windows x64 开发机和一次 Codex Mini 使用体验不能代表所有设备或宿主版本。
 
 ## 十六、许可证与致谢
 
